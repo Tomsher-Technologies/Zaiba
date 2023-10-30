@@ -1,0 +1,10 @@
+/*your custom css goes here*/
+
+.logo-custom{
+    height: 70px !important;
+    width: 170px !important;
+}
+
+.radius-50{
+    border-radius: 50px !important;
+}
