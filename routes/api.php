@@ -15,6 +15,10 @@ use App\Http\Controllers\ApiController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::options('{any}', function () {
+    return response('', 200);
+})->where('any', '.*');
+
 Route::group(['prefix' => 'auth'], function ($router) {
     Route::get('/countries', [ApiController::class, 'getCountries'])->name('countries');
     Route::get('/state/{country_id?}', [ApiController::class, 'getCountryStates'])->name('state');
@@ -23,6 +27,7 @@ Route::group(['prefix' => 'auth'], function ($router) {
 });
 
 Route::group(['middleware' => 'api','prefix' => 'auth'], function ($router) {
+    
     Route::post('/login', [ApiAuthController::class, 'login'])->name('login');
     Route::post('/otp-login', [ApiAuthController::class, 'loginWithOTP'])->name('otp-login');
     Route::post('/register', [ApiAuthController::class, 'signup'])->name('register');
