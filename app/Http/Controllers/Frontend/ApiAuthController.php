@@ -66,14 +66,15 @@ class ApiAuthController extends Controller
             <p>We look forward to serving you and being a part of your jewelry story. Happy shopping, and here's to a world adorned with your unique elegance!</p>"
         ];
        
-        \Mail::to($request->email)->send(new \App\Mail\SendMail($details));
+        // \Mail::to($request->email)->send(new \App\Mail\SendMail($details));
 
         $otp = generateOTP($user);
 
         $data['message'] = generateOTPMessage($user->name, $otp['otp']); 
         $data['phone'] = $user->phone_number;
         
-        $sendStatus = sendOTP($data);
+        // $sendStatus = sendOTP($data);
+        $sendStatus = true;
 
         $customer = new Customer;
         $customer->user_id = $user->id;
@@ -133,7 +134,8 @@ class ApiAuthController extends Controller
             $data['message'] = generateOTPMessage($user->name, $otp['otp']); 
             $data['phone'] = $phone;
 
-            $sendStatus = sendOTP($data);
+            // $sendStatus = sendOTP($data);
+            $sendStatus = true;
             return response()->json([
                                 'status' => true,
                                 'message' => translate('An OTP has been sent to the provided mobile number. Please check your messages.'),
@@ -180,7 +182,8 @@ class ApiAuthController extends Controller
             $data['message'] = generateOTPMessage($user->name, $otp['otp']); 
             $data['phone'] = $user->phone;
 
-            $sendStatus = sendOTP($data);
+            // $sendStatus = sendOTP($data);
+            $sendStatus = true;
             return response()->json([
                                 'status' => true,
                                 'message' => translate('An OTP has been resend sent to the provided mobile number. Please check your messages.'),
