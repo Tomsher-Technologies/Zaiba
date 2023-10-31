@@ -33,8 +33,14 @@ class ApiAuthController extends Controller
                 return response()->json(['status' => false, 'message' => 'Please make sure that you fill out all the required fields..', 'data' => []  ], 200);
             }else{
                 $errors = $validator->errors();
+                if ($errors->has('name')) {
+                    return response()->json(['status' => false, 'message' => $errors->first('name'), 'data' => []  ], 200);
+                }
                 if ($errors->has('email')) {
                     return response()->json(['status' => false, 'message' => $errors->first('email'), 'data' => []  ], 200);
+                }
+                if ($errors->has('password')) {
+                    return response()->json(['status' => false, 'message' => $errors->first('password'), 'data' => []  ], 200);
                 }
                 if ($errors->has('phone_number')) {
                     return response()->json(['status' => false, 'message' => $errors->first('phone_number'), 'data' => []  ], 200);
