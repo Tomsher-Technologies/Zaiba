@@ -71,9 +71,9 @@ class ApiAuthController extends Controller
         $otp = generateOTP($user);
 
         $data['message'] = generateOTPMessage($user->name, $otp['otp']); 
-        $data['phone'] = $user->phone_number;
-        
-        $sendStatus = sendOTP($data);
+        $data['phone'] = $user->phone;
+       
+        $sendStatus = sendOTP($data); 
         $sendStatus = true;
 
         $customer = new Customer;
@@ -133,7 +133,6 @@ class ApiAuthController extends Controller
 
             $data['message'] = generateOTPMessage($user->name, $otp['otp']); 
             $data['phone'] = $phone;
-
             $sendStatus = sendOTP($data);
             $sendStatus = true;
             return response()->json([
