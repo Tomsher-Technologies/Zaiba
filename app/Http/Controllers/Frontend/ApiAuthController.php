@@ -96,7 +96,7 @@ class ApiAuthController extends Controller
             if (Hash::check($password, $user->password)) {
                 return $this->loginSuccess($user);
             } else {
-                return response()->json(['status' => false, 'message' => translate('Unauthorized'),'data' => []], 200);
+                return response()->json(['status' => false, 'message' => 'Incorrect password.','data' => []], 200);
             }
         } else {
             return response()->json(['status' => false, 'message' => translate('User not found'), 'data' => []], 200);
