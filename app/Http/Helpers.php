@@ -1194,18 +1194,20 @@ if (!function_exists('load_seo_tags')) {
     //     return $html;
     // }
 
-    function generateOTP($user){
-        $data['otp'] = rand(1000,9999);
+    function generateOTP($user)
+    {
+        $data['otp'] = rand(1000, 9999);
         $data['otp_expiry'] = Carbon::now()->addMinutes(10);
-        
+
         $user->otp = $data['otp'];
         $user->otp_expiry = $data['otp_expiry'];
-        $user->save(); 
+        $user->save();
 
         return $data;
     }
 
-    function sendOTP($data){
+    function sendOTP($data)
+    {
         $messages = urlencode($data['message']);
         $sender = urlencode("TOMSHER");
         $curl = curl_init();
@@ -1216,26 +1218,148 @@ if (!function_exists('load_seo_tags')) {
         return $result;
     }
 
-    function verifyUserOTP($user, $otp){
+    function verifyUserOTP($user, $otp)
+    {
         $dbOtp = $user->otp;
         $otp_expiry = $user->otp_expiry;
 
-        if($dbOtp === $otp && strtotime($otp_expiry) > time()) {
+        if ($dbOtp === $otp && strtotime($otp_expiry) > time()) {
             $user->is_phone_verified = 1;
             $user->save();
             return true; // Verification successful
-        }else{
+        } else {
             return false;
         }
     }
 
-    function generateOTPMessage($userName, $otp){
+    function generateOTPMessage($userName, $otp)
+    {
         // $data['message'] = "Hello ".$user->name.",
         // Your One-Time Password (OTP) is: ".$otp.".
         // This OTP is valid for 10 minutes. For security reasons, do not share it with anyone.
         // Thank you for choosing ".env('APP_NAME').".";
 
-        $message = "Hi ".$userName.", Greetings from Farook! Your OTP: ".$otp." Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.";
+        $message = "Hi " . $userName . ", Greetings from Farook! Your OTP: " . $otp . " Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.";
         return $message;
+    }
+
+    function getUser()
+    {
+
+        $user = array(
+            'users_id_type' => 'temp_user_id',
+            'users_id' => null
+        );
+
+        if (auth('sanctum')->user()) {
+            $user = array(
+                'users_id_type' => 'user_id',
+                'users_id' => auth('sanctum')->user()->id
+            );
+        } else {
+            $user = array(
+                'users_id_type' => 'temp_user_id',
+                'users_id' => request()->header('UserToken')
+            );
+        }
+
+        return $user;
+    }
+
+    function getProductIdFromSlug($slug)
+    {
+        if ($slug != null) {
+            $product = Product::where('slug', $slug)->pluck('id')->first();
+            return $product;
+        }
+        return null;
+    }
+
+    function getProductOfferPrice($product)
+    {
+
+        $data["original_price"] = $product->unit_price;
+
+
+        $discountPrice = $product->unit_price;
+
+        // $allOffers = Offers::whereRaw('(now() between start_date and end_date)')->where('status',1)->get();
+
+        // print_r($data);
+
+        $offertag = $offer_type = '';
+        $x = $y = 0;
+
+        // die;
+        // DB::enableQueryLog();
+        $prodOffer = Offers::whereJsonContains('link_id', (string) $product->id)
+            ->whereRaw('(now() between start_date and end_date)')
+            ->where('link_type', 'product')->orderBy('id', 'desc')->skip(0)->take(1)->get();
+        // print_r($prodOffer);
+        if (empty($prodOffer[0])) {
+            // echo 'no product offer';
+            $brandOffer = Offers::whereJsonContains('link_id', (string) $product->brand_id)
+                ->whereRaw('(now() between start_date and end_date)')
+                ->where('category_id', $product->main_category)
+                ->where('link_type', 'category')->orderBy('id', 'desc')->skip(0)->take(1)->get();
+            // print_r($brandOffer);
+            if (empty($brandOffer[0])) {
+                $tax = 0;
+
+                $discount_applicable = false;
+
+                if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
+                    $discount_applicable = true;
+                }
+
+                if ($discount_applicable) {
+                    if ($product->discount_type == 'percent') {
+                        $discountPrice -= ($discountPrice * $product->discount) / 100;
+                        $offertag = $product->discount . '% OFF';
+                    } elseif ($product->discount_type == 'amount') {
+                        $discountPrice -= $product->discount;
+                        $offertag = 'AED ' . $product->discount . ' OFF';
+                    }
+                }
+            } else {
+                $offer_type = $brandOffer[0]->offer_type;
+                if ($brandOffer[0]->offer_type == 'amount_off') {
+                    $discountPrice -= $brandOffer[0]->offer_amount;
+                    $offertag = 'AED ' . $brandOffer[0]->offer_amount . ' OFF';
+                } elseif ($brandOffer[0]->offer_type == 'percentage') {
+                    $discountPrice -= ($discountPrice * $brandOffer[0]->percentage) / 100;
+                    $offertag = $brandOffer[0]->percentage . '% OFF';
+                } elseif ($brandOffer[0]->offer_type == 'buy_x_get_y') {
+                    $offertag = 'BUY ' . $brandOffer[0]->buy_amount . ' GET ' . $brandOffer[0]->get_amount;
+                    $x = $brandOffer[0]->buy_amount;
+                    $y = $brandOffer[0]->get_amount;
+                }
+            }
+        } else {
+            $offer_type = $prodOffer[0]->offer_type;
+            if ($prodOffer[0]->offer_type == 'amount_off') {
+                $discountPrice -= $prodOffer[0]->offer_amount;
+                $offertag = 'AED ' . $prodOffer[0]->offer_amount . ' OFF';
+            } elseif ($prodOffer[0]->offer_type == 'percentage') {
+                $discountPrice -= ($discountPrice * $prodOffer[0]->percentage) / 100;
+                $offertag = $prodOffer[0]->percentage . '% OFF';
+            } elseif ($prodOffer[0]->offer_type == 'buy_x_get_y') {
+                $offertag = 'BUY ' . $prodOffer[0]->buy_amount . ' GET ' . $prodOffer[0]->get_amount;
+                $x = $prodOffer[0]->buy_amount;
+                $y = $prodOffer[0]->get_amount;
+            }
+        }
+        // echo '      Price After Discount = '.$discountPrice;
+
+        $data["discounted_price"] = $discountPrice;
+        $data["offer_tag"] = $offertag;
+        $data["offer_type"] = $offer_type;
+        $data["x"] = $x;
+        $data["y"] = $y;
+
+        // print_r($data);
+        // die;
+        // dd(DB::getQueryLog());
+        return $data;
     }
 }

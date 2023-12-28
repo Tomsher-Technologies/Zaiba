@@ -21,7 +21,6 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
-        \Fruitcake\Cors\HandleCors::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class
