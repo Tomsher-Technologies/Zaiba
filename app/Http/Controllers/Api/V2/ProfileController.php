@@ -20,6 +20,35 @@ use Storage;
 
 class ProfileController extends Controller
 {
+
+    public function getUserAccountInfo()
+    {
+        $user_id = (!empty(auth('sanctum')->user())) ? auth('sanctum')->user()->id : '';
+        $user = User::find($user_id);
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found'
+            ]);
+        } else {
+            $data = [
+                "id" => $user->id,
+                "user_type" => $user->user_type,
+                "name"  => $user->name,
+                "email" => $user->email,
+                "phone" => $user->phone ?? "",
+                "wallet" => $user->wallet,
+                "phone_verified" => $user->phone_verified,
+                "created_at" => $user->created_at,
+            ];
+            return response()->json([
+                'status' => true,
+                'message' => 'User found',
+                'data' => $data
+            ]);
+        }
+    }
+
     public function counters()
     {
         return response()->json([
@@ -32,7 +61,7 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = User::find(auth()->user()->id);
-        if(!$user){
+        if (!$user) {
             return response()->json([
                 'result' => false,
                 'message' => translate("User not found.")
@@ -55,7 +84,7 @@ class ProfileController extends Controller
     public function update_device_token(Request $request)
     {
         $user = User::find(auth()->user()->id);
-        if(!$user){
+        if (!$user) {
             return response()->json([
                 'result' => false,
                 'message' => translate("User not found.")
@@ -76,7 +105,7 @@ class ProfileController extends Controller
     public function updateImage(Request $request)
     {
         $user = User::find(auth()->user()->id);
-        if(!$user){
+        if (!$user) {
             return response()->json([
                 'result' => false,
                 'message' => translate("User not found."),
@@ -188,7 +217,7 @@ class ProfileController extends Controller
     public function imageUpload(Request $request)
     {
         $user = User::find(auth()->user()->id);
-        if(!$user){
+        if (!$user) {
             return response()->json([
                 'result' => false,
                 'message' => translate("User not found."),

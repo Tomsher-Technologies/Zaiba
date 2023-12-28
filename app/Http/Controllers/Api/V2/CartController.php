@@ -30,7 +30,7 @@ class CartController extends Controller
 
         $sum = 0.00;
         $subtotal = 0.00;
-        $tax = 0.00;       
+        $tax = 0.00;
         foreach ($items as $cartItem) {
             $item_sum = 0.00;
             $item_sum += ($cartItem->price + $cartItem->tax) * $cartItem->quantity;

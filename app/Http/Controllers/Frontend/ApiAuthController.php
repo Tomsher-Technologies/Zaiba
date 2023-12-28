@@ -30,22 +30,16 @@ class ApiAuthController extends Controller
         ]);
         if($validator->fails()){
             if($request->name == '' || $request->email == '' || $request->password == '' || $request->phone_number == ''){
-                return response()->json(['status' => false, 'message' => 'Please make sure that you fill out all the required fields..', 'data' => []  ], 200);
+                return response()->json(['status' => false, 'message' => 'Please make sure that you fill out all the required fields..', 'data' => []  ], 400);
             }else{
                 $errors = $validator->errors();
-                if ($errors->has('name')) {
-                    return response()->json(['status' => false, 'message' => $errors->first('name'), 'data' => []  ], 200);
-                }
                 if ($errors->has('email')) {
-                    return response()->json(['status' => false, 'message' => $errors->first('email'), 'data' => []  ], 200);
-                }
-                if ($errors->has('password')) {
-                    return response()->json(['status' => false, 'message' => $errors->first('password'), 'data' => []  ], 200);
+                    return response()->json(['status' => false, 'message' => $errors->first('email'), 'data' => []  ], 400);
                 }
                 if ($errors->has('phone_number')) {
-                    return response()->json(['status' => false, 'message' => $errors->first('phone_number'), 'data' => []  ], 200);
+                    return response()->json(['status' => false, 'message' => $errors->first('phone_number'), 'data' => []  ], 400);
                 }
-                return response()->json(['status' => false, 'message' => 'Something went wrong', 'data' => []  ], 200);
+                return response()->json(['status' => false, 'message' => 'Something went wrong', 'data' => []  ], 400);
             }
         }
 
@@ -66,15 +60,14 @@ class ApiAuthController extends Controller
             <p>We look forward to serving you and being a part of your jewelry story. Happy shopping, and here's to a world adorned with your unique elegance!</p>"
         ];
        
-        // \Mail::to($request->email)->send(new \App\Mail\SendMail($details));
+        \Mail::to($request->email)->send(new \App\Mail\SendMail($details));
 
         $otp = generateOTP($user);
 
         $data['message'] = generateOTPMessage($user->name, $otp['otp']); 
-        $data['phone'] = $user->phone;
-       
-        $sendStatus = sendOTP($data); 
-        $sendStatus = true;
+        $data['phone'] = $user->phone_number;
+        
+        $sendStatus = sendOTP($data);
 
         $customer = new Customer;
         $customer->user_id = $user->id;
@@ -96,10 +89,10 @@ class ApiAuthController extends Controller
             if (Hash::check($password, $user->password)) {
                 return $this->loginSuccess($user);
             } else {
-                return response()->json(['status' => false, 'message' => 'Incorrect password.','data' => []], 200);
+                return response()->json(['status' => false, 'message' => translate('Unauthorized'),'data' => []], 401);
             }
         } else {
-            return response()->json(['status' => false, 'message' => translate('User not found'), 'data' => []], 200);
+            return response()->json(['status' => false, 'message' => translate('User not found'), 'data' => []], 401);
         }
     }
 
@@ -121,7 +114,7 @@ class ApiAuthController extends Controller
                 'avatar_original' => api_asset($user->avatar_original),
                 'phone' => $user->phone
             ]
-        ],200);
+        ]);
     }
 
     public function loginWithOTP(Request $request){
@@ -133,8 +126,8 @@ class ApiAuthController extends Controller
 
             $data['message'] = generateOTPMessage($user->name, $otp['otp']); 
             $data['phone'] = $phone;
+
             $sendStatus = sendOTP($data);
-            $sendStatus = true;
             return response()->json([
                                 'status' => true,
                                 'message' => translate('An OTP has been sent to the provided mobile number. Please check your messages.'),
@@ -145,7 +138,7 @@ class ApiAuthController extends Controller
                                 ]
                             ], 200);
         } else {
-            return response()->json(['status' => false, 'message' => translate('User not found'), 'data' => []], 200);
+            return response()->json(['status' => false, 'message' => translate('User not found'), 'data' => []], 401);
         }
     }
 
@@ -155,7 +148,7 @@ class ApiAuthController extends Controller
 
         // || !verifyOTP($user,$otp)
         if ($user_id == '' || $otp == '') {
-            return response()->json(['status'=>false,'message'=>'Invalid details.','data' => []],200);
+            return response()->json(['status'=>false,'message'=>'Invalid details.','data' => []]);
         }else{
             $user = User::find($user_id);
             if($user){
@@ -163,10 +156,10 @@ class ApiAuthController extends Controller
                 if($verify){
                     return $this->loginSuccess($user);
                 }else{
-                    return response()->json(['status' => false, 'message' => translate('Invalid or expired OTP.'), 'data' => null], 200);
+                    return response()->json(['status' => false, 'message' => translate('Invalid or expired OTP.'), 'data' => null], 401);
                 }
             }else{
-                return response()->json(['status' => false, 'message' => translate('User not found'), 'data' => []], 200);
+                return response()->json(['status' => false, 'message' => translate('User not found'), 'data' => []], 401);
             }
         }
     }
@@ -182,7 +175,6 @@ class ApiAuthController extends Controller
             $data['phone'] = $user->phone;
 
             $sendStatus = sendOTP($data);
-            $sendStatus = true;
             return response()->json([
                                 'status' => true,
                                 'message' => translate('An OTP has been resend sent to the provided mobile number. Please check your messages.'),
@@ -193,7 +185,7 @@ class ApiAuthController extends Controller
                                 ]
                             ], 200);
         } else {
-            return response()->json(['status' => false, 'message' => translate('User not found'), 'data' => []], 200);
+            return response()->json(['status' => false, 'message' => translate('User not found'), 'data' => []], 401);
         }
     }
 
@@ -242,9 +234,9 @@ class ApiAuthController extends Controller
             }
 
             $data['address'] = $address;
-            return response()->json([ 'status' => true, 'message' => 'Success', 'data' => $data],200);
+            return response()->json([ 'status' => true, 'message' => 'Success', 'data' => $data]);
         }else{
-            return response()->json([ 'status' => false, 'message' => 'User details not found.', 'data' => []],200);
+            return response()->json([ 'status' => false, 'message' => 'User details not found.', 'data' => []]);
         }                                                           
     }
 
@@ -258,10 +250,10 @@ class ApiAuthController extends Controller
         if($validator->fails()){
             $errors = $validator->errors();
             if ($errors->has('email')) {
-                return response()->json(['status' => false, 'message' => $errors->first('email'), 'data' => []  ], 200);
+                return response()->json(['status' => false, 'message' => $errors->first('email'), 'data' => []  ], 400);
             }
             if ($errors->has('phone_number')) {
-                return response()->json(['status' => false, 'message' => $errors->first('phone_number'), 'data' => []  ], 200);
+                return response()->json(['status' => false, 'message' => $errors->first('phone_number'), 'data' => []  ], 400);
             }
         }
         
@@ -287,17 +279,17 @@ class ApiAuthController extends Controller
         $userId = $request->user()->id;
         $user = User::find($userId);
         if (!Hash::check($request->current_password, $user->password)){
-            return response()->json(['status' => false,'message' => 'Old password is incorrect', 'data' => []],200);
+            return response()->json(['status' => false,'message' => 'Old password is incorrect', 'data' => []]);
         }
  
         // Current password and new password same
         if (strcmp($request->get('current_password'), $request->new_password) == 0){
-            return response()->json(['status' => false,'message' => 'New Password cannot be same as your current password.', 'data' => []],200);
+            return response()->json(['status' => false,'message' => 'New Password cannot be same as your current password.', 'data' => []]);
         }
 
         $user->password =  Hash::make($request->new_password);
         $user->save();
-        return response()->json(['status' => true,'message' => 'Password Changed Successfully', 'data' => []],200);
+        return response()->json(['status' => true,'message' => 'Password Changed Successfully', 'data' => []]);
     }
 
     public function addAddress(Request $request)
@@ -312,7 +304,7 @@ class ApiAuthController extends Controller
             'phone' => 'required'
         ]);
         if($validator->fails()){
-            return response()->json(['status' => false, 'message' => 'Please make sure that you fill out all the required fields..', 'data' => []  ], 200);
+            return response()->json(['status' => false, 'message' => 'Please make sure that you fill out all the required fields..', 'data' => []  ], 400);
         }
 
         $userId = $request->user()->id;
@@ -331,9 +323,9 @@ class ApiAuthController extends Controller
             $address->postal_code   = $request->postal_code;
             $address->phone         = $request->phone;
             $address->save();
-            return response()->json(['status' => true,'message' => 'Address added Successfully', 'data' => []],200);
+            return response()->json(['status' => true,'message' => 'Address added Successfully', 'data' => []]);
         }else {
-            return response()->json(['status' => false, 'message' => 'User not found', 'data' => []], 200);
+            return response()->json(['status' => false, 'message' => 'User not found', 'data' => []], 401);
         }
     }
 
@@ -354,9 +346,9 @@ class ApiAuthController extends Controller
             $address->postal_code   = $request->postal_code;
             $address->phone         = $request->phone;
             $address->save();
-            return response()->json(['status' => true,'message' => 'Address updated Successfully', 'data' => []],200);
+            return response()->json(['status' => true,'message' => 'Address updated Successfully', 'data' => []]);
         }else {
-            return response()->json(['status' => false, 'message' => 'User not found', 'data' => []], 200);
+            return response()->json(['status' => false, 'message' => 'User not found', 'data' => []], 401);
         }
     }
 
@@ -371,9 +363,9 @@ class ApiAuthController extends Controller
             $address = Address::findOrFail($id);
             $address->set_default = 1;
             $address->save();
-            return response()->json(['status' => true,'message' => 'Default address set Successfully', 'data' => []],200);
+            return response()->json(['status' => true,'message' => 'Default address set Successfully', 'data' => []]);
         }else{
-            return response()->json(['status' => false, 'message' => 'User not found', 'data' => []], 200);
+            return response()->json(['status' => false, 'message' => 'User not found', 'data' => []], 401);
         }
     }
 
@@ -385,9 +377,9 @@ class ApiAuthController extends Controller
             $address = Address::findOrFail($id);
             $address->is_deleted = 1;
             $address->save();
-            return response()->json(['status' => true,'message' => 'Address deleted successfully', 'data' => []],200);
+            return response()->json(['status' => true,'message' => 'Address deleted successfully', 'data' => []]);
         }else{
-            return response()->json(['status' => false, 'message' => 'User not found', 'data' => []], 200);
+            return response()->json(['status' => false, 'message' => 'User not found', 'data' => []], 401);
         }
     }
 }
