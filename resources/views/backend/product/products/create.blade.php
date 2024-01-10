@@ -211,7 +211,7 @@
                                     @php   
                                         $attributes = \App\Models\Attribute::orderBy('name','asc')->get();
                                     @endphp
-                                    <select class="form-control aiz-selectpicker" name="main_attributes[]" multiple id="main_attributes" required data-live-search="true">
+                                    <select class="form-control aiz-selectpicker" name="main_attributes[]" multiple id="main_attributes"  data-live-search="true">
                                         <option value="">Select Attributes</option>
                                         @foreach ($attributes as $attr)
                                             <option value="{{ $attr->id }}">{{ $attr->name }}
