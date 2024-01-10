@@ -180,7 +180,6 @@ return [
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
-        FruitCake\Cors\CorsServiceProvider::class,
         /*
          * Package Service Providers...
          */
