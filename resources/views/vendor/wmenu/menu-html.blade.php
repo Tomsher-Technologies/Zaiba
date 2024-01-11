@@ -1,6 +1,6 @@
 <?php
 $currentUrl = url()->current();
-$brands = \App\Models\Brand::all();
+$designs = \App\Models\Designs::all();
 ?>
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 <link href="{{ asset('vendor/harimayco-menu/style.css') }}" rel="stylesheet">
@@ -107,6 +107,46 @@ $brands = \App\Models\Brand::all();
                                                     <li class="control-section accordion-section  open add-page"
                                                         id="add-page">
                                                         <h3 class="accordion-section-title hndle" tabindex="0">
+                                                            Designs<span class="screen-reader-text">Press return or
+                                                                enter to expand</span></h3>
+                                                        <div class="accordion-section-content ">
+                                                            <div class="inside">
+                                                                <div class="customlinkdiv" id="customlinkdiv">
+                                                                    <p id="design-item-url-wrap">
+                                                                        @foreach ($designs as $des)
+                                                                            <label class="w-100 d-block"
+                                                                                for="design-{{ $des->id }}">
+                                                                                <input type="checkbox"
+                                                                                    name="product_menu"
+                                                                                    id="design-{{ $des->id }}"
+                                                                                    data-name="{{ $des->name }}"
+                                                                                    value="#">
+                                                                                {{ $des->name }}
+                                                                            </label>
+                                                                        @endforeach
+                                                                    </p>
+
+                                                                    <p class="button-controls">
+                                                                        <a href="#" onclick="addDesign()"
+                                                                            class="button-secondary  right">Add
+                                                                            menu item</a>
+                                                                        <span class="spinner"
+                                                                            id="spincustomuPro"></span>
+                                                                    </p>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+
+                                                </ul>
+                                            </div> --}}
+
+                                            {{-- <div id="side-sortables" class="accordion-container">
+                                                <ul class="outer-border">
+                                                    <li class="control-section accordion-section  open add-page"
+                                                        id="add-page">
+                                                        <h3 class="accordion-section-title hndle" tabindex="0">
                                                             Products <span class="screen-reader-text">Press return or
                                                                 enter to expand</span></h3>
                                                         <div class="accordion-section-content ">
@@ -141,7 +181,7 @@ $brands = \App\Models\Brand::all();
 
                                                 </ul>
                                             </div> --}}
-                                            <div id="side-sortables" class="accordion-container">
+                                            {{-- <div id="side-sortables" class="accordion-container">
                                                 <ul class="outer-border">
                                                     <li class="control-section accordion-section  open add-page"
                                                         id="add-page">
@@ -192,7 +232,7 @@ $brands = \App\Models\Brand::all();
                                                     </li>
 
                                                 </ul>
-                                            </div>
+                                            </div> --}}
                                         </form>
 
                                     </div>
@@ -228,7 +268,7 @@ $brands = \App\Models\Brand::all();
                                                                     id="save_menu_header"
                                                                     class="button button-primary menu-save">Save
                                                                     menu</a>
-                                                                <span class="spinner" id="spincustomu2"></span>
+                                                                <span class="spinner" id="spinsavemenu"></span>
                                                             </div>
                                                         @else
                                                             <div class="publishing-action">
@@ -561,32 +601,6 @@ $brands = \App\Models\Brand::all();
                                                                                         @enderror
                                                                                     </div>
                                                                                 </div>
-
-                                                                                <div class="form-group row">
-                                                                                    <label
-                                                                                        class="col-md-3 col-form-label"
-                                                                                        for="signinSrEmail">
-                                                                                        Brands
-                                                                                    </label>
-                                                                                    <div class="col-md-9">
-                                                                                        <select
-                                                                                            class="form-control aiz-selectpicker"
-                                                                                            name="brand_id"
-                                                                                            id="brand_id_{{ $m->id }}"
-                                                                                            data-live-search="true"
-                                                                                            multiple>
-                                                                                            <option value="">
-                                                                                                Select Brand</option>
-                                                                                            @foreach ($brands as $brand)
-                                                                                                <option
-                                                                                                    {{ in_array($brand->id, explode(',', $m->brands)) ? 'selected' : '' }}
-                                                                                                    value="{{ $brand->id }}">
-                                                                                                    {{ $brand->name }}
-                                                                                                </option>
-                                                                                            @endforeach
-                                                                                        </select>
-                                                                                    </div>
-                                                                                </div>
                                                                             @endif
 
                                                                             @if ($m->depth == 0 && $indmenu->id == 6)
@@ -807,6 +821,27 @@ $brands = \App\Models\Brand::all();
         if (refresh) {
             // 
         }
+    }
+    function addDesign() {
+        $('#spincustomuPro').show();
+
+        $('#design-item-url-wrap input:checkbox').each(function() {
+            if (this.checked) {
+                $.ajax({
+                    data: {
+                        labelmenu: $(this).data('name'),
+                        linkmenu: $(this).val(),
+                        rolemenu: $('#custom-menu-item-role').val(),
+                        idmenu: $('#idmenu').val()
+                    },
+                    url: addcustommenur,
+                    type: 'POST'
+                });
+            }
+        });
+
+        $('#spincustomuPro').hide();
+        window.location.reload();
     }
 
     function addProduct() {

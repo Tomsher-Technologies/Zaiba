@@ -193,7 +193,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Anhskohbo\NoCaptcha\NoCaptchaServiceProvider::class,
-
+        Harimayco\Menu\MenuServiceProvider::class,
     ],
 
     /*
@@ -250,6 +250,7 @@ return [
         'Image' => Intervention\Image\Facades\Image::class,
         'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
         'NoCaptcha' => Anhskohbo\NoCaptcha\Facades\NoCaptcha::class,
+        'Menu' => Harimayco\Menu\Facades\Menu::class,
     ],
 
 ];

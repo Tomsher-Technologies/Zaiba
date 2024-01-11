@@ -1,6 +1,7 @@
 var arraydata = [];
 function getmenus() {
   arraydata = [];
+
   $('#spinsavemenu').show();
 
   var cont = 0;
@@ -34,8 +35,10 @@ function getmenus() {
     });
     cont++;
   });
+ 
   updateitem();
   actualizarmenu();
+  
 }
 
 function addcustommenu() {
@@ -150,7 +153,7 @@ function updateMenu(id = 0) {
 }
 
 function updateitem(id = 0) {
-  console.log('updateitem');
+  // console.log('updateitem');
   if (id) {
     var label = $('#idlabelmenu_' + id).val();
     var clases = $('#clases_menu_' + id).val();
@@ -229,9 +232,10 @@ function actualizarmenu() {
       $('#spincustomu2').show();
     },
     success: function (response) {
-      console.log('aqu llega');
+      
     },
     complete: function () {
+      $('#spinsavemenu').hide();
       $('#spincustomu2').hide();
     }
   });

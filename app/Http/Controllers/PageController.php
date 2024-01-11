@@ -183,4 +183,31 @@ class PageController extends Controller
         }
         abort(404);
     }
+
+    public function storeHomePageHighlights(Request $request){
+        $request->validate([
+            'heading4' => 'required',
+            'sub_heading4' => 'required',
+            'heading5' => 'required',
+            'sub_heading5' => 'required',
+            'heading6' => 'required',
+            'sub_heading6' => 'required',
+            'image1' => 'nullable|max:50',
+            'image2' => 'nullable|max:50',
+            'title1' => 'required',
+            'title2' => 'required',
+            'title3' => 'required',
+            'image3' => 'nullable|max:50',
+            'image4' => 'nullable|max:50',
+            'image5' => 'nullable|max:50',
+
+        ],[
+            '*.required' => 'This field is required.',
+            'image1.max' => "Maximum file size to upload is 50 KB.",
+            'image2.max' => "Maximum file size to upload is 50 KB.",
+            'image3.max' => "Maximum file size to upload is 50 KB.",
+            'image4.max' => "Maximum file size to upload is 50 KB.",
+            'image5.max' => "Maximum file size to upload is 50 KB.",
+        ]);
+    }
 }
