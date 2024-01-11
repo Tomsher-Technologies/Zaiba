@@ -17,6 +17,7 @@ use App\Models\CombinedOrder;
 use App\Models\User;
 use App\Models\Addon;
 use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Products\ProductEnquiries;
@@ -1362,4 +1363,106 @@ if (!function_exists('load_seo_tags')) {
         // dd(DB::getQueryLog());
         return $data;
     }
+
+    function getImmediateSubCategories($id)
+    {
+        // Cache::forget('header_submenus');
+        return Category::select('id', 'name', 'slug')->where('parent_id', $id)->get();
+    }
+
+    function getHeaderCategoryBrands($ids)
+    {
+        // $brands = Brand::whereIn('id', json_decode($ids))->get();
+        return  Brand::whereIn('id', json_decode($ids))->get();
+    }
+
+    if (!function_exists('api_upload_asset')) {
+        function api_upload_asset($id)
+        {
+            if (($asset = Upload::find($id)) != null) {
+                return app('url')->asset('storage/' . $asset->file_name);
+            }
+            return "";
+        }
+    }
+
+    if (!function_exists('home_discounted_base_price_wo_currency')) {
+        function home_discounted_base_price_wo_currency($product, $formatted = true)
+        {
+            $price = $product->stocks->min('price');
+            $tax = 0;
+
+            $discount_applicable = false;
+
+            if ($product->discount_start_date == null) {
+                $discount_applicable = true;
+            } elseif (
+                strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date &&
+                strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date
+            ) {
+                $discount_applicable = true;
+            }
+
+            if ($discount_applicable) {
+                if ($product->discount_type == 'percent') {
+                    $price -= ($price * $product->discount) / 100;
+                } elseif ($product->discount_type == 'amount') {
+                    $price -= $product->discount;
+                }
+            }
+
+            // foreach ($product->taxes as $product_tax) {
+            //     if ($product_tax->tax_type == 'percent') {
+            //         $tax += ($price * $product_tax->tax) / 100;
+            //     } elseif ($product_tax->tax_type == 'amount') {
+            //         $tax += $product_tax->tax;
+            //     }
+            // }
+            // $price += $tax;
+
+            return $formatted ? format_price_wo_currency(convert_price($price)) : $price;
+        }
+    }
+
+    if (!function_exists('format_price_wo_currency')) {
+        function format_price_wo_currency($price)
+        {
+            if (get_setting('decimal_separator') == 1) {
+                $fomated_price = number_format($price, get_setting('no_of_decimals'));
+            } else {
+                $fomated_price = number_format($price, get_setting('no_of_decimals'), ',', ' ');
+            }
+
+            return $fomated_price;
+        }
+    }
+
+    function getSidebarCategoryTree()
+    {
+        $all_cats = Category::select([
+            'id',
+            'parent_id',
+            'name',
+            'level',
+            'slug',
+        ])->with(['child'])->withCount('products')->where('parent_id', 0)->get();
+
+        return $all_cats;
+    }
+
+    function getOfferTag($offer)
+    {
+        $tag = '';
+        $offer_type = $offer->offer_type;
+        if ($offer_type == 'percentage') {
+            $tag = $offer->percentage . '% OFF';
+        } elseif ($offer_type == 'amount_off') {
+            $tag = 'AED ' . $offer->offer_amount . ' OFF';
+        } elseif ($offer_type == 'buy_x_get_y') {
+            $tag = 'BUY ' . $offer->buy_amount . ' GET ' . $offer->get_amount;
+        }
+        return  $tag;
+    }
+
+
 }

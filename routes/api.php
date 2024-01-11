@@ -8,6 +8,10 @@ use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Api\V2\ProfileController;
 use App\Http\Controllers\Api\V2\WishlistController;
 use App\Http\Controllers\Api\V2\CartController;
+use App\Http\Controllers\Api\V2\ProductController;
+use App\Http\Controllers\Api\V2\CategoryController;
+use App\Http\Controllers\Api\V2\WebsiteController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -63,7 +67,16 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('cart/remove', [CartController::class, 'removeCartItem']);
         Route::apiResource('cart', CartController::class)->only('index', 'store', 'destroy');
     });
+
+    Route::get('products', [ProductController::class, 'index']);
+    // Route::get('categories', [CategoryController::class, 'index']);
+
+    Route::group(['prefix' => 'website'], function () {
+        Route::get('categories', [WebsiteController::class, 'websiteCategories']);
+        Route::get('brands', [WebsiteController::class, 'websiteBrands']);
+    });
 });
+
 
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
