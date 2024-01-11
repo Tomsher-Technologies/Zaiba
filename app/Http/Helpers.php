@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ClubPointController;
 use App\Http\Controllers\AffiliateController;
+use App\Http\Controllers\AffiliateController;
 use App\Http\Controllers\CommissionController;
 use App\Models\Currency;
 use App\Models\BusinessSetting;
@@ -19,6 +20,7 @@ use App\Models\Addon;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Cart;
+use App\Models\Offers;
 use App\Models\Product;
 use App\Models\Products\ProductEnquiries;
 use App\Models\Shop;
@@ -1464,5 +1466,30 @@ if (!function_exists('load_seo_tags')) {
         return  $tag;
     }
 
+    function getOffersProductIds($offerSlugs, $isId = 1)
+    {
+        if ($isId == 1) {
+            $offers = Offers::whereIn('id', $offerSlugs)->select('category_id', 'link_type', 'link_id')->get()->toArray();
+        } else {
+            $offers = Offers::whereIn('slug', $offerSlugs)->select('category_id', 'link_type', 'link_id')->get()->toArray();
+        }
 
+        $products = [];
+        if ($offers) {
+            foreach ($offers as $off) {
+                $type = $off['link_type'];
+                if ($type == 'product') {
+                    $products[] = json_decode($off['link_id']);
+                } elseif ($type == 'category') {
+                    $products[] = Product::where('main_category', $off['category_id'])->whereIn('brand_id', json_decode($off['link_id']))->pluck('id')->toArray();
+                }
+            }
+
+            if (!empty($products)) {
+                $products = array_merge(...$products);
+            }
+        }
+
+        return $products;
+    }
 }
