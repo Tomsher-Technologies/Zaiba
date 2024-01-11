@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\BusinessSetting;
+use App\Models\Page;
 use Artisan;
 // use CoreComponentRepository;
 
@@ -378,6 +379,21 @@ class BusinessSettingsController extends Controller
 
     public function update(Request $request)
     {
+        $page_type = $request->page_type;
+        if($page_type == 'trending_categories'){
+            $page = Page::where('type','home_page')->first();
+            $page->heading2 = $request->trend_title;
+            $page->sub_heading2 = $request->trend_sub_title;
+            $page->save();
+        }
+
+        if($page_type == 'trending_products'){
+            $page = Page::where('type','home_page')->first();
+            $page->heading3 = $request->trend_prod_title;
+            $page->sub_heading3 = $request->trend_prod_sub_title;
+            $page->save();
+        }
+
         foreach ($request->types as $key => $type) {
             if ($type == 'site_name') {
                 $this->overWriteEnvFile('APP_NAME', $request[$type]);

@@ -36,6 +36,12 @@ Route::group(['middleware' => 'api','prefix' => 'auth'], function ($router) {
     Route::post('/resend-otp', [ApiAuthController::class, 'resendOTP'])->name('resend-otp');
    
     Route::get('/user-profile', [ApiAuthController::class, 'userProfile'])->name('user-profile'); 
+
+    Route::get('/home', [ApiAuthController::class, 'homePage'])->name('home'); 
+    Route::get('/get-menus', [ApiAuthController::class, 'getMenus'])->name('get-menus'); 
+
+
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('logout', [ApiAuthController::class, 'logout']);
         Route::get('user-profile', [ApiAuthController::class, 'user']);

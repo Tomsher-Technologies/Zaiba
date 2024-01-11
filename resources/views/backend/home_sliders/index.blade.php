@@ -24,11 +24,11 @@
                         <table class="table aiz-table mb-0">
                             <thead>
                                 <tr>
-                                    <th data-breakpoints="lg">Name</th>
+                                    <th data-breakpoints="lg" >Name</th>
                                     <th data-breakpoints="lg">Image</th>
-                                    <th data-breakpoints="lg">Sort Order</th>
-                                    <th data-breakpoints="lg">Status</th>
-                                    <th>Options</th>
+                                    <th data-breakpoints="lg" class="text-center">Sort Order</th>
+                                    <th data-breakpoints="lg" class="text-center">Status</th>
+                                    <th class="text-center">Options</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -42,23 +42,23 @@
                                                 @if ($slider->image)
                                                     <div class="col-auto">
                                                         <img src="{{ uploaded_asset($slider->image) }}" alt="Image"
-                                                            class="size-50px img-fit">
+                                                            class=" img-fit">
                                                     </div>
                                                 @endif
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             {{ $slider->sort_order }}
                                         </td>
 
-                                        <td>
+                                        <td class="text-center">
                                             <label class="aiz-switch aiz-switch-success mb-0">
                                                 <input onchange="update_published(this)" value="{{ $slider->id }}"
                                                     type="checkbox" {{ $slider->status == 1 ? 'checked' : '' }}>
                                                 <span class="slider round"></span>
                                             </label>
                                         </td>
-                                        <td class="text-right">
+                                        <td class="text-center">
                                             <a class="btn btn-soft-primary btn-icon btn-circle btn-sm"
                                                 href="{{ route('home-slider.edit', $slider) }}" title="Edit">
                                                 <i class="las la-edit"></i>

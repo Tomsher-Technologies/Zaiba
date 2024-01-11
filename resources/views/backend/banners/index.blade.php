@@ -43,7 +43,7 @@
                                                 @if ($banner->image)
                                                     <div class="col-auto">
                                                         <img src="{{ uploaded_asset($banner->image) }}" alt="Image"
-                                                            class="size-50px img-fit">
+                                                            class="img-fit">
                                                     </div>
                                                 @endif
                                             </div>

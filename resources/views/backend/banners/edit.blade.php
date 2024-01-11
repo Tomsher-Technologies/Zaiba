@@ -72,6 +72,30 @@
                         </div>
 
                         <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Title</label>
+                            <div class="col-md-9">
+                                <input type="text" placeholder="Title" value="{{ old('title', $banner->title) }}" id="title"
+                                    name="title" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Sub Title</label>
+                            <div class="col-md-9">
+                                <input type="text" placeholder="Sub Title" value="{{ old('sub_title', $banner->sub_title) }}" id="sub_title"
+                                    name="sub_title" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Button Text</label>
+                            <div class="col-md-9">
+                                <input type="text" placeholder="Button Text" value="{{ old('btn_text', $banner->btn_text) }}" id="btn_text"
+                                    name="btn_text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
                             <label class="col-md-3 col-form-label">Link Type</label>
                             <div class="col-md-9">
                                 <select onchange="banner_form()" class="form-control aiz-selectpicker" name="link_type"

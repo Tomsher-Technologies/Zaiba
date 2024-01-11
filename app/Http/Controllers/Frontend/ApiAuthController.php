@@ -8,14 +8,18 @@ use Illuminate\Support\Facades\Auth;
 use App\Notifications\EmailVerificationNotification;
 use App\Models\Customer;
 use App\Models\Address;
+use App\Models\Frontend\HomeSlider;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\MenuItems;
+use App\Models\Menu;
 use Validator;
 use Hash;
 use Str;
 use File;
 use Storage;
 use DB;
+use Cache;
 
 class ApiAuthController extends Controller
 {
@@ -218,6 +222,7 @@ class ApiAuthController extends Controller
             $data['name'] = $user[0]['name'] ?? '';
             $data['email'] = $user[0]['email'] ?? '';
             $data['phone'] = $user[0]['phone'] ?? '';
+            $data['phone_verified'] = $user[0]['is_phone_verified'] ?? '';
             $dataAddress = $user[0]['addresses'] ?? [];
             $address = [];
             if($dataAddress){
@@ -389,5 +394,38 @@ class ApiAuthController extends Controller
         }else{
             return response()->json(['status' => false, 'message' => 'User not found', 'data' => []], 200);
         }
+    }
+
+    public function homePage(){
+        $banners = HomeSlider::whereStatus(1)->with(['mainImage', 'mobileImage'])->orderBy('sort_order')->get();
+        foreach ($banners as $banner) {
+            $banner->web_image = (isset($banner->mainImage->file_name)) ? uploaded_asset($banner->image) : '';
+            $banner->mob_image = (isset($banner->mobileImage->file_name)) ? uploaded_asset($banner->mobile_image) : '';
+            $banner->a_link = $banner->getALink();
+            unset($banner->mainImage);
+            unset($banner->mobileImage);
+        }
+        $data['sliders'] = $banners;
+
+        return response()->json([ 'status' => true, 'message' => 'Success', 'data' => $data],200);
+    }
+
+    public function getMenus(){
+
+        $menus = Menu::with('items')->get();
+
+        foreach($menus as $key => $main){
+            foreach($main->items as $keyS => $sub){
+                $main->items[$keyS]['img_1'] = (isset($sub->image1->file_name)) ? storage_asset($sub->image1->file_name) : '';
+                $main->items[$keyS]['img_2'] = (isset($sub->image2->file_name)) ? storage_asset($sub->image2->file_name) : '';
+                $main->items[$keyS]['img_3'] = (isset($sub->image3->file_name)) ? storage_asset($sub->image3->file_name) : '';
+
+                unset($sub->image1);
+                unset($sub->image2);
+                unset($sub->image3);
+            }
+        }
+
+        return response()->json([ 'status' => true, 'message' => 'Success', 'data' => $menus],200);
     }
 }
