@@ -6,6 +6,7 @@ use App\Http\Resources\V2\ProductCollection;
 use App\Http\Resources\V2\ProductMiniCollection;
 use App\Http\Resources\V2\ProductDetailCollection;
 use App\Http\Resources\V2\FlashDealCollection;
+use App\Http\Resources\V2\ProductFilterCollection;
 use App\Models\FlashDeal;
 use App\Models\Product;
 use App\Models\Category;
@@ -36,13 +37,13 @@ class ProductController extends Controller
         $offer_slug = $request->offer_slug ? explode(',', $request->offer_slug)  : false;
         $product_query  = Product::wherePublished(1);
 
-        if($offer){
-            $product_ids = getOffersProductIds($offer,1);
+        if ($offer) {
+            $product_ids = getOffersProductIds($offer, 1);
             $product_query->whereIn('id', $product_ids);
         }
 
-        if($offer_slug){
-            $product_ids = getOffersProductIds($offer_slug,0);
+        if ($offer_slug) {
+            $product_ids = getOffersProductIds($offer_slug, 0);
             $product_query->whereIn('id', $product_ids);
         }
 
@@ -51,7 +52,7 @@ class ProductController extends Controller
         }
 
         if ($category_slug) {
-            $category_ids = Category::whereIn('slug',$category_slug)->pluck('id')->toArray();
+            $category_ids = Category::whereIn('slug', $category_slug)->pluck('id')->toArray();
             $product_query->whereIn('category_id', $category_ids);
         }
 
@@ -59,7 +60,7 @@ class ProductController extends Controller
             $product_query->whereIn('brand_id', $brand);
         }
         if ($brand_slug) {
-            $brand_ids = Brand::whereIn('slug',$brand_slug)->pluck('id')->toArray();
+            $brand_ids = Brand::whereIn('slug', $brand_slug)->pluck('id')->toArray();
             $product_query->whereIn('brand_id', $brand_ids);
         }
 
@@ -90,18 +91,42 @@ class ProductController extends Controller
                     break;
             }
         }
+        if ($request->search) {
+            $sort_search = $request->search;
+            $products = $product_query
+                ->where('name', 'like', '%' . $sort_search . '%')
+                ->orWhereHas('stocks', function ($q) use ($sort_search) {
+                    $q->where('sku', 'like', '%' . $sort_search . '%');
+                });
+
+            SearchUtility::store($sort_search, $request);
+        }
+        if ($min_price != null && $min_price != "" && is_numeric($min_price)) {
+            $product_query->where('unit_price', '>=', $min_price);
+        }
+
+        if ($max_price != null && $max_price != "" && is_numeric($max_price)) {
+            $product_query->where('unit_price', '<=', $max_price);
+        }
+
+        $total_count = $product_query->count();
+        $products = $product_query->skip($offset)->take($limit)->get();
+
+        $next_offset = $offset + $limit;
 
         // print_r(new ProductMiniCollection(Product::latest()->paginate(10)));
         // die;
         $productDetails = Product::latest()->get();
+        // $response = new ProductFilterCollection($products);
         // print_r($productDetails);die();
-        if ($productDetails) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Success',
-                'data' => $productDetails,
-                'total_count' => Product::count()
-            ], 200);
+        if ($products) {
+            return response()->json(['success' => true, "message" => "Success", "data" => $products, "total_count" => $total_count, "next_offset" => $next_offset], 200);
+            // return response()->json([
+            //     'status' => true,
+            //     'message' => 'Success',
+            //     'data' => $productDetails,
+            //     'total_count' => Product::count()
+            // ], 200);
         } else {
             return response()->json([
                 'status' => true,

@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Frontend\ApiAuthController;
 use App\Http\Controllers\ApiController;
 
-<<<<<<< HEAD
 use App\Http\Controllers\Api\V2\ProfileController;
 use App\Http\Controllers\Api\V2\WishlistController;
 use App\Http\Controllers\Api\V2\CartController;
@@ -13,8 +12,6 @@ use App\Http\Controllers\Api\V2\ProductController;
 use App\Http\Controllers\Api\V2\CategoryController;
 use App\Http\Controllers\Api\V2\WebsiteController;
 
-=======
->>>>>>> f02c273fcda02281970e443290a75a6fb1ad2d78
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,6 +22,7 @@ use App\Http\Controllers\Api\V2\WebsiteController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 Route::group(['prefix' => 'auth'], function ($router) {
     Route::get('/countries', [ApiController::class, 'getCountries'])->name('countries');
     Route::get('/state/{country_id?}', [ApiController::class, 'getCountryStates'])->name('state');
@@ -32,15 +30,15 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::post('/forgot-password', [ApiController::class, 'forgotPassword'])->name('forgot-password');
 });
 
-Route::group(['middleware' => 'api','prefix' => 'auth'], function ($router) {
+Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
     Route::post('/login', [ApiAuthController::class, 'login'])->name('login');
     Route::post('/otp-login', [ApiAuthController::class, 'loginWithOTP'])->name('otp-login');
     Route::post('/register', [ApiAuthController::class, 'signup'])->name('register');
 
     Route::post('/verify-otp', [ApiAuthController::class, 'verifyOTP'])->name('verify-otp');
     Route::post('/resend-otp', [ApiAuthController::class, 'resendOTP'])->name('resend-otp');
-   
-    Route::get('/user-profile', [ApiAuthController::class, 'userProfile'])->name('user-profile'); 
+
+    Route::get('/user-profile', [ApiAuthController::class, 'userProfile'])->name('user-profile');
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('logout', [ApiAuthController::class, 'logout']);
         Route::get('user-profile', [ApiAuthController::class, 'user']);
@@ -50,9 +48,10 @@ Route::group(['middleware' => 'api','prefix' => 'auth'], function ($router) {
         Route::post('update-address', [ApiAuthController::class, 'updateAddress'])->name('update-address');
         Route::post('set-default-address', [ApiAuthController::class, 'setDefaultAddress'])->name('set-default-address');
         Route::post('delete-address', [ApiAuthController::class, 'deleteAddress'])->name('delete-address');
+        Route::get('account', [ProfileController::class, 'getUserAccountInfo']);
     });
+});
 
-<<<<<<< HEAD
 Route::group(['middleware' => 'api'], function ($router) {
     Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::group(['prefix' => 'profile'], function () {
@@ -76,8 +75,6 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('categories', [WebsiteController::class, 'websiteCategories']);
         Route::get('brands', [WebsiteController::class, 'websiteBrands']);
     });
-=======
->>>>>>> f02c273fcda02281970e443290a75a6fb1ad2d78
 });
 
 
