@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\ClubPointController;
 use App\Http\Controllers\AffiliateController;
-use App\Http\Controllers\AffiliateController;
 use App\Http\Controllers\CommissionController;
 use App\Models\Currency;
 use App\Models\BusinessSetting;
@@ -1197,9 +1196,8 @@ if (!function_exists('load_seo_tags')) {
     //     return $html;
     // }
 
-    function generateOTP($user)
-    {
-        $data['otp'] = rand(1000, 9999);
+    function generateOTP($user){
+        $data['otp'] = rand(1000,9999);
         $data['otp_expiry'] = Carbon::now()->addMinutes(10);
 
         $user->otp = $data['otp'];
@@ -1209,8 +1207,7 @@ if (!function_exists('load_seo_tags')) {
         return $data;
     }
 
-    function sendOTP($data)
-    {
+    function sendOTP($data){
         $messages = urlencode($data['message']);
         $sender = urlencode("TOMSHER");
         $curl = curl_init();
@@ -1221,28 +1218,26 @@ if (!function_exists('load_seo_tags')) {
         return $result;
     }
 
-    function verifyUserOTP($user, $otp)
-    {
+    function verifyUserOTP($user, $otp){
         $dbOtp = $user->otp;
         $otp_expiry = $user->otp_expiry;
 
-        if ($dbOtp === $otp && strtotime($otp_expiry) > time()) {
+        if($dbOtp === $otp && strtotime($otp_expiry) > time()) {
             $user->is_phone_verified = 1;
             $user->save();
             return true; // Verification successful
-        } else {
+        }else{
             return false;
         }
     }
 
-    function generateOTPMessage($userName, $otp)
-    {
+    function generateOTPMessage($userName, $otp){
         // $data['message'] = "Hello ".$user->name.",
         // Your One-Time Password (OTP) is: ".$otp.".
         // This OTP is valid for 10 minutes. For security reasons, do not share it with anyone.
         // Thank you for choosing ".env('APP_NAME').".";
 
-        $message = "Hi " . $userName . ", Greetings from Farook! Your OTP: " . $otp . " Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.";
+        $message = "Hi ".$userName.", Greetings from Farook! Your OTP: ".$otp." Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.";
         return $message;
     }
 
@@ -1466,30 +1461,30 @@ if (!function_exists('load_seo_tags')) {
         return  $tag;
     }
 
-    function getOffersProductIds($offerSlugs, $isId = 1)
-    {
-        if ($isId == 1) {
-            $offers = Offers::whereIn('id', $offerSlugs)->select('category_id', 'link_type', 'link_id')->get()->toArray();
-        } else {
-            $offers = Offers::whereIn('slug', $offerSlugs)->select('category_id', 'link_type', 'link_id')->get()->toArray();
+    function getOffersProductIds($offerSlugs, $isId = 1){
+        if($isId == 1){
+            $offers = Offers::whereIn('id',$offerSlugs)->select('category_id','link_type','link_id')->get()->toArray();
+        }else{
+            $offers = Offers::whereIn('slug',$offerSlugs)->select('category_id','link_type','link_id')->get()->toArray();
         }
 
         $products = [];
-        if ($offers) {
-            foreach ($offers as $off) {
+        if($offers){
+            foreach($offers as $off){
                 $type = $off['link_type'];
-                if ($type == 'product') {
+                if($type == 'product'){
                     $products[] = json_decode($off['link_id']);
-                } elseif ($type == 'category') {
+                }elseif($type == 'category'){
                     $products[] = Product::where('main_category', $off['category_id'])->whereIn('brand_id', json_decode($off['link_id']))->pluck('id')->toArray();
                 }
             }
 
-            if (!empty($products)) {
+            if(!empty($products)){
                 $products = array_merge(...$products);
             }
         }
 
         return $products;
     }
+
 }
