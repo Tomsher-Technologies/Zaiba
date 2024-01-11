@@ -5,6 +5,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Frontend\ApiAuthController;
 use App\Http\Controllers\ApiController;
 
+<<<<<<< HEAD
+use App\Http\Controllers\Api\V2\ProfileController;
+use App\Http\Controllers\Api\V2\WishlistController;
+use App\Http\Controllers\Api\V2\CartController;
+use App\Http\Controllers\Api\V2\ProductController;
+use App\Http\Controllers\Api\V2\CategoryController;
+use App\Http\Controllers\Api\V2\WebsiteController;
+
+=======
+>>>>>>> f02c273fcda02281970e443290a75a6fb1ad2d78
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -42,7 +52,34 @@ Route::group(['middleware' => 'api','prefix' => 'auth'], function ($router) {
         Route::post('delete-address', [ApiAuthController::class, 'deleteAddress'])->name('delete-address');
     });
 
+<<<<<<< HEAD
+Route::group(['middleware' => 'api'], function ($router) {
+    Route::group(['middleware' => ['auth:sanctum']], function () {
+        Route::group(['prefix' => 'profile'], function () {
+            Route::get('account', [ProfileController::class, 'getUserAccountInfo']);
+        });
+
+        Route::apiResource('wishlists', WishlistController::class)->only('index', 'store', 'destroy');
+        Route::get('wishlists/count', [WishlistController::class, 'getCount']);
+        Route::post('wishlist/remove', [WishlistController::class, 'removeWishlistItem']);
+
+        Route::get('cart/count', [CartController::class, 'getCount']);
+        Route::post('cart/change_quantity', [CartController::class, 'changeQuantity']);
+        Route::post('cart/remove', [CartController::class, 'removeCartItem']);
+        Route::apiResource('cart', CartController::class)->only('index', 'store', 'destroy');
+    });
+
+    Route::get('products', [ProductController::class, 'index']);
+    // Route::get('categories', [CategoryController::class, 'index']);
+
+    Route::group(['prefix' => 'website'], function () {
+        Route::get('categories', [WebsiteController::class, 'websiteCategories']);
+        Route::get('brands', [WebsiteController::class, 'websiteBrands']);
+    });
+=======
+>>>>>>> f02c273fcda02281970e443290a75a6fb1ad2d78
 });
+
 
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

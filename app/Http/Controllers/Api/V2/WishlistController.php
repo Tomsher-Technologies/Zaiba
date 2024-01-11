@@ -12,8 +12,35 @@ class WishlistController extends Controller
 
     public function index()
     {
+<<<<<<< HEAD
+        $user_id = (!empty(auth('sanctum')->user())) ? auth('sanctum')->user()->id : '';
+        if ($user_id != '') {
+            $wishlist = Wishlist::with('product')->where('user_id', $user_id)->get();
+
+            $result = [];
+            if ($wishlist) {
+                foreach ($wishlist as $data) {
+                    if (isset($data->product) && !empty($data->product)) {
+                        $result[] = [
+                            'id' => (int) $data->id,
+                            'product' => [
+                                'id' => $data->product->id,
+                                'name' => $data->product->name,
+                                'slug' => $data->product->slug,
+                                'thumbnail_image' => app('url')->asset($data->product->thumbnail_img),
+                                'has_discount' => home_base_price($data->product, false) != home_discounted_base_price($data->product, false),
+                                'stroked_price' => home_base_price($data->product, false),
+                                'main_price' => home_discounted_base_price($data->product, false),
+                                'price_high_low' => (float)explode('-', home_discounted_base_price($data->product, false))[0] == (float)explode('-', home_discounted_price($data->product, false))[1] ? format_price((float)explode('-', home_discounted_price($data->product, false))[0]) : "From " . format_price((float)explode('-', home_discounted_price($data->product, false))[0]) . " to " . format_price((float)explode('-', home_discounted_price($data->product, false))[1]),
+                            ]
+                        ];
+                    }
+                }
+            }
+=======
         $product_ids = Wishlist::where('user_id', auth()->user()->id)->pluck("product_id")->toArray();
         $existing_product_ids = Product::whereIn('id', $product_ids)->pluck("id")->toArray();
+>>>>>>> f02c273fcda02281970e443290a75a6fb1ad2d78
 
         $query = Wishlist::query();
         $query->where('user_id', auth()->user()->id)->whereIn("product_id", $existing_product_ids);
