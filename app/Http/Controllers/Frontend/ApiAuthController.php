@@ -23,7 +23,7 @@ use Cache;
 
 class ApiAuthController extends Controller
 {
-  
+
     public function signup(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -63,14 +63,14 @@ class ApiAuthController extends Controller
             <p>To start exploring, simply log in to your account using the credentials you provided during registration. If you have any questions or need assistance, please don't hesitate to reach out to our customer support team.</p><br>
             <p>We look forward to serving you and being a part of your jewelry story. Happy shopping, and here's to a world adorned with your unique elegance!</p>"
         ];
-       
+
         \Mail::to($request->email)->send(new \App\Mail\SendMail($details));
 
         $otp = generateOTP($user);
 
-        $data['message'] = generateOTPMessage($user->name, $otp['otp']); 
+        $data['message'] = generateOTPMessage($user->name, $otp['otp']);
         $data['phone'] = $user->phone_number;
-        
+
         $sendStatus = sendOTP($data);
 
         $customer = new Customer;
@@ -128,7 +128,7 @@ class ApiAuthController extends Controller
         if ($user != null) {
             $otp = generateOTP($user);
 
-            $data['message'] = generateOTPMessage($user->name, $otp['otp']); 
+            $data['message'] = generateOTPMessage($user->name, $otp['otp']);
             $data['phone'] = $phone;
 
             $sendStatus = sendOTP($data);
@@ -175,7 +175,7 @@ class ApiAuthController extends Controller
         if ($user != null) {
             $otp = generateOTP($user);
 
-            $data['message'] = generateOTPMessage($user->name, $otp['otp']); 
+            $data['message'] = generateOTPMessage($user->name, $otp['otp']);
             $data['phone'] = $user->phone;
 
             $sendStatus = sendOTP($data);
@@ -208,7 +208,7 @@ class ApiAuthController extends Controller
     public function user(Request $request)
     {
         $user = User::with(['addresses'])->find($request->user());
-                    
+
         if(isset($user[0])){
             $data['id'] = $user[0]['id'] ?? '';
             $data['name'] = $user[0]['name'] ?? '';
@@ -242,7 +242,7 @@ class ApiAuthController extends Controller
             return response()->json([ 'status' => true, 'message' => 'Success', 'data' => $data]);
         }else{
             return response()->json([ 'status' => false, 'message' => 'User details not found.', 'data' => []]);
-        }                                                           
+        }
     }
 
     public function updateProfile(Request $request){
@@ -251,7 +251,7 @@ class ApiAuthController extends Controller
             'email' => 'nullable|email|unique:users,email,'.$id,
             'phone_number' => 'nullable|unique:users,phone,'.$id,
         ]);
-        
+
         if($validator->fails()){
             $errors = $validator->errors();
             if ($errors->has('email')) {
@@ -261,11 +261,11 @@ class ApiAuthController extends Controller
                 return response()->json(['status' => false, 'message' => $errors->first('phone_number'), 'data' => []  ], 400);
             }
         }
-        
+
         $name   = $request->name;
         $email  = $request->email;
         $phone  = $request->phone_number;
-       
+
         $user = User::find($id);
 
         $old_phone = $user->phone;
@@ -286,7 +286,7 @@ class ApiAuthController extends Controller
         if (!Hash::check($request->current_password, $user->password)){
             return response()->json(['status' => false,'message' => 'Old password is incorrect', 'data' => []]);
         }
- 
+
         // Current password and new password same
         if (strcmp($request->get('current_password'), $request->new_password) == 0){
             return response()->json(['status' => false,'message' => 'New Password cannot be same as your current password.', 'data' => []]);
@@ -314,7 +314,7 @@ class ApiAuthController extends Controller
 
         $userId = $request->user()->id;
         $user = User::find($userId);
-        
+
         if($user){
             $address                = new Address;
             $address->user_id       = $userId;

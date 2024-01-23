@@ -23,6 +23,9 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        // echo '<pre>';
+        // print_r($request->all());
+        // die;
         $limit = $request->limit ? $request->limit : 10;
         $offset = $request->offset ? $request->offset : 0;
         $min_price = $request->min_price ? $request->min_price : '';

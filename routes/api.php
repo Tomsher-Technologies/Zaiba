@@ -73,7 +73,7 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('cart/count', [CartController::class, 'getCount']);
         Route::post('cart/change_quantity', [CartController::class, 'changeQuantity']);
         Route::post('cart/remove', [CartController::class, 'removeCartItem']);
-        Route::apiResource('cart', CartController::class)->only('index', 'store', 'destroy');
+        Route::apiResource('    ', CartController::class)->only('index', 'store', 'destroy');
     });
 
     Route::get('products', [ProductController::class, 'index']);
