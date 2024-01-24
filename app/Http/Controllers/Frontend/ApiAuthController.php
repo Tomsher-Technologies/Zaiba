@@ -13,6 +13,11 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\MenuItems;
 use App\Models\Menu;
+use App\Models\Category;
+use App\Models\BusinessSetting;
+use App\Models\Frontend\Banner;
+use App\Models\Page;
+use App\Models\Product;
 use Validator;
 use Hash;
 use Str;
@@ -192,7 +197,6 @@ class ApiAuthController extends Controller
             return response()->json(['status' => false, 'message' => translate('User not found'), 'data' => []], 401);
         }
     }
-
 
     public function logout(Request $request)
     {
@@ -389,15 +393,196 @@ class ApiAuthController extends Controller
     }
 
     public function homePage(){
-        $banners = HomeSlider::whereStatus(1)->with(['mainImage', 'mobileImage'])->orderBy('sort_order')->get();
-        foreach ($banners as $banner) {
-            $banner->web_image = (isset($banner->mainImage->file_name)) ? uploaded_asset($banner->image) : '';
-            $banner->mob_image = (isset($banner->mobileImage->file_name)) ? uploaded_asset($banner->mobile_image) : '';
-            $banner->a_link = $banner->getALink();
-            unset($banner->mainImage);
-            unset($banner->mobileImage);
-        }
-        $data['sliders'] = $banners;
+        // echo '<pre>';
+        $page         = Page::where('type','home_page')->first();
+        $data['slider'] = Cache::rememberForever('homeSlider', function () {
+            $slider = [];
+            $sliders = HomeSlider::whereStatus(1)->with(['mainImage', 'mobileImage'])->orderBy('sort_order')->get();
+            if ($sliders) {
+                foreach ($sliders as $slid) {
+                    $slider[] = [
+                        'id' => $slid->id,
+                        'name' => $slid->name,
+                        'type' => $slid->link_type,
+                        'link' => $slid->getBannerLink(),
+                        'type_id' => $slid->link_ref_id,
+                        'sort_order' => $slid->sort_order,
+                        'status' => $slid->status,
+                        'image' => api_upload_asset($slid->image),
+                        'mob_image' => api_upload_asset($slid->mobile_image)
+                    ];
+                }
+                return $slider;
+            }
+        });
+
+        $data['new_collection'] = Cache::rememberForever('newCollections', function () use($page) {
+            $collections['title'] =  $page->heading1;
+            $collections['sub_title'] = $page->sub_heading1;
+            $newCollection = json_decode(get_setting('new_collection_categories'));
+            if(!empty($newCollection)){
+                $collections['categories'] = Category::whereIn('id',$newCollection)
+                                        ->select('id','parent_id','name','slug')
+                                        ->where('is_active',1)
+                                        ->with(['products'=>function($query){
+                                                $query->select('id', 'name', 'category_id', 'sku', 'unit_price', 'slug',\DB::raw('CONCAT("'.url('/').'", thumbnail_img) as thumbnail_img'))->where('published',1)
+                                                ->take(8)
+                                                ->latest();
+                                            },])
+                                        ->get();
+            }
+            return $collections;
+        });
+        
+        $current_banners = BusinessSetting::whereIn('type', array('home_banner', 'home_mid_banner', 'home_large_banner'))->get()->keyBy('type');
+        $data['collection_banners'] = Cache::rememberForever('newCollectionBanners', function () use($current_banners) {
+            $colBanners = [];
+            $collection_banners = (isset($current_banners['home_banner'])) ? json_decode($current_banners['home_banner']->value) : [];
+            
+            if(!empty($collection_banners)){
+                $colBanners =  Banner::whereIn('id',$collection_banners)->where('status',1)
+                                        ->select('id', 'name', 'image', 'mobile_image', 'title', 'sub_title', 'btn_text', 'link_type','link_ref', 'link_ref_id', 'link', 'status')
+                                        ->get();
+                if($colBanners){
+                    foreach($colBanners as $colB){
+                        $colB->image = api_upload_asset($colB->image);
+                        $colB->mobile_image = api_upload_asset($colB->mobile_image);
+                        $colB->link = $colB->getBannerLink();
+                        unset($colB->link_ref);
+                        unset($colB->link_ref_id);
+                    }
+                }
+            }
+            return $colBanners;
+        });
+       
+        $data['trending_categories'] = Cache::rememberForever('home_trending_categories', function () use($page){
+            $home_categories['title'] =  $page->heading2;
+            $home_categories['sub_title'] = $page->sub_heading2;
+            $catIds = json_decode(get_setting('home_categories'));
+            if(!empty($catIds)){
+                $home_categories['categories'] = Category::with(['icon'=>function($query){
+                                                        $query->select('id', \DB::raw('CONCAT("'.url('/storage').'/", file_name) as file_name'));
+                                                    },])->whereIn('id',$catIds)
+                                                    ->select('id','parent_id','name','icon','slug')
+                                                    ->where('is_active',1)
+                                                    ->get();
+            }
+            return $home_categories;
+        });
+
+        $data['trending_products'] = Cache::rememberForever('home_trending_products', function () use($page){
+            $home_products['title'] =  $page->heading3;
+            $home_products['sub_title'] = $page->sub_heading3;
+            $proIds = json_decode(get_setting('trending_products'));
+            if(!empty($proIds)){
+                $home_products['products'] = Product::whereIn('id',$proIds)
+                                                    ->select('id', 'name', 'slug','sku', 'unit_price', \DB::raw('CONCAT("'.url('/').'", thumbnail_img) as thumbnail_img'))
+                                                    ->where('published',1)
+                                                    ->get();
+            }
+            return $home_products;
+        });
+
+        $data['highlights'] = Cache::rememberForever('home_highlights', function () use($page){
+            $highlights['title'] = $page->heading4;
+            $highlights['sub_title'] = $page->sub_heading4;
+            $highlights['counts'] = [
+                'count_1_icon' => api_upload_asset($page->image1),
+                'count_1_count' => $page->heading5,
+                'count_1_title' => $page->sub_heading5,
+                'count_2_icon' => api_upload_asset($page->image2),
+                'count_2_count' => $page->heading6,
+                'count_2_title' => $page->sub_heading6
+            ];
+            $highlights['points'] = [
+                'point_1_icon' => api_upload_asset($page->image3),
+                'point_1_title' => $page->title1,
+                'point_2_icon' => api_upload_asset($page->image4),
+                'point_2_title' => $page->title2,
+                'point_3_icon' => api_upload_asset($page->image5),
+                'point_3_title' => $page->title3,
+                'point_4_icon' => api_upload_asset($page->image6),
+                'point_4_title' => $page->title4,
+                'point_5_icon' => api_upload_asset($page->image7),
+                'point_5_title' => $page->title5,
+                'point_6_icon' => api_upload_asset($page->image8),
+                'point_6_title' => $page->title6,
+            ];
+            return $highlights;
+        });
+
+        $data['mid_banners'] = Cache::rememberForever('home_mid_banners', function ()  use($current_banners){
+            $mid_banners = [];
+            $midBanners = (isset($current_banners['home_mid_banner'])) ? json_decode($current_banners['home_mid_banner']->value) : [];
+            
+            if(!empty($midBanners)){
+                $mid_banners =  Banner::whereIn('id',$midBanners)->where('status',1)
+                                        ->select('id', 'name', 'image', 'mobile_image', 'title', 'sub_title', 'btn_text', 'link_type','link_ref', 'link_ref_id', 'link', 'status')
+                                        ->get();
+                if($mid_banners){
+                    foreach($mid_banners as $colM){
+                        $colM->image = api_upload_asset($colM->image);
+                        $colM->mobile_image = api_upload_asset($colM->mobile_image);
+                        $colM->link = $colM->getBannerLink();
+                        unset($colM->link_ref);
+                        unset($colM->link_ref_id);
+                    }
+                }
+            }
+            return $mid_banners;
+        });
+
+        $data['about_us'] = Cache::rememberForever('home_about_us', function () use($page){
+            $about_us['title'] = $page->heading7;
+            $about_us['sub_title'] = $page->sub_heading7;
+            $about_us['description'] = $page->description;
+            $about_us['image1'] = api_upload_asset($page->image9);
+            $about_us['image2'] = api_upload_asset($page->image10);
+            return $about_us;
+        });
+
+        $data['newsletter'] = Cache::rememberForever('home_newsletter', function () use($page){
+            $newsletter['title'] = $page->heading8;
+            $newsletter['sub_title'] = $page->sub_heading8;
+            $newsletter['description'] = $page->content8;
+            $newsletter['image'] = api_upload_asset($page->image11);
+            return $newsletter;
+        });
+
+        $data['get_inspired'] = Cache::rememberForever('home_get_inspired', function () use($page){
+            $get_inspired['title'] = $page->heading9;
+            $get_inspired['sub_title'] = $page->sub_heading9;
+            $get_inspired['image1'] = api_upload_asset($page->image12);
+            $get_inspired['image2'] = api_upload_asset($page->image13);
+            $get_inspired['image3'] = api_upload_asset($page->image14);
+            $get_inspired['image4'] = api_upload_asset($page->image15);
+            return $get_inspired;
+        });
+
+        $data['footer_points'] = Cache::rememberForever('home_footer_points', function () use($page){
+            $footer_points = [];
+            for ($i=0; $i<4; $i++){
+                $points = json_decode(get_setting('home_footer_point_'.$i+1), true);
+                $footer_points[$i] = [
+                    'title' => $points['title'] ?? '',
+                    'sub_title' => $points['sub_title'] ?? '',
+                ];
+            }
+            return $footer_points;
+        });
+
+        $data['meta_data'] = Cache::rememberForever('home_meta_data', function () use($page){
+            $meta_data['meta_title'] = $page->meta_title;
+            $meta_data['meta_description'] = $page->meta_description;
+            $meta_data['og_title'] = $page->og_title;
+            $meta_data['og_description'] = $page->og_description;
+            $meta_data['twitter_title'] = $page->twitter_title;
+            $meta_data['twitter_description'] = $page->twitter_description;
+            $meta_data['keywords'] = $page->keywords;
+            $meta_data['meta_image'] = api_upload_asset($page->meta_image);
+            return $meta_data;
+        });
 
         return response()->json([ 'status' => true, 'message' => 'Success', 'data' => $data],200);
     }

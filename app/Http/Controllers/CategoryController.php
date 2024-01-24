@@ -92,9 +92,9 @@ class CategoryController extends Controller
         // else {
         //     $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->name)).'-'.Str::random(5);
         // }
-
-        $category->featured = $request->featured;
-        $category->top = $request->top;
+        $category->is_active = $request->status;
+        // $category->featured = $request->featured;
+        // $category->top = $request->top;
 
         $category->slug = $request->slug;
 
@@ -177,9 +177,9 @@ class CategoryController extends Controller
             $category->parent_id = 0;
             $category->level = 0;
         }
-
-        $category->featured = $request->featured;
-        $category->top = $request->top;
+        $category->is_active = $request->status;
+        // $category->featured = $request->featured;
+        // $category->top = $request->top;
 
         if ($category->level > $previous_level) {
             CategoryUtility::move_level_down($category->id);
@@ -196,6 +196,8 @@ class CategoryController extends Controller
         $category->slug = $request->slug;
 
         $category->save();
+
+        $category->allChildCategories()->update(['is_active' => $request->status]);
 
         $category->attributes()->sync($request->filtering_attributes);
 
@@ -238,6 +240,16 @@ class CategoryController extends Controller
         $category->featured = $request->status;
         $category->save();
         Cache::forget('featured_categories');
+        return 1;
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $category = Category::findOrFail($request->id);
+        $category->is_active = $request->status;
+        $category->save();
+        $category->allChildCategories()->update(['is_active' => $request->status]);
+        // Cache::forget('featured_categories');
         return 1;
     }
 }

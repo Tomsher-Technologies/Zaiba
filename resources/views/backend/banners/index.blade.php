@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-8 mx-auto">
+        <div class="col-lg-12 mx-auto">
 
             <div class="aiz-titlebar text-left mt-2 mb-3">
                 <div class="row align-items-center">
@@ -24,12 +24,12 @@
                         <table class="table aiz-table mb-0">
                             <thead>
                                 <tr>
-                                    <th data-breakpoints="lg">Name</th>
-                                    <th data-breakpoints="lg">Image</th>
-                                    {{-- <th data-breakpoints="lg">Banner Position</th> --}}
-                                    <th data-breakpoints="lg">Link Type</th>
-                                    <th data-breakpoints="lg">Status</th>
-                                    <th>Options</th>
+                                    <th >Name</th>
+                                    <th >Image</th>
+                                    {{-- <th >Banner Position</th> --}}
+                                    <th class="text-center">Link Type</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Options</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -48,10 +48,10 @@
                                                 @endif
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             <span class="text-capitalize">{{ $banner->link_type }} </span>
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             @if ($banner->status)
                                                 <span
                                                     class="badge badge-inline badge-success text-capitalize">Enabled</span>
@@ -60,7 +60,7 @@
                                                     class="badge badge-inline badge-danger text-capitalize">Disabled</span>
                                             @endif
                                         </td>
-                                        <td class="text-right">
+                                        <td class="text-center">
                                             <a class="btn btn-soft-primary btn-icon btn-circle btn-sm"
                                                 href="{{ route('banners.edit', $banner) }}" title="Edit">
                                                 <i class="las la-edit"></i>

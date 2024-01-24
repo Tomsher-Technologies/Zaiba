@@ -8,7 +8,7 @@ use App\Models\Frontend\Banner;
 use App\Models\Product;
 use Cache;
 use Illuminate\Http\Request;
-
+use Artisan;
 class Bannercontroller extends Controller
 {
     /**
@@ -68,7 +68,7 @@ class Bannercontroller extends Controller
         ]);
 
         Cache::forget('smallBanners');
-
+        Artisan::call('cache:clear');
         flash(translate('Banner created successfully'))->success();
         return redirect()->route('banners.index');
     }
@@ -132,7 +132,7 @@ class Bannercontroller extends Controller
         ]);
 
         Cache::forget('smallBanners');
-
+        Artisan::call('cache:clear');
         flash(translate('Banner updated successfully'))->success();
         return redirect()->route('banners.index');
     }

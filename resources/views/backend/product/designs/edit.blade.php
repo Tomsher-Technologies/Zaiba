@@ -27,12 +27,12 @@
                     @livewire('slug-check', ['model' => 'App\\Models\\Designs', 'model_id' => $design->id, 'template' => 2])
 
                     <div class="form-group  row">
-                        <label class="col-md-3 col-form-label">Is Featured</label>
+                        <label class="col-md-3 col-form-label">Is Active</label>
                         <div class="col-md-9">
-                            <select class="select2 form-control" name="is_featured">
-                                <option {{ $design->is_featured == 1 ? 'selected' : '' }} value="1">Yes
+                            <select class="select2 form-control" name="is_active">
+                                <option {{ $design->is_active == 1 ? 'selected' : '' }} value="1">Yes
                                 </option>
-                                <option {{ $design->is_featured == 0 ? 'selected' : '' }} value="0">No
+                                <option {{ $design->is_active == 0 ? 'selected' : '' }} value="0">No
                                 </option>
                             </select>
                         </div>

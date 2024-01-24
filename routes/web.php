@@ -90,7 +90,7 @@ Route::get('/registration', [HomeController::class, 'registration'])->name('user
 Route::post('/signin/cart', [HomeController::class, 'cart_login'])->name('cart.login.submit');
 
 //Home Page
-Route::get('/', [HomeController::class, 'index'])->name('home');
+// Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::post('/home/section/brands', [HomeController::class, 'load_brands_section'])->name('home.section.brands');
 Route::post('/home/section/large_banner', [HomeController::class, 'load_large_banner_section'])->name('home.section.large_banner');
 // Route::post('/home/section/featured', [HomeController::class, 'load_featured_section'])->name('home.section.featured');

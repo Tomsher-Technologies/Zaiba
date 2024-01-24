@@ -45,7 +45,7 @@
                             @endif
                             @if (userHasPermision(2))
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{ route('products.all') }}" class="aiz-side-nav-link">
+                                    <a href="{{ route('products.all') }}" class="aiz-side-nav-link {{ areActiveRoutes(['products.all', 'products.edit']) }}" >
                                         <span class="aiz-side-nav-text">All Products</span>
                                     </a>
                                 </li>

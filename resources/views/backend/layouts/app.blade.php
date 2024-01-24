@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Favicon -->
-    <link rel="icon" href="{{ frontendAsset('img/favicon.ico') }}">
+    <link rel="icon" href="{{ static_asset('assets/img/favicon.ico') }}">
     <title>{{ env('APP_NAME') }} | @yield('title')</title>
   
     <!-- google font -->
