@@ -395,6 +395,7 @@ class ApiAuthController extends Controller
     public function homePage(){
         // echo '<pre>';
         $page         = Page::where('type','home_page')->first();
+        
         $data['slider'] = Cache::rememberForever('homeSlider', function () {
             $slider = [];
             $sliders = HomeSlider::whereStatus(1)->with(['mainImage', 'mobileImage'])->orderBy('sort_order')->get();
