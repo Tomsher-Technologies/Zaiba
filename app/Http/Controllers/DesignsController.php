@@ -62,7 +62,7 @@ class DesignsController extends Controller
         $design->twitter_title = $request->twitter_title ?? $request->meta_title;
         $design->twitter_description = $request->twitter_description ?? $request->meta_description;
         $design->slug = $request->slug;
-        $design->is_featured = $request->is_featured;
+        $design->is_active = $request->is_active;
 
         $design->logo = $request->image;
         $design->save();
@@ -119,7 +119,7 @@ class DesignsController extends Controller
         $design->twitter_description = $request->twitter_description ?? $request->meta_description;
         $design->slug = $request->slug;
         $design->logo = $request->logo;
-        $design->is_featured = $request->is_featured;
+        $design->is_active = $request->is_active;
         $design->save();
 
         flash(translate('Design has been updated successfully'))->success();

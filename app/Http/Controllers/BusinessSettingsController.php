@@ -379,78 +379,169 @@ class BusinessSettingsController extends Controller
 
     public function update(Request $request)
     {
+        // echo '<pre>';
+        // print_r($request->all());
+        // die;
         $page_type = $request->page_type;
+
+        if($page_type == 'new_collection'){
+            $page               = Page::where('type','home_page')->first();
+            $page->heading1     = $request->heading1;
+            $page->sub_heading1 = $request->sub_heading1;
+            $page->save();
+        }
+
         if($page_type == 'trending_categories'){
-            $page = Page::where('type','home_page')->first();
-            $page->heading2 = $request->trend_title;
+            $page               = Page::where('type','home_page')->first();
+            $page->heading2     = $request->trend_title;
             $page->sub_heading2 = $request->trend_sub_title;
             $page->save();
         }
 
         if($page_type == 'trending_products'){
-            $page = Page::where('type','home_page')->first();
-            $page->heading3 = $request->trend_prod_title;
+            $page               = Page::where('type','home_page')->first();
+            $page->heading3     = $request->trend_prod_title;
             $page->sub_heading3 = $request->trend_prod_sub_title;
             $page->save();
         }
 
-        foreach ($request->types as $key => $type) {
-            if ($type == 'site_name') {
-                $this->overWriteEnvFile('APP_NAME', $request[$type]);
-            }
+        if($page_type == 'home_about'){
+            $page               = Page::where('type','home_page')->first();
+            $page->heading7     = $request->heading7;
+            $page->sub_heading7 = $request->sub_heading7;
+            $page->description  = $request->description;
+            $page->image9       = $request->image9;
+            $page->image10      = $request->image10;
+            $page->save();
+        }
 
-            if ($type == 'home_banner') {
-                if (count(array_filter($request->banner)) !== count(array_unique(array_filter($request->banner)))) {
-                    return back()->withErrors([
-                        $request->name => "Both banners cannot be same"
+        if($page_type == 'home_newsletter'){
+            $page               = Page::where('type','home_page')->first();
+            $page->heading8     = $request->heading8;
+            $page->sub_heading8 = $request->sub_heading8;
+            $page->content8     = $request->content8;
+            $page->image11      = $request->image11;
+            $page->save();
+        }
+
+        if($page_type == 'home_footer'){
+            $page               = Page::where('type','home_page')->first();
+            $page->heading9     = $request->heading9;
+            $page->sub_heading9 = $request->sub_heading9;
+            $page->image12      = $request->image12;
+            $page->image13      = $request->image13;
+            $page->image14      = $request->image14;
+            $page->image15      = $request->image15;
+            $page->save();
+        }
+
+        if($page_type == 'highlights_section'){
+            $page               = Page::where('type','home_page')->first();
+            $page->heading4     = $request->heading4;
+            $page->sub_heading4 = $request->sub_heading4;
+            $page->image1       = $request->image1;
+            $page->heading5     = $request->heading5;
+            $page->sub_heading5 = $request->sub_heading5;
+            $page->image2       = $request->image2;
+            $page->heading6     = $request->heading6;
+            $page->sub_heading6 = $request->sub_heading6;
+            $page->title1       = $request->title1;
+            $page->image3       = $request->image3;
+            $page->title2       = $request->title2;
+            $page->image4       = $request->image4;
+            $page->title3       = $request->title3;
+            $page->image5       = $request->image5;
+            $page->title4       = $request->title4;
+            $page->image6       = $request->image6;
+            $page->title5       = $request->title5;
+            $page->image7       = $request->image7;
+            $page->title6       = $request->title6;
+            $page->image8       = $request->image8;
+            $page->save();
+        }
+
+        if($request->has('types')){
+            foreach ($request->types as $key => $type) {
+                // echo '<pre>';
+                //         print_r($request->all());
+                //         die;
+                if ($type == 'site_name') {
+                    $this->overWriteEnvFile('APP_NAME', $request[$type]);
+                }
+
+    
+                if ($type == 'home_banner') {
+                    if (count(array_filter($request->banner)) !== count(array_unique(array_filter($request->banner)))) {
+                        return back()->withErrors([
+                            $request->name => "Both banners cannot be same"
+                        ]);
+                    }
+    
+                    BusinessSetting::updateOrCreate([
+                        'type' => $request->name . '_status'
+                    ], [
+                        'value' =>  $request->has('status')
                     ]);
-                }
-
-                BusinessSetting::updateOrCreate([
-                    'type' => $request->name . '_status'
-                ], [
-                    'value' =>  $request->has('status')
-                ]);
-
-                BusinessSetting::updateOrCreate([
-                    'type' => $request->name
-                ], [
-                    'value' =>  json_encode($request->banner)
-                ]);
-            } else if ($type == 'timezone') {
-                $this->overWriteEnvFile('APP_TIMEZONE', $request[$type]);
-            } else {
-                $lang = null;
-                if (gettype($type) == 'array') {
-                    $lang = array_key_first($type);
-                    $type = $type[$lang];
-                    $business_settings = BusinessSetting::where('type', $type)->where('lang', $lang)->first();
-                } else {
-                    $business_settings = BusinessSetting::where('type', $type)->first();
-                }
-
-                if ($business_settings != null) {
-                    if (gettype($request[$type]) == 'array') {
-                        $business_settings->value = json_encode($request[$type]);
-                    } else {
-                        $business_settings->value = $request[$type];
+    
+                    BusinessSetting::updateOrCreate([
+                        'type' => $request->name
+                    ], [
+                        'value' =>  json_encode($request->banner)
+                    ]);
+                } else if ($type == 'timezone') {
+                    $this->overWriteEnvFile('APP_TIMEZONE', $request[$type]);
+                }else if($type == 'home_footer_points'){
+                    $points = $request->points;
+                    foreach($points as $key=>$po){
+                        BusinessSetting::updateOrCreate([
+                            'type' => 'home_footer_point_'.$key+1
+                        ], [
+                            'value' =>  json_encode($po)
+                        ]);
                     }
-                    $business_settings->lang = $lang;
-                    $business_settings->save();
+                }else if($type == 'new_collection_categories'){
+                    $categs = $request->new_collection_categories;
+                    BusinessSetting::updateOrCreate([
+                        'type' => 'new_collection_categories'
+                    ], [
+                        'value' =>  json_encode($categs)
+                    ]);
                 } else {
-                    $business_settings = new BusinessSetting;
-                    $business_settings->type = $type;
-                    if (gettype($request[$type]) == 'array') {
-                        $business_settings->value = json_encode($request[$type]);
+                    $lang = null;
+                    
+                    if (gettype($type) == 'array') {
+                        $lang = array_key_first($type);
+                        $type = $type[$lang];
+                        $business_settings = BusinessSetting::where('type', $type)->where('lang', $lang)->first();
                     } else {
-                        $business_settings->value = $request[$type];
+                        $business_settings = BusinessSetting::where('type', $type)->first();
                     }
-                    $business_settings->lang = $lang;
-                    $business_settings->save();
+                  
+                    if ($business_settings != null) {
+                        if (gettype($request[$type]) == 'array') {
+                            $business_settings->value = json_encode($request[$type]);
+                        } else {
+                            $business_settings->value = $request[$type];
+                        }
+
+                        
+                        $business_settings->lang = $lang;
+                        $business_settings->save();
+                    } else {
+                        $business_settings = new BusinessSetting;
+                        $business_settings->type = $type;
+                        if (gettype($request[$type]) == 'array') {
+                            $business_settings->value = json_encode($request[$type]);
+                        } else {
+                            $business_settings->value = $request[$type];
+                        }
+                        $business_settings->lang = $lang;
+                        $business_settings->save();
+                    }
                 }
             }
         }
-
+    
         Artisan::call('cache:clear');
 
         flash(translate("Settings updated successfully"))->success();

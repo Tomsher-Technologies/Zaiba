@@ -18,9 +18,8 @@
 		<table class="table aiz-table mb-0">
         <thead>
             <tr>
-                <th data-breakpoints="lg">#</th>
+                <th >#</th>
                 <th>{{translate('Name')}}</th>
-                <th data-breakpoints="md">{{translate('URL')}}</th>
                 <th class="text-right">{{translate('Actions')}}</th>
             </tr>
         </thead>
@@ -29,13 +28,9 @@
         	<tr>
         		<td>{{ $key+1 }}</td>
         		
-				@if($page->type == 'home_page')
-        			<td><a href="{{ route('custom-pages.show_custom_page', $page->slug) }}" class="text-reset">{{ $page->title }}</a></td>
-					<td>{{ route('home') }}</td>
-				@else
-        			<td><a href="{{ route('custom-pages.show_custom_page', $page->slug) }}" class="text-reset">{{ $page->title }}</a></td>
-					<td>{{ route('home') }}/{{ $page->slug }}</td>
-				@endif
+				<td>
+					{{ $page->title }}
+				</td>
 				
         		<td class="text-right">
 					@if($page->type == 'home_page')

@@ -55,6 +55,18 @@
                         @enderror
 
                         <div class="form-group  row">
+                            <label class="col-md-3 col-form-label">Is Active</label>
+                            <div class="col-md-9">
+                                <select class="select2 form-control" name="status">
+                                    <option {{ old('status') == 1 ? 'selected' : '' }} value="1">Yes
+                                    </option>
+                                    <option {{ old('status') == 0 ? 'selected' : '' }} value="0">No
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {{-- <div class="form-group  row">
                             <label class="col-md-3 col-form-label">Is Featured</label>
                             <div class="col-md-9">
                                 <select class="select2 form-control" name="featured">
@@ -76,7 +88,7 @@
                                     </option>
                                 </select>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="form-group row">
                             <label class="col-md-3 col-form-label" for="signinSrEmail">Banner

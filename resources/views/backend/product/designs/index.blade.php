@@ -42,8 +42,8 @@
                                 <th>Name</th>
                                 <th>Slug</th>
                                 <th>Image</th>
-                                <th>Is Featured</th>
-                                <th class="text-right">Options</th>
+                                <th class="text-center">Is Active</th>
+                                <th class="text-center">Options</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -56,20 +56,20 @@
                                         <img src="{{ uploaded_asset($design->logo) }}" alt="design"
                                             class="h-50px">
                                     </td>
-                                    <td>
-                                        {!! $design->is_featured ? '<span class="badge badge-inline badge-success">YES</span>' : '<span class="badge badge-inline badge-danger">NO</span>' !!}
+                                    <td class="text-center">
+                                        {!! $design->is_active ? '<span class="badge badge-inline badge-success">YES</span>' : '<span class="badge badge-inline badge-danger">NO</span>' !!}
                                     </td>
-                                    <td class="text-right">
+                                    <td class="text-center">
                                         <a class="btn btn-soft-primary btn-icon btn-circle btn-sm"
                                             href="{{ route('designs.edit', $design) }}" title="Edit">
                                             <i class="las la-edit"></i>
                                         </a>
-                                        <a href="#"
+                                        {{-- <a href="#"
                                             class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete"
                                             data-href="{{ route('designs.destroy', $design->id) }}"
                                             title="Delete">
                                             <i class="las la-trash"></i>
-                                        </a>
+                                        </a> --}}
                                     </td>
                                 </tr>
                             @endforeach

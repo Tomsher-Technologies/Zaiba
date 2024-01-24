@@ -485,7 +485,7 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card d-none">
                         <div class="card-header">
                             <h5 class="mb-0 h6">Price visibility</h5>
                         </div>
@@ -502,7 +502,7 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card d-none">
                         <div class="card-header">
                             <h5 class="mb-0 h6">Low Stock Quantity Warning</h5>
                         </div>
@@ -517,7 +517,7 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card d-none">
                         <div class="card-header">
                             <h5 class="mb-0 h6">
                                 Stock Visibility State
@@ -559,7 +559,7 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card d-none">
                         <div class="card-header">
                             <h5 class="mb-0 h6">Featured</h5>
                         </div>

@@ -725,7 +725,7 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card d-none">
                         <div class="card-header">
                             <h5 class="mb-0 h6">Price visibility</h5>
                         </div>
@@ -743,7 +743,7 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card d-none">
                         <div class="card-header">
                             <h5 class="mb-0 h6">Low Stock Quantity Warning</h5>
                         </div>
@@ -759,7 +759,7 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card d-none">
                         <div class="card-header">
                             <h5 class="mb-0 h6">
                                 Stock Visibility State
@@ -804,7 +804,7 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card d-none">
                         <div class="card-header">
                             <h5 class="mb-0 h6">Featured</h5>
                         </div>
@@ -825,8 +825,7 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="card">
+                    <div class="card d-none">
                         <div class="card-header">
                             <h5 class="mb-0 h6">Todays Deal</h5>
                         </div>
@@ -839,6 +838,45 @@
                                             <label class="aiz-switch aiz-switch-success mb-0">
                                                 <input type="checkbox" name="todays_deal" value="1"
                                                     @if ($product->todays_deal == 1) checked @endif>
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0 h6">Return and refund status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label class="col-md-6 col-from-label">Status</label>
+                                <div class="col-md-6">
+                                    <label class="aiz-switch aiz-switch-success mb-0">
+                                        <input type="checkbox" name="return_refund" value="0" @if ($product->return_refund == 1) checked @endif>
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0 h6">Publish Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-md-6 col-from-label">Status</label>
+                                        <div class="col-md-6">
+                                            <label class="aiz-switch aiz-switch-success mb-0">
+                                                <input type="checkbox" name="todays_deal" value="1"
+                                                    @if ($product->published == 1) checked @endif>
                                                 <span></span>
                                             </label>
                                         </div>

@@ -86,10 +86,10 @@ class PageController extends Controller
         if ($page != null) {
             if ($page_name == 'home') {
                 $banners = Banner::where('status', 1)->get();
-                $current_banners = BusinessSetting::whereIn('type', array('home_banner', 'home_ads_banner', 'home_large_banner'))->get()->keyBy('type');
+                $current_banners = BusinessSetting::whereIn('type', array('home_banner', 'home_mid_banner', 'home_large_banner'))->get()->keyBy('type');
 
                 $categories = Cache::rememberForever('categories', function () {
-                    return Category::where('parent_id', 0)->with('childrenCategories')->get();
+                    return Category::where('parent_id', 0)->where('is_active',1)->with('childrenCategories')->get();
                 });
 
                 $products = Product::select('id', 'name')->get();
@@ -118,11 +118,17 @@ class PageController extends Controller
 
         if (Page::where('id', '!=', $id)->where('slug', Str::slug($request->slug))->first() == null) {
             // if ($page->type == 'custom_page') {
-            $page->slug = Str::slug($request->slug);
+            
             // }    
-
-            $page->title          = $request->title;
-            $page->content        = $request->content;
+            if($request->has('slug')){
+                $page->slug = Str::slug($request->slug);
+            }
+            if($request->has('title')){
+                $page->title          = $request->title;
+            }
+            if($request->has('content')){
+                $page->content        = $request->content;
+            }
 
             $page->meta_title       = $request->meta_title;
             $page->meta_description = $request->meta_description;

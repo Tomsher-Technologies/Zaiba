@@ -24,7 +24,7 @@
                     <h5 class="mb-md-0 h6">All Product</h5>
                 </div>
 
-                <div class="dropdown mb-2 mb-md-0">
+                <div class="dropdown mb-2 mb-md-0 d-none">
                     <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
                         Bulk Action
                     </button>
@@ -77,7 +77,7 @@
                 <table class="table aiz-table mb-0">
                     <thead>
                         <tr>
-                            <th>
+                            {{-- <th>
                                 <div class="form-group">
                                     <div class="aiz-checkbox-inline">
                                         <label class="aiz-checkbox">
@@ -86,21 +86,22 @@
                                         </label>
                                     </div>
                                 </div>
-                            </th>
+                            </th> --}}
+                            <th>#</th>
                             <th>{{ translate('Name') }}</th>
-                            <th data-breakpoints="sm">{{ translate('Info') }}</th>
-                            <th data-breakpoints="md">{{ translate('Total Stock') }}</th>
+                            <th >{{ translate('Info') }}</th>
+                            <th class="text-center">{{ translate('Total Stock') }}</th>
                             {{-- <th data-breakpoints="lg">{{translate('Todays Deal')}}</th> --}}
-                            <th data-breakpoints="lg">{{ translate('Published') }}</th>
+                            <th class="text-center">{{ translate('Published') }}</th>
                             {{-- <th data-breakpoints="lg">{{translate('Featured')}}</th> --}}
-                            <th data-breakpoints="sm" class="text-right">{{ translate('Options') }}</th>
+                            <th class="text-center">{{ translate('Options') }}</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($products as $key => $product)
                             <tr>
-                                <!--<td>{{ $key + 1 + ($products->currentPage() - 1) * $products->perPage() }}</td>-->
-                                <td>
+                                <td>{{ $key + 1 + ($products->currentPage() - 1) * $products->perPage() }}</td>
+                                {{-- <td>
                                     <div class="form-group d-inline-block">
                                         <label class="aiz-checkbox">
                                             <input type="checkbox" class="check-one" name="id[]"
@@ -108,7 +109,7 @@
                                             <span class="aiz-square-check"></span>
                                         </label>
                                     </div>
-                                </td>
+                                </td> --}}
                                 <td>
                                     <div class="row gutters-5 w-200px w-md-300px mw-100">
 
@@ -133,7 +134,7 @@
                                     <strong>{{ translate('Rating') }}:</strong> {{ $product->rating }} </br>
                                     <strong>{{ translate('SKU') }}:</strong> {{ $product->sku }} </br>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     @php
                                         $qty = 0;
                                         if ($product->variant_product) {
@@ -159,7 +160,7 @@
                                 <span class="slider round"></span>
                             </label>
                         </td> --}}
-                                <td>
+                                <td class="text-center">
                                     <label class="aiz-switch aiz-switch-success mb-0">
                                         <input onchange="update_published(this)" value="{{ $product->id }}"
                                             type="checkbox" <?php if ($product->published == 1) {
@@ -176,7 +177,7 @@
                                 <span class="slider round"></span>
                             </label>
                         </td> --}}
-                                <td class="text-right">
+                                <td class="text-center">
                                     <a class="btn btn-soft-success btn-icon btn-circle btn-sm"
                                         href="{{ route('product', $product->slug) }}" target="_blank" title="View">
                                         <i class="las la-eye"></i>
@@ -189,10 +190,10 @@
                                     {{-- <a class="btn btn-soft-warning btn-icon btn-circle btn-sm" href="{{route('products.duplicate', ['id'=>$product->id, 'type'=>$type]  )}}" title="Duplicate">
                                 <i class="las la-copy"></i>
                             </a> --}}
-                                    <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete"
+                                    {{-- <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete"
                                         data-href="{{ route('products.destroy', $product->id) }}" title="Delete">
                                         <i class="las la-trash"></i>
-                                    </a>
+                                    </a> --}}
                                 </td>
                             </tr>
                         @endforeach

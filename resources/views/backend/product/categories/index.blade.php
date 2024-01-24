@@ -42,14 +42,14 @@ inp.remove();
                     <tr>
                         <th data-breakpoints="lg">#</th>
                         <th>Name</th>
-                        <th data-breakpoints="lg">Parent Category</th>
+                        <th >Parent Category</th>
                         <th data-breakpoints="lg">Link</th>
-                        <th data-breakpoints="lg">Order Level</th>
-                        <th data-breakpoints="lg">Level</th>
-                        <th data-breakpoints="lg">Banner</th>
-                        <th data-breakpoints="lg">Icon</th>
-                        <th data-breakpoints="lg">Featured</th>
-                        <th width="10%" class="text-right">Options</th>
+                        <th data-breakpoints="lg" class="text-center">Order Level</th>
+                        <th data-breakpoints="lg" class="text-center">Level</th>
+                        <th >Banner</th>
+                        <th >Icon</th>
+                        <th class="text-center">Active Status</th>
+                        <th width="10%" class="text-center">Options</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,8 +70,8 @@ inp.remove();
                             <td>
                                 <span style="cursor:pointer" onclick="copy(this)">{{ route('products.category', $category->slug) }}</span>
                             </td>
-                            <td>{{ $category->order_level }}</td>
-                            <td>{{ $category->level }}</td>
+                            <td class="text-center">{{ $category->order_level }}</td>
+                            <td class="text-center">{{ $category->level }}</td>
                             <td>
                                 @if ($category->banner != null)
                                     <img src="{{ uploaded_asset($category->banner) }}" alt="Banner"
@@ -89,25 +89,25 @@ inp.remove();
                                     —
                                 @endif
                             </td>
-                            <td>
+                            <td class="text-center">
                                 <label class="aiz-switch aiz-switch-success mb-0">
-                                    <input type="checkbox" onchange="update_featured(this)" value="{{ $category->id }}"
-                                        <?php if ($category->featured == 1) {
+                                    <input type="checkbox" onchange="update_status(this)" value="{{ $category->id }}"
+                                        <?php if ($category->is_active == 1) {
                                             echo 'checked';
                                         } ?>>
                                     <span></span>
                                 </label>
                             </td>
-                            <td class="text-right">
+                            <td class="text-center">
                                 <a class="btn btn-soft-primary btn-icon btn-circle btn-sm"
                                     href="{{ route('categories.edit', ['id' => $category->id, 'lang' => env('DEFAULT_LANGUAGE')]) }}"
                                     title="Edit">
                                     <i class="las la-edit"></i>
                                 </a>
-                                <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete"
+                                {{-- <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete"
                                     data-href="{{ route('categories.destroy', $category->id) }}" title="Delete">
                                     <i class="las la-trash"></i>
-                                </a>
+                                </a> --}}
                             </td>
                         </tr>
                     @endforeach
@@ -128,22 +128,26 @@ inp.remove();
 
 @section('script')
     <script type="text/javascript">
-        function update_featured(el) {
+        function update_status(el) {
             if (el.checked) {
                 var status = 1;
             } else {
                 var status = 0;
             }
-            $.post('{{ route('categories.featured') }}', {
+            $.post('{{ route('categories.status') }}', {
                 _token: '{{ csrf_token() }}',
                 id: el.value,
                 status: status
             }, function(data) {
                 if (data == 1) {
-                    AIZ.plugins.notify('success', 'Featured categories updated successfully');
+                    AIZ.plugins.notify('success', 'Category status updated successfully');
                 } else {
                     AIZ.plugins.notify('danger', 'Something went wrong');
                 }
+                setTimeout(function() {
+                    window.location.reload();
+                }, 3000);
+               
             });
         }
     </script>
