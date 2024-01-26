@@ -18,6 +18,8 @@ use App\Models\User;
 use App\Models\Addon;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\AttributeValue;
+use App\Models\ProductAttributes;
 use App\Models\Cart;
 use App\Models\Offers;
 use App\Models\Product;
@@ -1176,6 +1178,30 @@ if (!function_exists('load_seo_tags')) {
         $sku = str_replace(' ', '', $sku);
         $sku = preg_replace('/[^a-zA-Z0-9_-]/', '', $sku);
         return $sku;
+    }
+
+    function get_attribute_values($attribute_id, $proAttr){
+        $all_attribute_values = AttributeValue::with('attribute')->where('attribute_id', $attribute_id)->get();
+
+        $html = '';
+
+        foreach ($all_attribute_values as $row) {
+            $selected = ($proAttr == $row->id) ? 'selected' : '';
+            $html .= '<option value="' . $row->id . '" '.$selected.'>' . $row->value . '</option>';
+        }
+
+        return $html;
+    }
+
+    function get_product_attrValue($attrValue, $productStockId){
+        $query = ProductAttributes::where('product_varient_id', $productStockId)
+                                    ->where('attribute_id', $attrValue)
+                                    ->first();
+        $value = '';
+        if($query){
+            $value = $query->attribute_value_id;
+        }
+        return $value;
     }
 
     function userHasPermision($id)

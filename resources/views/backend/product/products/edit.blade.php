@@ -286,19 +286,21 @@
                                 <label class="col-md-3 col-from-label">Attributes <span class="text-danger">*</span></label>
                                 <div class="col-md-6">
                                     @php   
-                                        $attributes = \App\Models\Attribute::orderBy('name','asc')->get();
+                                        $attributes = \App\Models\Attribute::orderBy('name','asc')->pluck('name','id')->toArray();
                                         $attrsProd = json_decode($product->attributes);
                                     @endphp
+                                    
                                     <select class="form-control aiz-selectpicker" name="main_attributes[]" multiple id="main_attributes" required data-live-search="true">
-                                        <option value="">Select Attributes</option>
-                                        @foreach ($attributes as $attr)
+                                        
+                                        @foreach ($attributes as $attrKey => $attrN)
+                                        
                                             @php 
                                                 $selected = '';
-                                                if(!empty($attrsProd) && in_array($attr->id, $attrsProd)){
+                                                if(!empty($attrsProd) && in_array($attrKey, $attrsProd)){
                                                     $selected = 'selected';
                                                 }
                                             @endphp
-                                            <option {{ $selected }}  value="{{ $attr->id }}">{{ $attr->name }}
+                                            <option {{ $selected }}  value="{{ $attrKey }}">{{ $attrN }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -307,6 +309,10 @@
 
                             @foreach($product->stocks as $key => $stocks)
                                 @php
+
+                                // echo '<pre>';
+                                // print_r($stocks);
+                                // die;
                                     $varients_sku = $stocks->sku;
                                     $varients_description = $stocks->description;
                                     $varients_current_stock = $stocks->qty;
@@ -318,8 +324,8 @@
                                     $varients_making_price_type_id = $stocks->making_price_type_id;
                                     $varients_making_charge = $stocks->making_charge;
                                 @endphp
-                                    <div id="old_product{{$key}}">
-                                        <div data-item>
+                                    <div id="old_product{{$key}}" data-item>
+                                        <div >
                                             <div class="form-group row">
                                                 <div class="col-md-12">
                                                     <h6 class="pro_variant_name" id="pro_variant_name">Product Variant {{ $key+1 }}</h6>
@@ -359,7 +365,26 @@
                                                 </div>
                                             </div>
 
-                                            <div class="product_attributes" >
+                                            <div class="old_product_attributes{{$key}}" >
+                                                @if(!empty($attrsProd))
+                                                    @foreach($attrsProd as $ii => $aprod)
+
+                                                        @php
+                                                            $prodAttrValue = get_product_attrValue($aprod,$stocks->id);
+                                                            $attrValues = get_attribute_values($aprod, $prodAttrValue);
+                                                        @endphp
+                                                        <div class="form-group row attr{{$aprod}}" >
+                                                            <div class="col-md-3">
+                                                                <input type="text" class="form-control" name="oldproduct[{{$key}}][choice_{{$ii}}]" value="{{ ($attributes[$aprod] ?? '') }}" placeholder="Choice Title" readonly>
+                                                            </div>
+                                                            <div class="col-md-8">
+                                                                <select required class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="oldproduct[{{$key}}][choice_options_{{$ii}}]">
+                                                                    {!! $attrValues !!}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                @endif
                                                 
                                             </div>
 
@@ -373,7 +398,7 @@
                                             <div class="form-group row">
                                                 <label class="col-md-3 col-from-label">Quantity <span  class="text-danger">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="number" lang="en" min="0" value="0" step="0.01" placeholder="Quantity" name="oldproduct[{{$key}}][current_stock]" class="form-control" required
+                                                    <input type="number" lang="en" min="0"  step="0.01" placeholder="Quantity" name="oldproduct[{{$key}}][current_stock]" class="form-control" required
                                                     value="{{ $varients_current_stock }}">
                                                 </div>
                                             </div>
@@ -381,7 +406,7 @@
                                             <div class="form-group row">
                                                 <label class="col-md-3 col-from-label">Metal Weight<span class="text-danger">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="number" lang="en" min="0" value="0" step="0.01"
+                                                    <input type="number" lang="en" min="0" step="0.01"
                                                         placeholder="Metal Weight" name="oldproduct[{{$key}}][metal_weight]" class="form-control" required value="{{ $varients_metal_weight }}">
                                                 </div>
                                             </div>
@@ -445,13 +470,7 @@
                                                     <input type="number" lang="en" min="0" value="{{ $stocks->making_charge }}" step="0.01" placeholder="Making Charge" name="oldproduct[{{$key}}][making_charge]" class="form-control" required>
                                                 </div>
                                             </div>
-                                            @if($key != 0)
-                                            <div class="form-group row">
-                                                <div class="col-md-12 text-right">
-                                                    <input  type="button" class="btn btn-danger action-btn deleteOld" data-id="{{$key}}" value="Delete" />
-                                                </div>
-                                            </div> 
-                                            @endif    
+                                               
                                         </div>
                                     </div>
                             @endforeach
@@ -977,6 +996,7 @@
             $tabs[$key]['tab_heading'] = $tab->heading;
             $tabs[$key]['tab_description'] = $tab->content;
         }
+        $productStockCount = count($product->stocks);
     @endphp
 
     
@@ -1021,8 +1041,10 @@
                                 var repeatCount = repeaterItems.length;
 
                                 var oldCount = $("div[data-item]").length;
-                               
+                               alert(oldCount);
                                 var newCount = parseInt(repeatCount) + parseInt(oldCount);
+                                alert(repeatCount);
+                                alert(newCount);
                                 var count = parseInt(repeatCount) - 1;
 
                                 $('[name="products['+count+'][sku]"]').parent().parent().parent().find('#pro_variant_name').attr("id","pro_variant_name"+count);
@@ -1163,12 +1185,29 @@
             }
         });
 
-        $('#main_attributes').on('change', function() {
-            $('.product_attributes').html(null);
-            $.each($("#main_attributes option:selected"), function() {
-                add_more_customer_choice_option($(this).val(), $(this).text());
-            });
+        // $('#main_attributes').on('change', function() {
+        //     alert($(this).val());
+        //     // $('.product_attributes').html(null);
+        //     // $.each($("#main_attributes option:selected"), function() {
+        //     //     add_more_customer_choice_option($(this).val(), $(this).text());
+        //     // });
 
+        // });
+
+        $("#main_attributes").on("changed.bs.select", function(e, clickedIndex, newValue, oldValue) {
+            var sel = $(this).find('option').eq(clickedIndex).val();
+            console.log(sel+" "+newValue);
+
+            var text = $(this).find('option').eq(clickedIndex).text();
+            // console.log(e);
+            console.log('clickedIndex   ========  '+clickedIndex);
+            console.log('Value   ======= '+sel);
+            console.log('Text    ======== '+text);
+            if(newValue == true){
+                add_more_customer_choice_option(sel, text);
+            }else{
+                $('.attr'+sel).remove();
+            }
         });
 
         function add_more_customer_choice_option(i, name){
@@ -1183,8 +1222,27 @@
                 },
                 success: function(data) {
                     var obj = JSON.parse(data);
+
+                    var productStockCount = {{ $productStockCount }};
+                    if(productStockCount != 0){
+                        for(j=0; j<productStockCount; j++){
+                            $('.old_product_attributes'+j).append('\
+                                <div class="form-group row attr'+i+'" >\
+                                    <div class="col-md-3">\
+                                        <input type="text" class="form-control" name="oldproduct['+j+'][choice_'+i+']" value="'+name+'" placeholder="Choice Title" readonly>\
+                                    </div>\
+                                    <div class="col-md-8">\
+                                        <select required class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="oldproduct['+j+'][choice_options_'+i+']">\
+                                            '+obj+'\
+                                        </select>\
+                                    </div>\
+                                </div>');
+                        }
+                    }
+                   
+                   // var stockCount = $product->stocks
                     $('.product_attributes').append('\
-                        <div class="form-group row">\
+                        <div class="form-group row attr'+i+'">\
                             <div class="col-md-3">\
                                 <input type="text" class="form-control" name="choice_'+ i +'" value="'+name+'" placeholder="Choice Title" readonly>\
                             </div>\

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\BusinessSetting;
 use App\Models\Page;
 use Artisan;
+use Cache;
 // use CoreComponentRepository;
 
 class BusinessSettingsController extends Controller
@@ -543,6 +544,10 @@ class BusinessSettingsController extends Controller
         }
     
         Artisan::call('cache:clear');
+
+        // $cacheKeys = ['homeSlider','newCollections','newCollectionBanners','home_trending_categories','home_trending_products','home_highlights','home_mid_banners','home_about_us','home_newsletter','home_get_inspired','home_footer_points','home_meta_data'];
+
+        // Cache::forget('homeSlider','newCollections','newCollectionBanners','home_trending_categories','home_trending_products','home_highlights','home_mid_banners','home_about_us','home_newsletter','home_get_inspired','home_footer_points','home_meta_data');
 
         flash(translate("Settings updated successfully"))->success();
         return back();

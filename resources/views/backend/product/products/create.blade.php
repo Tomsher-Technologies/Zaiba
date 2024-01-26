@@ -236,11 +236,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row">
+                                    <div class="form-group row imageVariant">
                                         <label class="col-md-3 col-form-label" for="signinSrEmail">Product Variant
                                             Image<small>(1000*1000)</small></label>
                                         <div class="col-md-8">
-                                            <input type="file" name="variant_images" class="form-control"
+                                            <input type="file" name="variant_images" class="form-control variant_images"
                                                 accept="image/*" required>
                                         </div>
                                     </div>
@@ -629,7 +629,9 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
-        $('.stone-div').hide();
+        $('.stone-div,.imageVariant').hide();
+
+        $('.variant_images').removeAttr('required');
         $('.add_variant,#attributes,.pro_variant_name').hide();
         let buttons = [
                     ["font", ["bold", "underline", "italic", "clear"]],
@@ -714,6 +716,9 @@
 
                 $('#pro_variant_name'+count).html('Product Variant '+repeatCount);
                 $('.pro_variant_name').show();
+                $('.imageVariant').show();
+                // $('.variant_images').addAttr('required');
+                $('.variant_images').prop('required', true);
                 $.each($("#main_attributes option:selected"), function() {
                     var i = $(this).val();
                     var name = $(this).text();
@@ -735,7 +740,7 @@
                                         <input type="text" class="form-control" name="products['+count+'][choice_'+ i +']" value="'+name+'" placeholder="Choice Title" readonly>\
                                     </div>\
                                     <div class="col-md-8">\
-                                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="products['+count+'][choice_options_'+ i +']">\
+                                        <select required class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="products['+count+'][choice_options_'+ i +']">\
                                             '+obj+'\
                                         </select>\
                                     </div>\
@@ -786,29 +791,31 @@
 
         $(document).on('change','#product_type',function(){
             if($(this).val() == 'variant'){
-                $('.add_variant,#attributes,.pro_variant_name').show();
+                $('.add_variant,#attributes,.pro_variant_name,.imageVariant').show();
+                $('.variant_images').prop('required', true);
             }else{ 
-                $('.add_variant,#attributes,.pro_variant_name').hide();
+                $('.add_variant,#attributes,.pro_variant_name,.imageVariant').hide();
+                $('.variant_images').removeAttr('required');
                 $('div[data-repeater-item]').slice(1).remove();
             }
         });
 
         let selected_attributes = [];
         $('#main_attributes').on('change', function() {
-            // $('.product_attributes').html(null);
-            // $.each($("#main_attributes option:selected"), function() {
-            //     add_more_customer_choice_option($(this).val(), $(this).text());
-            //     if( $.inArray($(this).val(), selected_attributes) == -1 ) {
-            //         selected_attributes.push($(this).val());
-            //     }
-            //     $('#selected_attributes').val(selected_attributes);
-            // });
+             $('.product_attributes').html(null);
+            $.each($("#main_attributes option:selected"), function() {
+                 add_more_customer_choice_option($(this).val(), $(this).text());
+                 if( $.inArray($(this).val(), selected_attributes) == -1 ) {
+                     selected_attributes.push($(this).val());
+                 }
+                 $('#selected_attributes').val(selected_attributes);
+             });
 
-            const values = $(this).val();
-            // Remove all non selected from selected array if user has deselected something
-            selected = selected.filter((value) => values.includes(value));
-            // get value which is not in selected list
-            const lastSelected = values.filter((value) => !selected.includes(value));
+           // const values = $(this).val();
+           // // Remove all non selected from selected array if user has deselected something
+          //  selected = selected.filter((value) => values.includes(value));
+          //  // get value which is not in selected list
+           // const lastSelected = values.filter((value) => !selected.includes(value));
 
         });
 
@@ -832,7 +839,7 @@
                                     <input type="text" class="form-control" name="choice_'+ i +'" value="'+name+'" placeholder="Choice Title" readonly>\
                                 </div>\
                                 <div class="col-md-8">\
-                                    <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i +'">\
+                                    <select required class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i +'">\
                                         '+obj+'\
                                     </select>\
                                 </div>\
