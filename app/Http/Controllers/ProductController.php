@@ -236,7 +236,7 @@ class ProductController extends Controller
             }
 
             foreach ($request->file('gallery_images') as $key => $file) {
-                $gallery[] = $this->downloadAndResizeImage($file, $product->sku, false, $count + $key);
+                $gallery[] = $this->downloadAndResizeImage('main_product',$file, $product->sku, false, $count + $key);
             }
             $product->photos = implode(',', array_merge($old_gallery, $gallery));
         }
@@ -258,7 +258,7 @@ class ProductController extends Controller
                     Storage::delete($product->thumbnail_img);
                 }
             }
-            $gallery = $this->downloadAndResizeImage($request->file('thumbnail_image'), $product->sku, true);
+            $gallery = $this->downloadAndResizeImage('main_product',$request->file('thumbnail_image'), $product->sku, true);
             $product->thumbnail_img = $gallery;
         }
 
@@ -315,7 +315,7 @@ class ProductController extends Controller
                 $product_stock->sku = $prod['sku'];
                 $product_stock->description = $prod['description'];
                 $product_stock->metal_weight = $prod['metal_weight'];
-                $product_stock->stone_available =  (array_key_exists('stone_available', $prod)) ? 1 : 0;
+                $product_stock->stone_available =  (array_key_exists('stone_availability', $prod)) ? 1 : 0;
                 $product_stock->stone_type = $prod['stone_type'];
                 $product_stock->stone_count = $prod['stone_count'];
                 $product_stock->stone_weight = $prod['stone_weight'];
@@ -324,7 +324,7 @@ class ProductController extends Controller
                 $product_stock->making_charge = $prod['making_charge'];
                 $product_stock->qty = $prod['current_stock'];
                 
-                $variantImage = $this->downloadAndResizeImage($prod['variant_images'], $prod['sku'], false);
+                $variantImage = (isset($prod['variant_images'])) ? $this->downloadAndResizeImage('varient',$prod['variant_images'], $prod['sku'], false) : NULL;
                 $product_stock->image = $variantImage;
 
                 $product_stock->save();
@@ -409,13 +409,18 @@ class ProductController extends Controller
     }
 
 
-    public function downloadAndResizeImage($imageUrl, $sku, $mainImage = false, $count = 1, $update = false)
+    public function downloadAndResizeImage($product_type, $imageUrl, $sku, $mainImage = false, $count = 1, $update = false)
     {
         $data_url = '';
 
         try {
             $ext = $imageUrl->getClientOriginalExtension();
-            $path = 'products/' . Carbon::now()->year . '/' . Carbon::now()->format('m') . '/' . $sku . '/';
+            
+            if($product_type == 'main_product'){
+                $path = 'products/' . Carbon::now()->year . '/' . Carbon::now()->format('m') . '/' . $sku . '/main/';
+            }else{
+                $path = 'products/' . Carbon::now()->year . '/' . Carbon::now()->format('m') . '/' . $sku . '/';
+            }
 
             if ($mainImage) {
                 $filename = $path . $sku . '.' . $ext;
@@ -486,7 +491,7 @@ class ProductController extends Controller
             }
 
             foreach ($request->file('gallery_images') as $key => $file) {
-                $gallery[] = $this->downloadAndResizeImage($file, $product->sku, false, $count + $key);
+                $gallery[] = $this->downloadAndResizeImage('main_product',$file, $product->sku, false, $count + $key);
             }
             $product->photos = implode(',', array_merge($old_gallery, $gallery));
         }
@@ -508,7 +513,7 @@ class ProductController extends Controller
                     Storage::delete($product->thumbnail_img);
                 }
             }
-            $gallery = $this->downloadAndResizeImage($request->file('thumbnail_image'), $product->sku, true);
+            $gallery = $this->downloadAndResizeImage('main_product',$request->file('thumbnail_image'), $product->sku, true);
             $product->thumbnail_img = $gallery;
         }
 
