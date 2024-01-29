@@ -13,11 +13,10 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <meta name="robots" content="noindex">
     <!-- Favicon -->
     <link rel="icon" href="{{ static_asset('assets/img/favicon.ico') }}">
-    <title>{{ get_setting('website_name') . ' | ' . get_setting('site_motto') }}</title>
-
+    <title>{{ env('APP_NAME') }} | Admin Panel</title>
     <!-- google font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700">
 
@@ -66,9 +65,11 @@
     <div class="aiz-main-wrapper d-flex">
         <div class="flex-grow-1">
             @yield('content')
+           
         </div>
+        
     </div><!-- .aiz-main-wrapper -->
-
+    
     @yield('modal')
 
 

@@ -276,7 +276,7 @@
                                 <label class="col-md-3 col-from-label">Product Type <span class="text-danger">*</span></label>
                                 <div class="col-md-6">
                                     <select class="form-control aiz-selectpicker" name="product_type" id="product_type" required>
-                                        <option @if($product->product_type == '0') selected @endif  value="single">Single</option>
+                                        <option @if($product->product_type == '0') selected @endif @if($product->product_type == '1') disabled @endif value="single">Single</option>
                                         <option  @if($product->product_type == '1') selected @endif value="variant">Variants</option>
                                     </select>
                                 </div>
@@ -335,6 +335,7 @@
                                             <div class="form-group row">
                                                 <label class="col-md-3 col-from-label">SKU <span class="text-danger">*</span></label>
                                                 <div class="col-md-6">
+                                                    <input type="text" name="oldproduct[{{$key}}][stock_id]" class="form-control" value="{{ $stocks->id }}">
                                                     <input type="text" placeholder="SKU" name="oldproduct[{{$key}}][sku]" class="form-control" required value="{{ $varients_sku }}">
                                                 </div>
                                             </div>
@@ -375,10 +376,10 @@
                                                         @endphp
                                                         <div class="form-group row attr{{$aprod}}" >
                                                             <div class="col-md-3">
-                                                                <input type="text" class="form-control" name="oldproduct[{{$key}}][choice_{{$ii}}]" value="{{ ($attributes[$aprod] ?? '') }}" placeholder="Choice Title" readonly>
+                                                                <input type="text" class="form-control" name="oldproduct[{{$key}}][choice_{{$aprod}}]" value="{{ ($attributes[$aprod] ?? '') }}" placeholder="Choice Title" readonly>
                                                             </div>
                                                             <div class="col-md-8">
-                                                                <select required class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="oldproduct[{{$key}}][choice_options_{{$ii}}]">
+                                                                <select required class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="oldproduct[{{$key}}][choice_options_{{$aprod}}]">
                                                                     {!! $attrValues !!}
                                                                 </select>
                                                             </div>
@@ -470,7 +471,17 @@
                                                     <input type="number" lang="en" min="0" value="{{ $stocks->making_charge }}" step="0.01" placeholder="Making Charge" name="oldproduct[{{$key}}][making_charge]" class="form-control" required>
                                                 </div>
                                             </div>
-                                               
+
+                                            <div class="form-group row">
+                                                <label class="col-md-3 col-from-label">Active Status <span class="text-danger">*</span></label>
+                                                <div class="col-md-6">
+                                                    <select class="form-control" name="oldproduct[{{$key}}][status]" id="status" data-live-search="true" required>
+                                                        <option value="">Select Status</option>
+                                                        <option @if($stocks->status == "1") selected @endif value="1">Active</option>
+                                                        <option @if($stocks->status == "0") selected @endif value="0">Inactive</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                             @endforeach
@@ -481,7 +492,7 @@
 
 
                             <div data-repeater-list="products">
-                                <div data-repeater-item>
+                                <div data-repeater-item data-new-item>
                                     <div class="form-group row">
                                         <div class="col-md-12">
                                             <h6 class="pro_variant_name" id="pro_variant_name">Product Variant 1</h6>
@@ -616,13 +627,21 @@
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" name="tab_heading">
                                         </div>
-                                        <input data-repeater-delete type="button" class="btn btn-danger action-btn"
-                                            value="Delete" />
+                                        
                                     </div>
                                     <div class="form-group row">
                                         <label class="col-md-3 col-from-label">Description</label>
                                         <div class="col-md-8">
                                             <textarea class="text-area" name="tab_description"></textarea>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-md-9">
+                                        </div>  
+                                        <div class="col-md-3">
+                                            <input data-repeater-delete type="button" class="btn btn-danger action-btn"
+                                            value="Delete" />
                                         </div>
                                     </div>
                                 </div>
@@ -894,7 +913,7 @@
                                         <label class="col-md-6 col-from-label">Status</label>
                                         <div class="col-md-6">
                                             <label class="aiz-switch aiz-switch-success mb-0">
-                                                <input type="checkbox" name="todays_deal" value="1"
+                                                <input type="checkbox" name="published" value="1"
                                                     @if ($product->published == 1) checked @endif>
                                                 <span></span>
                                             </label>
@@ -1037,14 +1056,14 @@
                             show: function() {
                                 $(this).slideDown();
 
-                                var repeaterItems = $("div[data-repeater-item]");
+                                var repeaterItems = $("div[data-new-item]");
                                 var repeatCount = repeaterItems.length;
 
                                 var oldCount = $("div[data-item]").length;
-                               alert(oldCount);
+                            //    alert('oldCount == '+oldCount);
                                 var newCount = parseInt(repeatCount) + parseInt(oldCount);
-                                alert(repeatCount);
-                                alert(newCount);
+                                // alert('repeatCount == '+repeatCount);
+                                // alert('newCount == '+newCount);
                                 var count = parseInt(repeatCount) - 1;
 
                                 $('[name="products['+count+'][sku]"]').parent().parent().parent().find('#pro_variant_name').attr("id","pro_variant_name"+count);
@@ -1200,9 +1219,9 @@
 
             var text = $(this).find('option').eq(clickedIndex).text();
             // console.log(e);
-            console.log('clickedIndex   ========  '+clickedIndex);
-            console.log('Value   ======= '+sel);
-            console.log('Text    ======== '+text);
+            // console.log('clickedIndex   ========  '+clickedIndex);
+            // console.log('Value   ======= '+sel);
+            // console.log('Text    ======== '+text);
             if(newValue == true){
                 add_more_customer_choice_option(sel, text);
             }else{

@@ -44,8 +44,6 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
     Route::get('/get-menus', [ApiAuthController::class, 'getMenus'])->name('get-menus'); 
 
 
-
-
     Route::get('/user-profile', [ApiAuthController::class, 'userProfile'])->name('user-profile');
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('logout', [ApiAuthController::class, 'logout']);

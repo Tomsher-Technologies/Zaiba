@@ -86,6 +86,11 @@ class Category extends Model
         return $this->hasOne(Upload::class, 'id', 'icon');
     }
 
+    public function child()
+    {
+        return $this->hasMany(Category::class,'parent_id')->with('child')->select('id','parent_id','name','level','slug');
+    }
+
     public static function boot()
     {
         static::creating(function ($model) {

@@ -7,10 +7,10 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
+    <meta name="robots" content="noindex">
     <!-- Favicon -->
     <link rel="icon" href="{{ static_asset('assets/img/favicon.ico') }}">
-  	<title>{{ config('app.name', 'eCommerce') }}</title>
+    <title>{{ env('APP_NAME') }} | Admin Panel</title>
 
     <!-- google font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700">
@@ -26,7 +26,7 @@
 <body>
     <div class="aiz-main-wrapper d-flex">
 
-        <div class="flex-grow-1">
+        <div class="flex-grow-1 m-auto">
             @yield('content')
         </div>
 

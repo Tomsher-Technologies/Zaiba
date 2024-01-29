@@ -1,4 +1,4 @@
-@extends('frontend.layouts.app')
+@extends('backend.layouts.blank')
 
 @section('content')
     <div class="ps-section--shopping ps-shopping-cart">
@@ -16,9 +16,9 @@
                                     <h5 class="text-muted mb-0">Oops! The page you are looking for does not exist. It might
                                         have been moved or delete.</h5>
                                     <div class="mt-4 pt-2 hstack gap-2 justify-content-center">
-                                        <a href="{{ route('home') }}" class="btn ps-btn btn-sm">
+                                        {{-- <a href="{{ route('home') }}" class="btn ps-btn btn-sm">
 											Back to home
-                                        </a>
+                                        </a> --}}
                                     </div>
                                 </div>
                             </div>

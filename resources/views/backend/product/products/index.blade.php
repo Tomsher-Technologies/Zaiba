@@ -1,6 +1,33 @@
 @extends('backend.layouts.app')
 
 @section('content')
+<style>
+    .bread .breadcrumb {
+        all: unset;
+    }
+
+    .bread .breadcrumb li {
+        display: inline-block;
+    }
+
+    .bread nav {
+        display: inline-block;
+        max-width: 250px;
+    }
+
+    .bread .breadcrumb-item+.breadcrumb-item::before {
+        content: ">";
+    }
+
+    .breadcrumb-item+.breadcrumb-item {
+        padding-left: 0;
+    }
+
+    .bread a {
+        pointer-events: none;
+        cursor: sw-resize;
+    }
+</style>
     <div class="aiz-titlebar text-left mt-2 mb-3">
         <div class="row align-items-center">
             <div class="col-auto">
@@ -24,15 +51,24 @@
                     <h5 class="mb-md-0 h6">All Product</h5>
                 </div>
 
-                <div class="dropdown mb-2 mb-md-0 d-none">
-                    <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
-                        Bulk Action
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="#" onclick="bulk_delete()">
-                            Delete selection
-                        </a>
-                    </div>
+               
+                <div class="col-md-2 ml-auto bootstrap-select">
+                    
+                    <select class="form-control form-control-sm aiz-selectpicker mb-2 mb-md-0" data-live-search="true"
+                            name="category" id="" data-selected={{ $category }}>
+                        <option value="0">All</option>
+                        @foreach (getAllCategories()->where('parent_id', 0) as $item)
+                            <option value="{{ $item->id }}" @if( $category == $item->id)  {{ 'selected' }} @endif )>{{ $item->name }}</option>
+                            @if ($item->child)
+                                @foreach ($item->child as $cat)
+                                    @include('backend.product.categories.menu_child_category', [
+                                        'category' => $cat,
+                                        'old_data' => $category,
+                                    ])
+                                @endforeach
+                            @endif
+                        @endforeach
+                    </select>
                 </div>
                 <div class="col-md-2 ml-auto bootstrap-select">
                     <select class="form-control form-control-sm aiz-selectpicker mb-2 mb-md-0" name="type" id="type"
@@ -71,6 +107,10 @@
                             placeholder="Type & Enter">
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <button class="btn btn-info " type="submit">Filter</button>
+                    <a href="{{ route('products.all') }}" class="btn btn-warning">Reset</a>
+                </div>
             </div>
 
             <div class="card-body">
@@ -89,6 +129,7 @@
                             </th> --}}
                             <th>#</th>
                             <th>{{ translate('Name') }}</th>
+                            <th >Category</th>
                             <th >{{ translate('Info') }}</th>
                             <th class="text-center">{{ translate('Total Stock') }}</th>
                             {{-- <th data-breakpoints="lg">{{translate('Todays Deal')}}</th> --}}
@@ -111,7 +152,7 @@
                                     </div>
                                 </td> --}}
                                 <td>
-                                    <div class="row gutters-5 w-200px w-md-300px mw-100">
+                                    <div class="row gutters-5 w-200px w-md-250px mw-100">
 
                                         @if ($product->thumbnail_img)
                                             <div class="col-auto">
@@ -125,6 +166,9 @@
                                             <span class="text-muted text-truncate-2">{{ $product->name }}</span>
                                         </div>
                                     </div>
+                                </td>
+                                <td class="bread">
+                                    {{ Breadcrumbs::render('product_admin', $product) }}
                                 </td>
                                 <td>
                                     <strong>{{ translate('Num of Sale') }}:</strong> {{ $product->num_of_sale }}

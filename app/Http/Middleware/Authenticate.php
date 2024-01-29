@@ -20,6 +20,6 @@ class Authenticate extends Middleware
         if ($route_name[0] == env('ADMIN_PREFIX')) {
             return route('admin.login');
         }
-        return route('user.login');
+        return route('admin.login');
     }
 }

@@ -10,10 +10,10 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <meta name="robots" content="noindex">
     <!-- Favicon -->
     <link rel="icon" href="{{ static_asset('assets/img/favicon.ico') }}">
-    <title>{{ env('APP_NAME') }} | @yield('title')</title>
+    <title>{{ env('APP_NAME') }} | Admin Panel</title>
   
     <!-- google font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700">
@@ -69,10 +69,7 @@
                     @yield('content')
                 </div>
                 <div class="bg-white text-center py-3 px-15px px-lg-25px mt-auto">
-                    <p class="mb-0 text-muted">©
-                        <script>
-                        document.write(new Date().getFullYear())
-                        </script> {{ env('APP_NAME') }}</p>
+                    <p class="mb-0">&copy; {{ env('APP_NAME') }} - Developed By <a href="https://www.tomsher.com/" target="_blank">Tomsher</a></p>
                 </div>
             </div><!-- .aiz-main-content -->
         </div><!-- .aiz-content-wrapper -->

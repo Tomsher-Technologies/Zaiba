@@ -13,6 +13,7 @@ use App\Models\Category;
 use App\Models\Brand;
 use App\Models\Shop;
 use App\Models\Color;
+use App\Models\Page;
 use Illuminate\Http\Request;
 use App\Utility\CategoryUtility;
 use App\Utility\SearchUtility;
@@ -23,6 +24,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        
         $limit = $request->limit ? $request->limit : 10;
         $offset = $request->offset ? $request->offset : 0;
         $min_price = $request->min_price ? $request->min_price : '';
@@ -35,32 +37,59 @@ class ProductController extends Controller
         $brand_slug = $request->brand_slug ? explode(',', $request->brand_slug)  : false;
 
         $offer_slug = $request->offer_slug ? explode(',', $request->offer_slug)  : false;
+
         $product_query  = Product::wherePublished(1);
-
-        if ($offer) {
-            $product_ids = getOffersProductIds($offer, 1);
-            $product_query->whereIn('id', $product_ids);
+        
+        $metaData = Page::where('type', 'product_listing')->select('image1','meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image')->first();
+        if($metaData){
+            $metaData->image1           = ($metaData->image1 != NULL) ? uploaded_asset($metaData->image1) : '';
+            $metaData->meta_image       = ($metaData->meta_image != NULL) ? uploaded_asset($metaData->meta_image) : '';
+            $metaData->footer_title     = '';
+            $metaData->footer_content   = '';
         }
+        
+        $meta = NULL;
+        // if($offer){
+        //     $product_ids = getOffersProductIds($offer,1);
+        //     $product_query->whereIn('id', $product_ids);
+        // }
 
-        if ($offer_slug) {
-            $product_ids = getOffersProductIds($offer_slug, 0);
-            $product_query->whereIn('id', $product_ids);
-        }
+        // if($offer_slug){
+        //     $product_ids = getOffersProductIds($offer_slug,0);
+        //     $product_query->whereIn('id', $product_ids);
+        // }
 
         if ($category) {
             $product_query->whereIn('category_id', $category);
         }
 
         if ($category_slug) {
-            $category_ids = Category::whereIn('slug', $category_slug)->pluck('id')->toArray();
-            $product_query->whereIn('category_id', $category_ids);
-        }
+            $catids = implode(',', $category_slug);
+            $childIds = [];
+            $category_ids = Category::whereIn('slug',$category_slug)->pluck('id')->toArray();
+            $childIds[] = $category_ids;
+            if(!empty($category_ids)){
+                foreach($category_ids as $cId){
+                    $childIds[] = getChildCategoryIds($cId);
+                }
+            }
+
+            if(!empty($childIds)){
+                $childIds = array_merge(...$childIds);
+                $childIds = array_unique($childIds);
+            }
+            
+            $product_query->whereIn('category_id', $childIds);
+            if(!empty($category_ids)){
+                $meta = Category::select('meta_title', 'meta_description', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_keyword', 'footer_title', 'footer_content')->find($category_ids[0]);
+            }
+        }   
 
         if ($brand) {
             $product_query->whereIn('brand_id', $brand);
         }
         if ($brand_slug) {
-            $brand_ids = Brand::whereIn('slug', $brand_slug)->pluck('id')->toArray();
+            $brand_ids = Brand::whereIn('slug',$brand_slug)->pluck('id')->toArray();
             $product_query->whereIn('brand_id', $brand_ids);
         }
 
@@ -91,10 +120,12 @@ class ProductController extends Controller
                     break;
             }
         }
+
         if ($request->search) {
             $sort_search = $request->search;
             $products = $product_query
                 ->where('name', 'like', '%' . $sort_search . '%')
+                ->orWhere('tags', 'like', '%' . $sort_search . '%')
                 ->orWhereHas('stocks', function ($q) use ($sort_search) {
                     $q->where('sku', 'like', '%' . $sort_search . '%');
                 });
@@ -111,30 +142,25 @@ class ProductController extends Controller
 
         $total_count = $product_query->count();
         $products = $product_query->skip($offset)->take($limit)->get();
-
+        
         $next_offset = $offset + $limit;
-
-        // print_r(new ProductMiniCollection(Product::latest()->paginate(10)));
-        // die;
-        $productDetails = Product::latest()->get();
-        // $response = new ProductFilterCollection($products);
-        // print_r($productDetails);die();
-        if ($products) {
-            return response()->json(['success' => true, "message" => "Success", "data" => $products, "total_count" => $total_count, "next_offset" => $next_offset], 200);
-            // return response()->json([
-            //     'status' => true,
-            //     'message' => 'Success',
-            //     'data' => $productDetails,
-            //     'total_count' => Product::count()
-            // ], 200);
-        } else {
-            return response()->json([
-                'status' => true,
-                'message' => 'Products not found',
-            ], 200);
+      
+        $response = new ProductFilterCollection($products);
+        
+        if($meta != NULL){
+            $metaData->meta_title           = ($meta->meta_title != '') ? $meta->meta_title : $metaData->meta_title ;
+            $metaData->meta_description     = ($meta->meta_description != '') ? $meta->meta_description : $metaData->meta_description ;
+            $metaData->og_title             = ($meta->og_title != '') ? $meta->og_title : $metaData->og_title ;
+            $metaData->og_description       = ($meta->og_description != '') ? $meta->og_description : $metaData->og_description ;
+            $metaData->twitter_title        = ($meta->twitter_title != '') ? $meta->twitter_title : $metaData->twitter_title ;
+            $metaData->twitter_description  = ($meta->twitter_description != '') ? $meta->twitter_description : $metaData->twitter_description ;
+            $metaData->keywords             = ($meta->meta_keyword != '') ? $meta->meta_keyword : $metaData->keywords ;
+            $metaData->footer_title         = $meta->footer_title;
+            $metaData->footer_content       = $meta->footer_content;
+            
         }
-        die;
-        // return new ProductMiniCollection(Product::latest()->paginate(10));
+  
+        return response()->json(['success' => true,"message"=>"Success","data" => $response, "total_count" => $total_count, "next_offset" => $next_offset, 'meta' => $metaData ],200);
     }
 
     public function show($id)

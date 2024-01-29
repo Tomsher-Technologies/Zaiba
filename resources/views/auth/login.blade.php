@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="h-100 bg-cover bg-center py-5 d-flex align-items-center" style="background-image: url({{ uploaded_asset(get_setting('admin_login_background')) }})">
+<div class="h-100 bg-cover bg-center py-5 d-flex align-items-center" style="background-image: url({{ asset('admin_assets/assets/img/logo.png') }})">
     <div class="container">
         <div class="row">
             <div class="col-lg-6 col-xl-4 mx-auto">
@@ -72,10 +72,14 @@
                         @endif
                     </div>
                 </div>
+                <p class="mb-0">&copy; {{ env('APP_NAME') }} - Developed By <a href="https://www.tomsher.com/" target="_blank">Tomsher</a></p>
             </div>
         </div>
+        
     </div>
+    
 </div>
+
 
 
 @endsection
