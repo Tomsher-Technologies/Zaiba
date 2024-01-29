@@ -41,6 +41,7 @@ class ProductController extends Controller
         $seller_id = null;
         $sort_search = null;
         $products = Product::orderBy('created_at', 'desc');
+        $category = ($request->has('category')) ? $request->category : '';
         
         if ($request->type != null) {
             $var = explode(",", $request->type);
@@ -55,8 +56,21 @@ class ProductController extends Controller
             $sort_type = $request->type;
         }
         if ($request->has('category') && $request->category !== '0') {
-            $products = $products->whereHas('category', function ($q) use ($request) {
-                $q->where('id', $request->category);
+            $childIds = [];
+            $categoryfilter = $request->category;
+            $childIds[] = array($request->category);
+            
+            if($categoryfilter != ''){
+                $childIds[] = getChildCategoryIds($categoryfilter);
+            }
+
+            if(!empty($childIds)){
+                $childIds = array_merge(...$childIds);
+                $childIds = array_unique($childIds);
+            }
+            
+            $products = $products->whereHas('category', function ($q) use ($childIds) {
+                $q->whereIn('id', $childIds);
             });
         }
 
@@ -74,7 +88,7 @@ class ProductController extends Controller
         $products = $products->paginate(15);
         $type = 'All';
 
-        return view('backend.product.products.index', compact('products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
+        return view('backend.product.products.index', compact('category','products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
     }
 
 
@@ -473,6 +487,263 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
+    {
+        // echo '<pre>';
+        // print_r($request->all());
+        // die;
+        $product = Product::findOrFail($id);
+
+        $skuMain = '';
+        if($request->has('oldproduct')){
+            $oldproduct = $request->oldproduct;
+            if(isset($oldproduct[0])){
+                $skuMain = $oldproduct[0]['sku'];
+            }
+        }
+        $product->name                      = $request->name;
+        $product->category_id               = $request->category_id;
+        $product->design_id                 = $request->design_id;
+        $product->design_category_id        = $request->design_category_id;
+        $product->metal_type                = $request->metal_type;
+        $product->purity                    = $request->purity;
+        $product->min_qty                   = $request->min_qty;
+        $product->sku                       = cleanSKU($skuMain);
+        $product->low_stock_quantity        = $request->low_stock_quantity;
+        $product->stock_visibility_state    = $request->stock_visibility_state;    
+        $product->hide_price                = $request->hide_price ? 1 : 0;
+        $product_type                       = ($request->product_type == 'variant') ? 1 : 0;
+        $product->product_type              = $product_type;
+        $product->published                 = ($request->has('published')) ? 1 : 0;
+        $tags = array();
+        if ($request->tags[0] != null) {
+            foreach (json_decode($request->tags[0]) as $key => $tag) {
+                array_push($tags, $tag->value);
+            }
+        }
+        $product->tags                      = implode(',', $tags);
+        $product->video_provider            = $request->video_provider;
+        $product->video_link                = $request->video_link;
+        $product->discount                  = $request->discount;
+        $product->discount_type             = $request->discount_type;
+
+        if ($request->date_range != null) {
+            $date_var               = explode(" to ", $request->date_range);
+            $product->discount_start_date   = strtotime($date_var[0]);
+            $product->discount_end_date     = strtotime($date_var[1]);
+        }
+
+        $slug = $request->slug ? Str::slug($request->slug, '-') : Str::slug($request->name, '-');
+        $same_slug_count = Product::where('slug', 'LIKE', $slug . '%')->where('id','!=',$id)->count();
+        $slug_suffix = $same_slug_count ? '-' . $same_slug_count + 1 : '';
+        $slug .= $slug_suffix;
+
+        $product->slug = $slug;
+
+        if (!empty($request->main_attributes)) {
+            $product->attributes = json_encode($request->main_attributes);
+        } else {
+            $product->attributes = json_encode(array());
+        }
+
+        if ($request->has('featured')) {
+            $product->featured = 1;
+        }
+
+        if ($request->has('return_refund')) {
+            $product->return_refund = 1;
+        }
+
+        // $product->save();
+
+        $gallery = [];
+        if ($request->hasfile('gallery_images')) {
+            if ($product->photos == null) {
+                $count = 1;
+                $old_gallery = [];
+            } else {
+                $old_gallery = explode(',', $product->photos);
+                $count = count($old_gallery) + 1;
+            }
+
+            foreach ($request->file('gallery_images') as $key => $file) {
+                $gallery[] = $this->downloadAndResizeImage('main_product',$file, $product->sku, false, $count + $key);
+            }
+            $product->photos = implode(',', array_merge($old_gallery, $gallery));
+        }
+
+        if ($request->hasFile('thumbnail_image')) {
+            if ($product->thumbnail_img) {
+                if (Storage::exists($product->thumbnail_img)) {
+                    $info = pathinfo($product->thumbnail_img);
+                    $file_name = basename($product->thumbnail_img, '.' . $info['extension']);
+                    $ext = $info['extension'];
+
+                    $sizes = config('app.img_sizes');
+                    foreach ($sizes as $size) {
+                        $path = $info['dirname'] . '/' . $file_name . '_' . $size . 'px.' . $ext;
+                        if (Storage::exists($path)) {
+                            Storage::delete($path);
+                        }
+                    }
+                    Storage::delete($product->thumbnail_img);
+                }
+            }
+            $gallery = $this->downloadAndResizeImage('main_product',$request->file('thumbnail_image'), $product->sku, true);
+            $product->thumbnail_img = $gallery;
+        }
+        $product->save();
+
+        $seo = ProductSeo::firstOrNew(['product_id' => $product->id]);
+
+        $seo->meta_title            = $request->meta_title;
+        $seo->meta_description      = $request->meta_description;
+
+        $keywords = array();
+        if ($request->meta_keywords[0] != null) {
+            foreach (json_decode($request->meta_keywords[0]) as $key => $keyword) {
+                array_push($keywords, $keyword->value);
+            }
+        }
+        $seo->meta_keywords         = implode(',', $keywords);
+
+        $seo->og_title              = $request->og_title;
+        $seo->og_description        = $request->og_description;
+
+        $seo->twitter_title         = $request->twitter_title;
+        $seo->twitter_description   = $request->twitter_description;
+
+        if ($request->meta_title == null) {
+            $seo->meta_title        = $product->name;
+        }
+        if ($request->og_title == null) {
+            $seo->og_title          = $product->name;
+        }
+        if ($request->twitter_title == null) {
+            $seo->twitter_title     = $product->name;
+        }
+
+        $seo->save();
+
+        if ($request->has('tabs')) {
+            ProductTabs::where('product_id', $product->id)->delete();
+            foreach ($request->tabs as $tab) {
+                $p_tab = $product->tabs()->create([
+                    'heading' => $tab['tab_heading'],
+                    'content' => $tab['tab_description'],
+                ]);
+            }
+        }
+        if($request->has('oldproduct')){
+            $oldproduct = $request->oldproduct;
+            $oldproduct_attributes = array();
+            foreach($oldproduct as $prodOld){
+                $product_stock                      = ProductStock::find($prodOld['stock_id']);
+                $product_stock->product_id          = $product->id;
+                $product_stock->sku                 = $prodOld['sku'];
+                $product_stock->description         = $prodOld['description'];
+                $product_stock->metal_weight        = $prodOld['metal_weight'];
+                $product_stock->stone_available     = (array_key_exists('stone_availability', $prodOld)) ? 1 : 0;
+                $product_stock->stone_type          = $prodOld['stone_type'];
+                $product_stock->stone_count         = $prodOld['stone_count'];
+                $product_stock->stone_weight        = $prodOld['stone_weight'];
+                $product_stock->stone_price         = $prodOld['stone_price'];
+                $product_stock->making_price_type   = $prodOld['making_price_type_id'];
+                $product_stock->making_charge       = $prodOld['making_charge'];
+                $product_stock->qty                 = $prodOld['current_stock'];
+                $product_stock->status              = $prodOld['status'];
+                
+
+                if (isset($prodOld['variant_images'])) {
+                    if ($product_stock->image) {
+                        if (Storage::exists($product_stock->image)) {
+                            $info = pathinfo($product_stock->image);
+                            $file_name = basename($product_stock->image, '.' . $info['extension']);
+                            $ext = $info['extension'];
+        
+                            $sizes = config('app.img_sizes');
+                            foreach ($sizes as $size) {
+                                $path = $info['dirname'] . '/' . $file_name . '_' . $size . 'px.' . $ext;
+                                if (Storage::exists($path)) {
+                                    Storage::delete($path);
+                                }
+                            }
+                            Storage::delete($product_stock->image);
+                        }
+                    }
+                    $gallery = $this->downloadAndResizeImage('varient',$prodOld['variant_images'], $prodOld['sku'], false);
+                    $product_stock->image = $gallery;
+                }
+            
+                $product_stock->save();
+                
+                if ($request->has('main_attributes')) {
+                    ProductAttributes::where('product_id',$product->id)->delete();
+                    foreach ($request->main_attributes as $key => $no) {
+                        $attrId = 'choice_options_' . $no;
+                        $oldproduct_attributes[] = [
+                            'product_id' => $product->id,
+                            'product_varient_id' => $product_stock->id,
+                            'attribute_id' => $no,
+                            'attribute_value_id' => $prodOld[$attrId]
+                        ];
+                    }
+                }
+               
+            }
+            if(!empty($oldproduct_attributes)){
+                ProductAttributes::insert($oldproduct_attributes);
+            }
+        }
+
+        if($request->has('products')){
+            $products = $request->products;
+            $product_attributes = array();
+            foreach($products as $prod){
+                $product_stock = new ProductStock;
+                $product_stock->product_id = $product->id;
+                $product_stock->sku = $prod['sku'];
+                $product_stock->description = $prod['description'];
+                $product_stock->metal_weight = $prod['metal_weight'];
+                $product_stock->stone_available =  (array_key_exists('stone_availability', $prod)) ? 1 : 0;
+                $product_stock->stone_type = $prod['stone_type'];
+                $product_stock->stone_count = $prod['stone_count'];
+                $product_stock->stone_weight = $prod['stone_weight'];
+                $product_stock->stone_price = $prod['stone_price'];
+                $product_stock->making_price_type = $prod['making_price_type_id'];
+                $product_stock->making_charge = $prod['making_charge'];
+                $product_stock->qty = $prod['current_stock'];
+                
+                $variantImage = (isset($prod['variant_images'])) ? $this->downloadAndResizeImage('varient',$prod['variant_images'], $prod['sku'], false) : NULL;
+                $product_stock->image = $variantImage;
+
+                $product_stock->save();
+                
+                if ($request->has('main_attributes')) {
+                    foreach ($request->main_attributes as $key => $no) {
+                        $attrId = 'choice_options_' . $no;
+                        $product_attributes[] = [
+                            'product_id' => $product->id,
+                            'product_varient_id' => $product_stock->id,
+                            'attribute_id' => $no,
+                            'attribute_value_id' => $prod[$attrId]
+                        ];
+                    }
+                }
+               
+            }
+            if(!empty($product_attributes)){
+                ProductAttributes::insert($product_attributes);
+            }
+        }
+
+        flash(translate('Product has been updated successfully'))->success();
+
+        Artisan::call('view:clear');
+        Artisan::call('cache:clear');
+
+        return redirect()->route('products.all');
+    }
+    public function updateOld(Request $request, $id)
     {
         echo '<pre>';
         print_r($request->all());

@@ -134,7 +134,7 @@
         </div>
 
         <div class="ps-footer__copyright">
-            <p>{!! get_setting('frontend_copyright_text', '&copy; 2023 ITS All Rights Reserved | WEBSITE BY TOMSHER', false) !!} </p>
+            <p class="mb-0">&copy; {{ env('APP_NAME') }} - Developed By <a href="https://www.tomsher.com/" target="_blank">Tomsher</a></p>
             <p>
                 <img alt="Our payment gateways" src="{{ frontendAsset('img/payment-method/1.jpg') }}" height="30"
                     class="mw-100 h-auto" style="max-height: 30px">

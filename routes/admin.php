@@ -66,7 +66,7 @@ Route::get('/' . env('ADMIN_PREFIX'), [AdminController::class, 'admin_dashboard'
     ->middleware(['auth', 'admin']);
 
 Route::get('/', [AuthLoginController::class, 'adminLoginView'])->name('admin.login');
-
+Route::get('/', [AuthLoginController::class, 'adminLoginView'])->name('user.login');
 Route::group(['prefix' => env('ADMIN_PREFIX'), 'middleware' => ['guest']], function () {
     Route::get('login', [AuthLoginController::class, 'adminLoginView'])->name('admin.login');
     Route::post('login', [AuthLoginController::class, 'login']);
