@@ -417,12 +417,10 @@ class ApiAuthController extends Controller
             }
         });
 
-        $data['new_collection'] = Cache::rememberForever('newCollections', function () use($page) {
-            $collections['title'] =  $page->heading1;
-            $collections['sub_title'] = $page->sub_heading1;
-            $newCollection = json_decode(get_setting('new_collection_categories'));
-            if(!empty($newCollection)){
-                $collections['categories'] = Category::whereIn('id',$newCollection)
+        $collections['title'] =  $page->heading1;
+        $collections['sub_title'] = $page->sub_heading1;
+        $newCollection = json_decode(get_setting('new_collection_categories'));
+        $collections['categories'] = Category::whereIn('id',$newCollection)
                                         ->select('id','parent_id','name','slug')
                                         ->where('is_active',1)
                                         ->with(['products'=>function($query){
@@ -431,9 +429,32 @@ class ApiAuthController extends Controller
                                                 ->latest();
                                             },])
                                         ->get();
+        if($collections['categories']){
+            foreach($collections['categories'] as $coll_cat){
+                $categoryProducts = [];
+                if($coll_cat->products){
+                    foreach($coll_cat->products as $col_prod){
+                        $stock = $col_prod->stocks()->orderBy('metal_weight','asc')->first();
+                        $priceData = getProductPrice($stock);
+                        $categoryProducts[] = [
+                            'id' => $col_prod->id,
+                            'name' => $col_prod->name,
+                            'sku' => $col_prod->sku,
+                            'thumbnail_image' => app('url')->asset($col_prod->thumbnail_img),
+                            'stroked_price' => $priceData['original_price'],
+                            'main_price' => $priceData['discounted_price'],
+                            'min_qty' => $col_prod->min_qty,
+                            'slug' => $col_prod->slug,
+                            'offer_tag' => $priceData['offer_tag']
+                        ];
+                    }
+                }
+                unset($coll_cat->products);
+                $coll_cat->products = $categoryProducts;
             }
-            return $collections;
-        });
+        }
+
+        $data['new_collection'] = $collections;
         
         $current_banners = BusinessSetting::whereIn('type', array('home_banner', 'home_mid_banner', 'home_large_banner'))->get()->keyBy('type');
         $data['collection_banners'] = Cache::rememberForever('newCollectionBanners', function () use($current_banners) {
@@ -472,18 +493,35 @@ class ApiAuthController extends Controller
             return $home_categories;
         });
 
-        $data['trending_products'] = Cache::rememberForever('home_trending_products', function () use($page){
-            $home_products['title'] =  $page->heading3;
-            $home_products['sub_title'] = $page->sub_heading3;
-            $proIds = json_decode(get_setting('trending_products'));
-            if(!empty($proIds)){
-                $home_products['products'] = Product::whereIn('id',$proIds)
-                                                    ->select('id', 'name', 'slug','sku', 'unit_price', \DB::raw('CONCAT("'.url('/').'", thumbnail_img) as thumbnail_img'))
-                                                    ->where('published',1)
-                                                    ->get();
+        $home_products['title'] =  $page->heading3;
+        $home_products['sub_title'] = $page->sub_heading3;
+        $home_products['products'] = [];
+        $proIds = json_decode(get_setting('trending_products'));
+        if(!empty($proIds)){
+            $homeProducts = Product::whereIn('id',$proIds)
+                                                ->select('id', 'name', 'slug','sku', 'unit_price', \DB::raw('CONCAT("'.url('/').'", thumbnail_img) as thumbnail_img'))
+                                                ->where('published',1)
+                                                ->get();
+            if($homeProducts){
+                foreach($homeProducts as $hmProd){
+                    $stock = $hmProd->stocks()->orderBy('metal_weight','asc')->first();
+                    $priceData = getProductPrice($stock);
+                    $home_products['products'][] = [
+                        'id' => $hmProd->id,
+                        'name' => $hmProd->name,
+                        'sku' => $hmProd->sku,
+                        'thumbnail_image' => app('url')->asset($hmProd->thumbnail_img),
+                        'stroked_price' => $priceData['original_price'],
+                        'main_price' => $priceData['discounted_price'],
+                        'min_qty' => $hmProd->min_qty,
+                        'slug' => $hmProd->slug,
+                        'offer_tag' => $priceData['offer_tag']
+                    ];
+                }
             }
-            return $home_products;
-        });
+        }
+
+        $data['trending_products'] = $home_products;
 
         $data['highlights'] = Cache::rememberForever('home_highlights', function () use($page){
             $highlights['title'] = $page->heading4;
