@@ -11,6 +11,7 @@ use App\Models\CustomerPackage;
 use App\Models\Upload;
 use App\Models\Translation;
 use App\Models\City;
+use App\Models\GoldPrices;
 use App\Utility\CategoryUtility;
 use App\Models\Wallet;
 use App\Models\CombinedOrder;
@@ -1181,7 +1182,7 @@ if (!function_exists('load_seo_tags')) {
     }
 
     function get_attribute_values($attribute_id, $proAttr){
-        $all_attribute_values = AttributeValue::with('attribute')->where('attribute_id', $attribute_id)->get();
+        $all_attribute_values = AttributeValue::with('attribute')->where('is_active',1)->where('attribute_id', $attribute_id)->get();
 
         $html = '';
 
@@ -1543,4 +1544,52 @@ if (!function_exists('load_seo_tags')) {
         }
 
         return $childIds;
+    }
+
+    function getProductPrice($stock){
+        $productPrice = [
+            'original_price' => 0,
+            'discounted_price' => 0,
+            'offer_tag' => null,
+        ];
+        $product = $stock->product;
+        $stock = $stock->toArray();
+        $price=0;
+        // print_r($stock);
+        // print_r($product);
+        // die;
+echo 'dvgggggggggggggggggggggggggggggg ----------------------   '. $product->id;
+        echo '<br> purity  ==== ' .$purity = $product->purity;
+        echo '<br> metal_weight  ==== ' .$metal_weight = $stock['metal_weight'];
+        $gold_purity = [18 => '18_k', 21 => '21_k', 22 => '22_k', 24 => '24_k'];
+        print_r($gold_purity);
+        $discount_applicable = false;
+        $offertag = '';
+        if(array_key_exists($purity, $gold_purity)){
+            $gold_rate = GoldPrices::first()->toArray();
+            $goldRate = isset($gold_rate[$gold_purity[$purity]]) ? $gold_rate[$gold_purity[$purity]] : 0;
+            if($goldRate != 0){
+                $prPrice = $metal_weight * $goldRate;
+                $productPrice['original_price'] = $prPrice;
+                if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
+                    $discount_applicable = true;
+                }
+
+                if ($discount_applicable) {
+                    if ($product->discount_type == 'percent') {
+                        $prPrice -= ($prPrice * $product->discount) / 100;
+                        $offertag = $product->discount . '% OFF';
+                    } elseif ($product->discount_type == 'amount') {
+                        $prPrice -= $product->discount;
+                        $offertag = 'AED '.$product->discount.' OFF';
+                    }
+                }
+                $productPrice['discounted_price'] = $prPrice;
+                $productPrice['offer_tag'] = $offertag;
+            }
+        }else{
+            echo "not exist";
+        }
+      print_r($productPrice);
+        die;
     }

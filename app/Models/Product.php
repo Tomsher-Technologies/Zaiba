@@ -85,7 +85,7 @@ class Product extends Model
 
     public function stocks()
     {
-        return $this->hasMany(ProductStock::class);
+        return $this->hasMany(ProductStock::class)->where('status', 1);
     }
 
     public function taxes()

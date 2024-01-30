@@ -232,5 +232,25 @@ class AttributeController extends Controller
         return redirect()->route('colors');
 
     }
+
+    public function updateAttributeStatus(Request $request)
+    {
+        $attribute = Attribute::findOrFail($request->id);
+        $attribute->is_active = $request->status;
+        $attribute->save();
+        // $category->allChildCategories()->update(['is_active' => $request->status]);
+        // Cache::forget('featured_categories');
+        return 1;
+    }
+
+    public function updateAttributeValueStatus(Request $request)
+    {
+        $attribute = AttributeValue::findOrFail($request->id);
+        $attribute->is_active = $request->status;
+        $attribute->save();
+        // $category->allChildCategories()->update(['is_active' => $request->status]);
+        // Cache::forget('featured_categories');
+        return 1;
+    }
     
 }

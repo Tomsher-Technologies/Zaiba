@@ -209,7 +209,7 @@
                                 <label class="col-md-3 col-from-label">Attributes <span class="text-danger">*</span></label>
                                 <div class="col-md-6">
                                     @php   
-                                        $attributes = \App\Models\Attribute::orderBy('name','asc')->get();
+                                        $attributes = \App\Models\Attribute::where('is_active',1)->orderBy('name','asc')->get();
                                     @endphp
                                     <select class="form-control aiz-selectpicker" name="main_attributes[]" multiple id="main_attributes"  data-live-search="true">
                                         <option value="">Select Attributes</option>
@@ -292,14 +292,14 @@
                                         <div class="form-group row">
                                             <label class="col-md-3 col-from-label">Stone Count</label>
                                             <div class="col-md-6">
-                                                <input type="number" lang="en" min="0" value="0" step="1" placeholder="Stone Count" name="stone_count" class="form-control">
+                                                <input type="text" placeholder="Stone Count" name="stone_count" class="form-control">
                                             </div>
                                         </div>
 
                                         <div class="form-group row">
                                             <label class="col-md-3 col-from-label">Stone Weight</label>
                                             <div class="col-md-6">
-                                                <input type="number" lang="en" min="0" value="0" step="0.01" placeholder="Stone Weight" name="stone_weight" class="form-control">
+                                                <input type="text" placeholder="Stone Weight" name="stone_weight" class="form-control">
                                             </div>
                                         </div>
 
@@ -793,10 +793,14 @@
             if($(this).val() == 'variant'){
                 $('.add_variant,#attributes,.pro_variant_name,.imageVariant').show();
                 $('.variant_images').prop('required', true);
+                $('#main_attributes').prop('required', true);
             }else{ 
                 $('.add_variant,#attributes,.pro_variant_name,.imageVariant').hide();
                 $('.variant_images').removeAttr('required');
+                $('#main_attributes').removeAttr("required");
                 $('div[data-repeater-item]').slice(1).remove();
+                $('.product_attributes').html('');
+                $('#main_attributes').selectpicker('deselectAll');
             }
         });
 
