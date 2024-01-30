@@ -24,6 +24,7 @@
                         <tr>
                             <th>#</th>
                             <th>Value</th>
+                            <th>{{ translate('Status')}}</th>
                             <th class="text-right">Action</th>
                         </tr>
                     </thead>
@@ -34,14 +35,22 @@
                             <td>
                                 {{ $attribute_value->value }}
                             </td>
-
+                            <td>
+                                <label class="aiz-switch aiz-switch-success mb-0">
+                                    <input type="checkbox" onchange="update_status(this)" value="{{ $attribute_value->id }}"
+                                        <?php if ($attribute_value->is_active == 1) {
+                                            echo 'checked';
+                                        } ?>>
+                                    <span></span>
+                                </label>
+                            </td>
                             <td class="text-right">
                                 <a class="btn btn-soft-primary btn-icon btn-circle btn-sm" href="{{route('edit-attribute-value', ['id'=>$attribute_value->id] )}}" title="Edit">
 									<i class="las la-edit"></i>
 								</a>
-								<a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete" data-href="{{route('destroy-attribute-value', $attribute_value->id)}}" title="Delete">
+								{{-- <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete" data-href="{{route('destroy-attribute-value', $attribute_value->id)}}" title="Delete">
 									<i class="las la-trash"></i>
-								</a>
+								</a> --}}
                             </td>
                         </tr>
                         @endforeach
@@ -82,3 +91,29 @@
 @section('modal')
     @include('modals.delete_modal')
 @endsection
+
+@section('script')
+    <script type="text/javascript">
+      
+        function update_status(el) {
+            if (el.checked) {
+                var status = 1;
+            } else {
+                var status = 0;
+            }
+            $.post('{{ route('attribute_value.status') }}', {
+                _token: '{{ csrf_token() }}',
+                id: el.value,
+                status: status
+            }, function(data) {
+                if (data == 1) {
+                    AIZ.plugins.notify('success', 'Attribute value status updated successfully');
+                } else {
+                    AIZ.plugins.notify('danger', 'Something went wrong');
+                }
+            });
+        }
+    </script>
+@endsection
+
+

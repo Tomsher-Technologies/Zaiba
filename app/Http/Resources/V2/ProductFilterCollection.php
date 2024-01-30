@@ -10,10 +10,12 @@ class ProductFilterCollection extends ResourceCollection
     public function toArray($request)
     {
        return $this->collection->map(function ($data) {
-            // echo '<pre>';
-            // print_r($data);
+            echo '<pre>';
+            // print_r($data->stocks);
+            $stock = $data->stocks()->orderBy('metal_weight','asc')->first();
+            // print_r($stock);
             // die;
-            // $priceData = getProductOfferPrice($data);
+            $priceData = getProductPrice($stock);
             return [
                 'id' => $data->id,
                 'name' => $data->name,

@@ -7,7 +7,7 @@
                 <h1 class="h3">All Categories</h1>
             </div>
             <div class="col-md-6 text-md-right">
-                <a href="{{ route('categories.create') }}" class="btn btn-primary">
+                <a href="{{ route('categories.create') }}" class="btn btn-info">
                     <span>Add new category</span>
                 </a>
             </div>
@@ -15,41 +15,55 @@
     </div>
     <div class="card">
         <div class="card-header d-block d-md-flex">
-            <h5 class="mb-0 h6">Categories</h5>
-            <form class="" id="sort_categories" action="" method="GET">
-                <div class="box-inline pad-rgt pull-left">
-                    <div class="" style="min-width: 200px;">
+            <h5 class="mb-0 h6 mr-4">Categories</h5>
+            <form class="" id="sort_categories" action="" method="GET" style="width: 100%">
+
+                <div class="row gutters-5">
+                    <div class="col-md-4">
+                        <select class="form-control form-control-sm aiz-selectpicker mb-2 mb-md-0" data-live-search="true"
+                            name="catgeory" id="" data-selected={{ $catgeory }}>
+                            <option value="0">All</option>
+                            @foreach (getAllCategories()->where('parent_id', 0) as $item)
+                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                @if ($item->child)
+                                    @foreach ($item->child as $cat)
+                                        @include('backend.product.categories.menu_child_category', [
+                                            'category' => $cat,
+                                            'selected_id' => 0,
+                                        ])
+                                    @endforeach
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4">
                         <input type="text" class="form-control" id="search"
                             name="search"@isset($sort_search) value="{{ $sort_search }}" @endisset
                             placeholder="Type name & Enter">
                     </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-info" type="submit">Filter</button>
+                        <a href="{{ route('categories.index') }}" class="btn btn-warning">Reset</a>
+                    </div>
                 </div>
+
             </form>
         </div>
-        <script>
-            function copy(that){
-var inp =document.createElement('input');
-document.body.appendChild(inp)
-inp.value =that.textContent
-inp.select();
-document.execCommand('copy',false);
-inp.remove();
-}
-        </script>
+
         <div class="card-body">
             <table class="table aiz-table mb-0">
                 <thead>
                     <tr>
-                        <th data-breakpoints="lg">#</th>
+                        <th >#</th>
                         <th>Name</th>
                         <th >Parent Category</th>
-                        <th data-breakpoints="lg">Link</th>
-                        <th data-breakpoints="lg" class="text-center">Order Level</th>
-                        <th data-breakpoints="lg" class="text-center">Level</th>
+                        {{-- <th >Link</th> --}}
+                        <th class="text-center">Order Level</th>
+                        {{-- <th data-breakpoints="lg">Level</th> --}}
                         <th >Banner</th>
                         <th >Icon</th>
-                        <th class="text-center">Active Status</th>
-                        <th width="10%" class="text-center">Options</th>
+                        <th class="text-center">Status</th>
+                        <th width="10%" class="text-right">Options</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,15 +81,12 @@ inp.remove();
                                     —
                                 @endif
                             </td>
-                            <td>
-                                <span style="cursor:pointer" onclick="copy(this)">{{ route('products.category', $category->slug) }}</span>
-                            </td>
+                           
                             <td class="text-center">{{ $category->order_level }}</td>
-                            <td class="text-center">{{ $category->level }}</td>
+                            {{-- <td>{{ $category->level }}</td> --}}
                             <td>
                                 @if ($category->banner != null)
-                                    <img src="{{ uploaded_asset($category->banner) }}" alt="Banner"
-                                        class="h-50px">
+                                    <img src="{{ uploaded_asset($category->banner) }}" alt="Banner" class="h-50px">
                                 @else
                                     —
                                 @endif
@@ -98,7 +109,7 @@ inp.remove();
                                     <span></span>
                                 </label>
                             </td>
-                            <td class="text-center">
+                            <td class="text-right">
                                 <a class="btn btn-soft-primary btn-icon btn-circle btn-sm"
                                     href="{{ route('categories.edit', ['id' => $category->id, 'lang' => env('DEFAULT_LANGUAGE')]) }}"
                                     title="Edit">
@@ -127,7 +138,35 @@ inp.remove();
 
 
 @section('script')
+    <script>
+        function copy(that) {
+            var inp = document.createElement('input');
+            document.body.appendChild(inp)
+            inp.value = that.textContent
+            inp.select();
+            document.execCommand('copy', false);
+            inp.remove();
+        }
+    </script>
     <script type="text/javascript">
+        function update_featured(el) {
+            if (el.checked) {
+                var status = 1;
+            } else {
+                var status = 0;
+            }
+            $.post('{{ route('categories.featured') }}', {
+                _token: '{{ csrf_token() }}',
+                id: el.value,
+                status: status
+            }, function(data) {
+                if (data == 1) {
+                    AIZ.plugins.notify('success', 'Featured categories updated successfully');
+                } else {
+                    AIZ.plugins.notify('danger', 'Something went wrong');
+                }
+            });
+        }
         function update_status(el) {
             if (el.checked) {
                 var status = 1;
@@ -144,10 +183,6 @@ inp.remove();
                 } else {
                     AIZ.plugins.notify('danger', 'Something went wrong');
                 }
-                setTimeout(function() {
-                    window.location.reload();
-                }, 3000);
-               
             });
         }
     </script>

@@ -286,11 +286,11 @@
                                 <label class="col-md-3 col-from-label">Attributes <span class="text-danger">*</span></label>
                                 <div class="col-md-6">
                                     @php   
-                                        $attributes = \App\Models\Attribute::orderBy('name','asc')->pluck('name','id')->toArray();
+                                        $attributes = \App\Models\Attribute::where('is_active',1)->orderBy('name','asc')->pluck('name','id')->toArray();
                                         $attrsProd = json_decode($product->attributes);
                                     @endphp
                                     
-                                    <select class="form-control aiz-selectpicker" name="main_attributes[]" multiple id="main_attributes" required data-live-search="true">
+                                    <select class="form-control aiz-selectpicker" name="main_attributes[]" multiple id="main_attributes"  data-live-search="true">
                                         
                                         @foreach ($attributes as $attrKey => $attrN)
                                         
@@ -335,16 +335,16 @@
                                             <div class="form-group row">
                                                 <label class="col-md-3 col-from-label">SKU <span class="text-danger">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="text" name="oldproduct[{{$key}}][stock_id]" class="form-control" value="{{ $stocks->id }}">
+                                                    <input type="hidden" name="oldproduct[{{$key}}][stock_id]" class="form-control" value="{{ $stocks->id }}">
                                                     <input type="text" placeholder="SKU" name="oldproduct[{{$key}}][sku]" class="form-control" required value="{{ $varients_sku }}">
                                                 </div>
                                             </div>
 
-                                            <div class="form-group row">
+                                            <div class="form-group row  imageVariant">
                                                 <label class="col-md-3 col-form-label" for="signinSrEmail">Product Variant
                                                     Image<small>(1000*1000)</small></label>
                                                 <div class="col-md-8">
-                                                    <input type="file" name="oldproduct[{{$key}}][variant_images]" class="form-control" accept="image/*" >
+                                                    <input type="file" name="oldproduct[{{$key}}][variant_images]" class="form-control variant_images" accept="image/*" >
 
                                                     @if ($stocks->image)
                                                         <div class="file-preview box sm">
@@ -366,7 +366,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="old_product_attributes{{$key}}" >
+                                            <div class="old_product_attributes{{$key}} old_product_attribute" >
                                                 @if(!empty($attrsProd))
                                                     @foreach($attrsProd as $ii => $aprod)
 
@@ -433,14 +433,14 @@
                                                 <div class="form-group row">
                                                     <label class="col-md-3 col-from-label">Stone Count</label>
                                                     <div class="col-md-6">
-                                                        <input type="number" lang="en" min="0" value="{{ $varients_stone_count }}" step="1" placeholder="Stone Count" name="oldproduct[{{$key}}][stone_count]" class="form-control">
+                                                        <input type="text" value="{{ $varients_stone_count }}" placeholder="Stone Count" name="oldproduct[{{$key}}][stone_count]" class="form-control">
                                                     </div>
                                                 </div>
 
                                                 <div class="form-group row">
                                                     <label class="col-md-3 col-from-label">Stone Weight</label>
                                                     <div class="col-md-6">
-                                                        <input type="number" lang="en" min="0" value="{{ $varients_stone_weight }}" step="0.01" placeholder="Stone Weight" name="oldproduct[{{$key}}][stone_weight]" class="form-control">
+                                                        <input type="text"value="{{ $varients_stone_weight }}" placeholder="Stone Weight" name="oldproduct[{{$key}}][stone_weight]" class="form-control">
                                                     </div>
                                                 </div>
 
@@ -506,11 +506,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row">
+                                    <div class="form-group row imageVariant">
                                         <label class="col-md-3 col-form-label" for="signinSrEmail">Product Variant
                                             Image<small>(1000*1000)</small></label>
                                         <div class="col-md-8">
-                                            <input type="file" name="variant_images" class="form-control"
+                                            <input type="file" name="variant_images" class="form-control variant_images"
                                                 accept="image/*" required>
                                         </div>
                                     </div>
@@ -562,14 +562,14 @@
                                         <div class="form-group row">
                                             <label class="col-md-3 col-from-label">Stone Count</label>
                                             <div class="col-md-6">
-                                                <input type="number" lang="en" min="0" value="0" step="1" placeholder="Stone Count" name="stone_count" class="form-control">
+                                                <input type="text" placeholder="Stone Count" name="stone_count" class="form-control">
                                             </div>
                                         </div>
 
                                         <div class="form-group row">
                                             <label class="col-md-3 col-from-label">Stone Weight</label>
                                             <div class="col-md-6">
-                                                <input type="number" lang="en" min="0" value="0" step="0.01" placeholder="Stone Weight" name="stone_weight" class="form-control">
+                                                <input type="text" placeholder="Stone Weight" name="stone_weight" class="form-control">
                                             </div>
                                         </div>
 
@@ -1070,6 +1070,9 @@
 
                                 $('#pro_variant_name'+count).html('Product Variant '+newCount);
                                 $('.pro_variant_name').show();
+                                $('.imageVariant').show();
+                                // $('.variant_images').addAttr('required');
+                                // $('.variant_images').prop('required', true);
                                 $.each($("#main_attributes option:selected"), function() {
                                     var i = $(this).val();
                                     var name = $(this).text();
@@ -1132,8 +1135,13 @@
 
         
         var productType = '{{ $product->product_type }}';
+       
         if(productType == '1'){
-            $('.add_variant,#attributes,.pro_variant_name').show();
+            $('.add_variant,#attributes,.pro_variant_name,.imageVariant').show();
+            $('#main_attributes').prop('required', true);
+            // $('.variant_images').prop('required', true);
+        }else{
+            $('.imageVariant').hide();
         }
 
 
@@ -1197,11 +1205,18 @@
 
         $(document).on('change','#product_type',function(){
             if($(this).val() == 'variant'){
-                $('.add_variant,#attributes,.pro_variant_name').show();
+                $('.add_variant,#attributes,.pro_variant_name,.imageVariant').show();
+                $('#main_attributes').prop('required', true);
+                // $('.variant_images').prop('required', true);
             }else{ 
-                $('.add_variant,#attributes,.pro_variant_name').hide();
-                $('div[data-repeater-item]').slice(1).remove();
+                $('.add_variant,#attributes,.pro_variant_name,.imageVariant').hide();
+                $('div[data-new-item]').remove();
+                $('.variant_images').removeAttr('required');
+                $('#main_attributes').removeAttr("required");
+                $('.product_attributes,.old_product_attribute').html('');
+                $('#main_attributes').selectpicker('deselectAll');
             }
+            AIZ.plugins.bootstrapSelect('refresh');
         });
 
         // $('#main_attributes').on('change', function() {

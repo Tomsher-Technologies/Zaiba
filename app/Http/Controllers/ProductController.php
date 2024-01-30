@@ -108,7 +108,7 @@ class ProductController extends Controller
 
     public function add_more_choice_option(Request $request)
     {
-        $all_attribute_values = AttributeValue::with('attribute')->where('attribute_id', $request->attribute_id)->get();
+        $all_attribute_values = AttributeValue::with('attribute')->where('is_active',1)->where('attribute_id', $request->attribute_id)->get();
 
         $html = '';
 
@@ -121,7 +121,7 @@ class ProductController extends Controller
 
     public function get_attribute_values(Request $request)
     {
-        $all_attribute_values = AttributeValue::with('attribute')->where('attribute_id', $request->attribute_id)->get();
+        $all_attribute_values = AttributeValue::with('attribute')->where('is_active',1)->where('attribute_id', $request->attribute_id)->get();
 
         $html = '';
 
