@@ -499,9 +499,9 @@ class ApiAuthController extends Controller
         $proIds = json_decode(get_setting('trending_products'));
         if(!empty($proIds)){
             $homeProducts = Product::whereIn('id',$proIds)
-                                                ->select('id', 'name', 'slug','sku', 'unit_price', \DB::raw('CONCAT("'.url('/').'", thumbnail_img) as thumbnail_img'))
-                                                ->where('published',1)
-                                                ->get();
+                                    ->select('id', 'name', 'slug','sku', 'unit_price', \DB::raw('CONCAT("'.url('/').'", thumbnail_img) as thumbnail_img'))
+                                    ->where('published',1)
+                                    ->get();
             if($homeProducts){
                 foreach($homeProducts as $hmProd){
                     $stock = $hmProd->stocks()->orderBy('metal_weight','asc')->first();
