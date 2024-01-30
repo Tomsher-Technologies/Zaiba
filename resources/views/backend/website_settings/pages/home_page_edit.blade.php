@@ -1030,7 +1030,7 @@
                         @for ($i=0; $i<4; $i++)
 
                             @php
-                                $points = (get_setting('home_footer_point_'.$i+1) != 'null' && get_setting('home_footer_point_'.$i+1) != null) ? json_decode(get_setting('home_footer_point_'.$i+1), true) : '';
+                                $points = (get_setting('home_footer_point_'.$i+1) != 'null' && get_setting('home_footer_point_'.$i+1) != null) ? json_decode(get_setting('home_footer_point_'.$i+1), true) : [];
                             @endphp
                             <div class="form-group row">
                                 <h6 class="ml-3">Point {{$i+1}}</h6>
