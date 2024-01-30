@@ -1546,7 +1546,7 @@ if (!function_exists('load_seo_tags')) {
         return $childIds;
     }
 
-    function getProductPrice($stock){
+    function getProductPrice($stock, $quantity = 1){
         $productPrice = [
             'original_price' => 0,
             'discounted_price' => 0,
@@ -1558,38 +1558,64 @@ if (!function_exists('load_seo_tags')) {
         // print_r($stock);
         // print_r($product);
         // die;
-echo 'dvgggggggggggggggggggggggggggggg ----------------------   '. $product->id;
-        echo '<br> purity  ==== ' .$purity = $product->purity;
-        echo '<br> metal_weight  ==== ' .$metal_weight = $stock['metal_weight'];
+        // echo 'Product_id  --------   '. $product->id;
+        // echo '<br>purity  ==== ' .$purity = $product->purity;
+        // echo '<br>metal_weight  ==== ' .$metal_weight = $stock['metal_weight'];
+        // echo '<br>';
+       
+        $purity = $product->purity;
+        $metal_weight = $stock['metal_weight'];
+    
         $gold_purity = [18 => '18_k', 21 => '21_k', 22 => '22_k', 24 => '24_k'];
-        print_r($gold_purity);
+        // print_r($gold_purity);
         $discount_applicable = false;
         $offertag = '';
         if(array_key_exists($purity, $gold_purity)){
             $gold_rate = GoldPrices::first()->toArray();
+            // echo '<br>gold_rate  === '.
             $goldRate = isset($gold_rate[$gold_purity[$purity]]) ? $gold_rate[$gold_purity[$purity]] : 0;
             if($goldRate != 0){
-                $prPrice = $metal_weight * $goldRate;
-                $productPrice['original_price'] = $prPrice;
-                if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
-                    $discount_applicable = true;
-                }
+                // echo '<br>metal price  === '.$metalPrice = $metal_weight * $goldRate;
+                // echo '<br>Stone price  === '. $stonePrice = $stock['stone_price'] ?? 0;
+                // echo '<br>making_price_type  === '. $making_price_type = $stock['making_price_type'];
+                // echo '<br>making_charge  === '. $making_charge = $stock['making_charge'] ?? 0;
 
-                if ($discount_applicable) {
+                $metalPrice = $metal_weight * $goldRate;
+                $stonePrice = $stock['stone_price'] ?? 0;
+                $making_price_type = $stock['making_price_type'];
+                $making_charge = $stock['making_charge'] ?? 0;
+
+                $total_making_charge = 0; 
+
+                if($making_price_type == 1){       // Per gram amount
+                    $total_making_charge = $metal_weight * $making_charge;
+                }elseif($making_price_type == 2){       // Per gram percentage
+                    $total_making_charge = ($metalPrice / 100) * $making_charge;
+                }elseif($making_price_type == 3){       // PC Rate
+                    $total_making_charge =  $quantity* $making_charge;
+                }
+                // echo '<br>total_making_charge  === '. $total_making_charge;  echo '<br>productOrgPrice  === '. 
+                $productOrgPrice = $metalPrice + $stonePrice + $total_making_charge;
+                $productPrice['original_price'] = $productOrgPrice;
+
+                $discountPrice = $productOrgPrice;
+                if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
+                    // echo '<br>discount_type  === '. $product->discount_type;
                     if ($product->discount_type == 'percent') {
-                        $prPrice -= ($prPrice * $product->discount) / 100;
+                        $discountPrice = $productOrgPrice - (($productOrgPrice * $product->discount) / 100);
                         $offertag = $product->discount . '% OFF';
                     } elseif ($product->discount_type == 'amount') {
-                        $prPrice -= $product->discount;
+                        $discountPrice = $productOrgPrice - $product->discount;
                         $offertag = 'AED '.$product->discount.' OFF';
                     }
                 }
-                $productPrice['discounted_price'] = $prPrice;
+                // echo '<br>discountPrice  === '.  echo '<br>offertag  === '. 
+                $productPrice['discounted_price'] = $discountPrice;
                 $productPrice['offer_tag'] = $offertag;
             }
-        }else{
-            echo "not exist";
         }
-      print_r($productPrice);
-        die;
+        //     echo '<br>';
+        //   print_r($productPrice);
+        //     die;
+        return $productPrice;
     }
