@@ -131,7 +131,7 @@
                                         <input type="hidden" name="types[][{{ $lang }}]"
                                             value="widget_one_labels">
                                         <input type="hidden" name="types[]" value="widget_one_links">
-                                        @if (get_setting('widget_one_labels', null, $lang) != null)
+                                        @if (get_setting('widget_one_labels', null, $lang) != null && get_setting('widget_one_labels', null, $lang) != 'null')
                                             @foreach (json_decode(get_setting('widget_one_labels', null, $lang), true) as $key => $value)
                                                 <div class="row gutters-5">
                                                     <div class="col-4">
