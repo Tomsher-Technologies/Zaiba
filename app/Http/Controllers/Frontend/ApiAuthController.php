@@ -419,7 +419,7 @@ class ApiAuthController extends Controller
 
         $collections['title'] =  $page->heading1;
         $collections['sub_title'] = $page->sub_heading1;
-        $newCollection = json_decode(get_setting('new_collection_categories'));
+        $newCollection = (get_setting('new_collection_categories') != null && get_setting('new_collection_categories') != 'null') ? json_decode(get_setting('new_collection_categories')) : [];
         $collections['categories'] = Category::whereIn('id',$newCollection)
                                         ->select('id','parent_id','name','slug')
                                         ->where('is_active',1)
@@ -481,7 +481,7 @@ class ApiAuthController extends Controller
         $data['trending_categories'] = Cache::rememberForever('home_trending_categories', function () use($page){
             $home_categories['title'] =  $page->heading2;
             $home_categories['sub_title'] = $page->sub_heading2;
-            $catIds = json_decode(get_setting('home_categories'));
+            $catIds = (get_setting('home_categories') != null && get_setting('home_categories') != 'null') ? json_decode(get_setting('home_categories')) : [];
             if(!empty($catIds)){
                 $home_categories['categories'] = Category::with(['icon'=>function($query){
                                                         $query->select('id', \DB::raw('CONCAT("'.url('/storage').'/", file_name) as file_name'));
@@ -496,7 +496,7 @@ class ApiAuthController extends Controller
         $home_products['title'] =  $page->heading3;
         $home_products['sub_title'] = $page->sub_heading3;
         $home_products['products'] = [];
-        $proIds = json_decode(get_setting('trending_products'));
+        $proIds = (get_setting('trending_products') != null && get_setting('trending_products') != 'null') ? json_decode(get_setting('trending_products')) : [];
         if(!empty($proIds)){
             $homeProducts = Product::whereIn('id',$proIds)
                                     ->select('id', 'name', 'slug','sku', 'unit_price', \DB::raw('CONCAT("'.url('/').'", thumbnail_img) as thumbnail_img'))
@@ -602,7 +602,7 @@ class ApiAuthController extends Controller
         $data['footer_points'] = Cache::rememberForever('home_footer_points', function () use($page){
             $footer_points = [];
             for ($i=0; $i<4; $i++){
-                $points = json_decode(get_setting('home_footer_point_'.$i+1), true);
+                $points = (get_setting('home_footer_point_'.$i+1) != null && get_setting('home_footer_point_'.$i+1) != 'null') ?  json_decode(get_setting('home_footer_point_'.$i+1), true) : [];
                 $footer_points[$i] = [
                     'title' => $points['title'] ?? '',
                     'sub_title' => $points['sub_title'] ?? '',

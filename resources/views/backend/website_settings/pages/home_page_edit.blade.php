@@ -33,7 +33,7 @@
                                 <input type="hidden" name="types[]" value="new_collection_categories">
                                 <input type="hidden" name="page_type" value="new_collection">
                                 
-                                @if (get_setting('new_collection_categories') != null || get_setting('new_collection_categories') != 'null')
+                                @if (get_setting('new_collection_categories') != null && get_setting('new_collection_categories') != 'null')
                                     @foreach (json_decode(get_setting('new_collection_categories'), true) as $key => $value)
                                         <div class="row gutters-5">
                                             <div class="col">
@@ -227,7 +227,7 @@
                                 <input type="hidden" name="types[]" value="home_categories">
                                 <input type="hidden" name="page_type" value="trending_categories">
                                 
-                                @if (get_setting('home_categories') != null || get_setting('home_categories') != 'null') 
+                                @if (get_setting('home_categories') != null && get_setting('home_categories') != 'null') 
                                     @foreach (json_decode(get_setting('home_categories'), true) as $key => $value)
                                         <div class="row gutters-5">
                                             <div class="col">
@@ -1030,7 +1030,7 @@
                         @for ($i=0; $i<4; $i++)
 
                             @php
-                                $points = (get_setting('home_footer_point_'.$i+1) != 'null' || get_setting('home_footer_point_'.$i+1) != null) ? json_decode(get_setting('home_footer_point_'.$i+1), true) : '';
+                                $points = (get_setting('home_footer_point_'.$i+1) != 'null' && get_setting('home_footer_point_'.$i+1) != null) ? json_decode(get_setting('home_footer_point_'.$i+1), true) : [];
                             @endphp
                             <div class="form-group row">
                                 <h6 class="ml-3">Point {{$i+1}}</h6>
