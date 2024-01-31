@@ -430,4 +430,6 @@ Route::group(['prefix' => env('ADMIN_PREFIX'), 'middleware' => ['auth', 'admin']
     Route::resource('designs', DesignsController::class);
 
     Route::post('/products/add-attributes', [ProductController::class, 'get_attribute_values'])->name('products.add-attributes');
+
+    Route::get('/product-prices', [ProductController::class, 'updateAllPrices']);
 });

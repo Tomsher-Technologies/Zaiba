@@ -17,6 +17,7 @@ use App\Models\Products\ProductTabs;
 use App\Models\ProductSeo;
 use App\Models\User;
 use App\Models\ProductAttributes;
+use App\Models\GoldPrices;
 use Auth;
 use Carbon\Carbon;
 use Combinations;
@@ -320,10 +321,14 @@ class ProductController extends Controller
             }
         }
 
+        $today_gold_rate    = GoldPrices::first()->toArray();
+        $gold_purity        = [18 => '18_k', 21 => '21_k', 22 => '22_k', 24 => '24_k'];
+
         if($request->has('products')){
             $products = $request->products;
             $product_attributes = array();
             foreach($products as $prod){
+
                 $product_stock = new ProductStock;
                 $product_stock->product_id = $product->id;
                 $product_stock->sku = $prod['sku'];
@@ -337,7 +342,50 @@ class ProductController extends Controller
                 $product_stock->making_price_type = $prod['making_price_type_id'];
                 $product_stock->making_charge = $prod['making_charge'];
                 $product_stock->qty = $prod['current_stock'];
-                
+
+                $price          = 0;
+                $offertag       = '';
+                $purity         = $product->purity;
+                $metal_weight   = $prod['metal_weight'];
+
+                $discount_applicable = false;
+                if(array_key_exists($purity, $gold_purity)){
+                    $goldRate = isset($today_gold_rate[$gold_purity[$purity]]) ? $today_gold_rate[$gold_purity[$purity]] : 0;
+                }
+
+                if($goldRate != 0){
+                    $metalPrice         = $metal_weight * $goldRate;
+                    $stonePrice         = $prod['stone_price'] ?? 0;
+                    $making_price_type  = $prod['making_price_type_id'];
+                    $making_charge      = $prod['making_charge'] ?? 0;
+
+                    $total_making_charge = 0; 
+
+                    if($making_price_type == 1){       // Per gram amount
+                        $total_making_charge = $metal_weight * $making_charge;
+                    }elseif($making_price_type == 2){       // Per gram percentage
+                        $total_making_charge = ($metalPrice / 100) * $making_charge;
+                    }elseif($making_price_type == 3){       // PC Rate
+                        $total_making_charge = $making_charge;
+                    }
+
+                    $productOrgPrice = $metalPrice + $stonePrice + $total_making_charge;
+                    $discountPrice = $productOrgPrice;
+
+                    if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
+                        if ($product->discount_type == 'percent') {
+                            $discountPrice = $productOrgPrice - (($productOrgPrice * $product->discount) / 100);
+                            $offertag = $product->discount . '% OFF';
+                        } elseif ($product->discount_type == 'amount') {
+                            $discountPrice = $productOrgPrice - $product->discount;
+                            $offertag = 'AED '.$product->discount.' OFF';
+                        }
+                    }
+                    $product_stock->price       = $productOrgPrice;
+                    $product_stock->offer_price = $discountPrice;
+                    $product_stock->offer_tag   = $offertag;
+                }
+
                 $variantImage = (isset($prod['variant_images'])) ? $this->downloadAndResizeImage('varient',$prod['variant_images'], $prod['sku'], false) : NULL;
                 $product_stock->image = $variantImage;
 
@@ -488,9 +536,6 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // echo '<pre>';
-        // print_r($request->all());
-        // die;
         $product = Product::findOrFail($id);
 
         $skuMain = '';
@@ -532,9 +577,9 @@ class ProductController extends Controller
             $product->discount_end_date     = strtotime($date_var[1]);
         }
 
-        $slug = $request->slug ? Str::slug($request->slug, '-') : Str::slug($request->name, '-');
-        $same_slug_count = Product::where('slug', 'LIKE', $slug . '%')->where('id','!=',$id)->count();
-        $slug_suffix = $same_slug_count ? '-' . $same_slug_count + 1 : '';
+        $slug               = $request->slug ? Str::slug($request->slug, '-') : Str::slug($request->name, '-');
+        $same_slug_count    = Product::where('slug', 'LIKE', $slug . '%')->where('id','!=',$id)->count();
+        $slug_suffix        = $same_slug_count ? '-' . $same_slug_count + 1 : '';
         $slug .= $slug_suffix;
 
         $product->slug = $slug;
@@ -633,6 +678,9 @@ class ProductController extends Controller
                 ]);
             }
         }
+        $today_gold_rate    = GoldPrices::first()->toArray();
+        $gold_purity        = [18 => '18_k', 21 => '21_k', 22 => '22_k', 24 => '24_k'];
+
         if($request->has('oldproduct')){
             $oldproduct = $request->oldproduct;
             $oldproduct_attributes = array();
@@ -652,6 +700,50 @@ class ProductController extends Controller
                 $product_stock->qty                 = $prodOld['current_stock'];
                 $product_stock->status              = $prodOld['status'];
                 
+                $price          = 0;
+                $offertag       = '';
+                $purity         = $product->purity;
+                $metal_weight   = $prodOld['metal_weight'];
+
+                $discount_applicable = false;
+                if(array_key_exists($purity, $gold_purity)){
+                    $goldRate = isset($today_gold_rate[$gold_purity[$purity]]) ? $today_gold_rate[$gold_purity[$purity]] : 0;
+                }
+
+                if($goldRate != 0){
+                    $metalPrice         = $metal_weight * $goldRate;
+                    $stonePrice         = $prodOld['stone_price'] ?? 0;
+                    $making_price_type  = $prodOld['making_price_type_id'];
+                    $making_charge      = $prodOld['making_charge'] ?? 0;
+
+                    $total_making_charge = 0; 
+
+                    if($making_price_type == 1){       // Per gram amount
+                        $total_making_charge = $metal_weight * $making_charge;
+                    }elseif($making_price_type == 2){       // Per gram percentage
+                        $total_making_charge = ($metalPrice / 100) * $making_charge;
+                    }elseif($making_price_type == 3){       // PC Rate
+                        $total_making_charge = $making_charge;
+                    }
+
+                    $productOrgPrice    = $metalPrice + $stonePrice + $total_making_charge;
+                    $discountPrice      = $productOrgPrice;
+
+                    if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
+                        if ($product->discount_type == 'percent') {
+                            $discountPrice  = $productOrgPrice - (($productOrgPrice * $product->discount) / 100);
+                            $offertag       = $product->discount . '% OFF';
+                        } elseif ($product->discount_type == 'amount') {
+                            $discountPrice  = $productOrgPrice - $product->discount;
+                            $offertag       = 'AED '.$product->discount.' OFF';
+                        }
+                    }
+                    $product_stock->price       = $productOrgPrice;
+                    $product_stock->offer_price = $discountPrice;
+                    $product_stock->offer_tag   = $offertag;
+                }
+
+
 
                 if (isset($prodOld['variant_images'])) {
                     if ($product_stock->image) {
@@ -699,19 +791,62 @@ class ProductController extends Controller
             $products = $request->products;
             $product_attributes = array();
             foreach($products as $prod){
-                $product_stock = new ProductStock;
-                $product_stock->product_id = $product->id;
-                $product_stock->sku = $prod['sku'];
-                $product_stock->description = $prod['description'];
-                $product_stock->metal_weight = $prod['metal_weight'];
-                $product_stock->stone_available =  (array_key_exists('stone_availability', $prod)) ? 1 : 0;
-                $product_stock->stone_type = $prod['stone_type'];
-                $product_stock->stone_count = $prod['stone_count'];
-                $product_stock->stone_weight = $prod['stone_weight'];
-                $product_stock->stone_price = $prod['stone_price'];
-                $product_stock->making_price_type = $prod['making_price_type_id'];
-                $product_stock->making_charge = $prod['making_charge'];
-                $product_stock->qty = $prod['current_stock'];
+                $product_stock                      = new ProductStock;
+                $product_stock->product_id          = $product->id;
+                $product_stock->sku                 = $prod['sku'];
+                $product_stock->description         = $prod['description'];
+                $product_stock->metal_weight        = $prod['metal_weight'];
+                $product_stock->stone_available     = (array_key_exists('stone_availability', $prod)) ? 1 : 0;
+                $product_stock->stone_type          = $prod['stone_type'];
+                $product_stock->stone_count         = $prod['stone_count'];
+                $product_stock->stone_weight        = $prod['stone_weight'];
+                $product_stock->stone_price         = $prod['stone_price'];
+                $product_stock->making_price_type   = $prod['making_price_type_id'];
+                $product_stock->making_charge       = $prod['making_charge'];
+                $product_stock->qty                 = $prod['current_stock'];
+
+                $price          = 0;
+                $offertag       = '';
+                $purity         = $product->purity;
+                $metal_weight   = $prod['metal_weight'];
+
+                $discount_applicable = false;
+                if(array_key_exists($purity, $gold_purity)){
+                    $goldRate = isset($today_gold_rate[$gold_purity[$purity]]) ? $today_gold_rate[$gold_purity[$purity]] : 0;
+                }
+
+                if($goldRate != 0){
+                    $metalPrice         = $metal_weight * $goldRate;
+                    $stonePrice         = $prod['stone_price'] ?? 0;
+                    $making_price_type  = $prod['making_price_type_id'];
+                    $making_charge      = $prod['making_charge'] ?? 0;
+
+                    $total_making_charge = 0; 
+
+                    if($making_price_type == 1){       // Per gram amount
+                        $total_making_charge = $metal_weight * $making_charge;
+                    }elseif($making_price_type == 2){       // Per gram percentage
+                        $total_making_charge = ($metalPrice / 100) * $making_charge;
+                    }elseif($making_price_type == 3){       // PC Rate
+                        $total_making_charge = $making_charge;
+                    }
+
+                    $productOrgPrice = $metalPrice + $stonePrice + $total_making_charge;
+                    $discountPrice = $productOrgPrice;
+
+                    if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
+                        if ($product->discount_type == 'percent') {
+                            $discountPrice  = $productOrgPrice - (($productOrgPrice * $product->discount) / 100);
+                            $offertag       = $product->discount . '% OFF';
+                        } elseif ($product->discount_type == 'amount') {
+                            $discountPrice  = $productOrgPrice - $product->discount;
+                            $offertag       = 'AED '.$product->discount.' OFF';
+                        }
+                    }
+                    $product_stock->price       = $productOrgPrice;
+                    $product_stock->offer_price = $discountPrice;
+                    $product_stock->offer_tag   = $offertag;
+                }
                 
                 $variantImage = (isset($prod['variant_images'])) ? $this->downloadAndResizeImage('varient',$prod['variant_images'], $prod['sku'], false) : NULL;
                 $product_stock->image = $variantImage;
@@ -1339,5 +1474,73 @@ class ProductController extends Controller
         } else {
             return 0;
         }
+    }
+
+    public function updateAllPrices(){
+        $today_gold_rate    = GoldPrices::first()->toArray();
+        $gold_purity        = [18 => '18_k', 21 => '21_k', 22 => '22_k', 24 => '24_k'];
+
+        $productStocks = ProductStock::orderBy('status','desc')->get();
+        
+        if(!empty($productStocks)){
+            foreach($productStocks as $proSk){
+                $price = 0;
+                $offertag = '';
+            
+                $product_id = $proSk->product_id;
+                $purity = $proSk->product->purity;
+                $metal_weight = $proSk->metal_weight;
+            
+                $discount_applicable = false;
+                if(array_key_exists($purity, $gold_purity)){
+                    $goldRate = isset($today_gold_rate[$gold_purity[$purity]]) ? $today_gold_rate[$gold_purity[$purity]] : 0;
+                }
+        
+                $productPrice = [
+                    'id' => $proSk->id,
+                    'price' => 0,
+                    'offer_price' => 0,
+                    'offer_tag' => null,
+                ];
+
+                if($goldRate != 0){
+                    $metalPrice = $metal_weight * $goldRate;
+                    $stonePrice = $proSk->stone_price ?? 0;
+                    $making_price_type = $proSk->making_price_type;
+                    $making_charge = $proSk->making_charge ?? 0;
+    
+                    $total_making_charge = 0; 
+
+                    if($making_price_type == 1){       // Per gram amount
+                        $total_making_charge = $metal_weight * $making_charge;
+                    }elseif($making_price_type == 2){       // Per gram percentage
+                        $total_making_charge = ($metalPrice / 100) * $making_charge;
+                    }elseif($making_price_type == 3){       // PC Rate
+                        $total_making_charge = $making_charge;
+                    }
+
+                    $productOrgPrice = $metalPrice + $stonePrice + $total_making_charge;
+                    
+                    $discountPrice = $productOrgPrice;
+
+                    if (strtotime(date('d-m-Y H:i:s')) >= $proSk->product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $proSk->product->discount_end_date) {
+                        if ($proSk->product->discount_type == 'percent') {
+                            $discountPrice = $productOrgPrice - (($productOrgPrice * $proSk->product->discount) / 100);
+                            $offertag = $proSk->product->discount . '% OFF';
+                        } elseif ($proSk->product->discount_type == 'amount') {
+                            $discountPrice = $productOrgPrice - $proSk->product->discount;
+                            $offertag = 'AED '.$proSk->product->discount.' OFF';
+                        }
+                    }
+
+                    $proSk->price = $productOrgPrice;
+                    $proSk->offer_price = $discountPrice;
+                    $proSk->offer_tag = $offertag;
+                    $proSk->save();
+                }
+            }
+
+        }
+        
     }
 }

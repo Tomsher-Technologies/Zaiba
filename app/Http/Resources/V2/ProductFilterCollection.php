@@ -11,21 +11,20 @@ class ProductFilterCollection extends ResourceCollection
     {
        return $this->collection->map(function ($data) {
             // echo '<pre>';
-            // print_r($data->stocks);
-            $stock = $data->stocks()->orderBy('metal_weight','asc')->first();
-            // print_r($stock);
+            // print_r($data);
+            
             // die;
-            $priceData = getProductPrice($stock);
             return [
-                'id' => $data->id,
-                'name' => $data->name,
-                'sku' => $data->sku,
-                'thumbnail_image' => app('url')->asset($data->thumbnail_img),
-                'stroked_price' => $priceData['original_price'],
-                'main_price' => $priceData['discounted_price'],
-                'min_qty' => $data->min_qty,
-                'slug' => $data->slug,
-                'offer_tag' => $priceData['offer_tag']
+                'id' => $data->id ?? '',
+                'product_id' => $data->product_id ?? '',
+                'name' => $data->product->name ?? '',
+                'sku' => $data->sku ?? '',
+                'thumbnail_image' => ($data->image != NULL && $data->image != '0') ? get_product_image($data->image,'300') : get_product_image($data->product->thumbnail_img,'300'),
+                'stroked_price' => $data->price ?? 0,
+                'main_price' => $data->offer_price ?? 0,
+                'min_qty' => $data->product->min_qty ?? 0,
+                'slug' => $data->product->slug ?? '',
+                'offer_tag' => $data->offer_tag ?? ''
             ];
         });
     }

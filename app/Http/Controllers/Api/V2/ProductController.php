@@ -9,6 +9,7 @@ use App\Http\Resources\V2\FlashDealCollection;
 use App\Http\Resources\V2\ProductFilterCollection;
 use App\Models\FlashDeal;
 use App\Models\Product;
+use App\Models\ProductStock;
 use App\Models\Category;
 use App\Models\Brand;
 use App\Models\Shop;
@@ -29,17 +30,21 @@ class ProductController extends Controller
         $offset = $request->offset ? $request->offset : 0;
         $min_price = $request->min_price ? $request->min_price : '';
         $max_price = $request->max_price ? $request->max_price : '';
-        $category = $request->category ? explode(',', $request->category)  : false;
-        $brand = $request->brand ? explode(',', $request->brand)  : false;
-        $offer = $request->offer ? explode(',', $request->offer)  : false;
 
         $category_slug = $request->category_slug ? explode(',', $request->category_slug)  : false;
         $brand_slug = $request->brand_slug ? explode(',', $request->brand_slug)  : false;
 
-        $offer_slug = $request->offer_slug ? explode(',', $request->offer_slug)  : false;
+        // $product_query  = Product::wherePublished(1);
+        // DB::enableQueryLog();
+        $product_query = ProductStock::leftJoin('products','products.id','=','product_stocks.product_id')
+                                    ->where('products.published',1)
+                                    ->where('product_stocks.status',1)
+                                    ->select('product_stocks.*');
+        // dd(DB::getQueryLog());
+        // echo '<pre>';
+        // print_r($product_query);
+        // die;
 
-        $product_query  = Product::wherePublished(1);
-        
         $metaData = Page::where('type', 'product_listing')->select('image1','meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image')->first();
         if($metaData){
             $metaData->image1           = ($metaData->image1 != NULL) ? uploaded_asset($metaData->image1) : '';
@@ -49,20 +54,7 @@ class ProductController extends Controller
         }
         
         $meta = NULL;
-        // if($offer){
-        //     $product_ids = getOffersProductIds($offer,1);
-        //     $product_query->whereIn('id', $product_ids);
-        // }
-
-        // if($offer_slug){
-        //     $product_ids = getOffersProductIds($offer_slug,0);
-        //     $product_query->whereIn('id', $product_ids);
-        // }
-
-        if ($category) {
-            $product_query->whereIn('category_id', $category);
-        }
-
+       
         if ($category_slug) {
             $catids = implode(',', $category_slug);
             $childIds = [];
@@ -79,18 +71,15 @@ class ProductController extends Controller
                 $childIds = array_unique($childIds);
             }
             
-            $product_query->whereIn('category_id', $childIds);
+            $product_query->whereIn('products.category_id', $childIds);
             if(!empty($category_ids)){
                 $meta = Category::select('meta_title', 'meta_description', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_keyword', 'footer_title', 'footer_content')->find($category_ids[0]);
             }
         }   
 
-        if ($brand) {
-            $product_query->whereIn('brand_id', $brand);
-        }
         if ($brand_slug) {
             $brand_ids = Brand::whereIn('slug',$brand_slug)->pluck('id')->toArray();
-            $product_query->whereIn('brand_id', $brand_ids);
+            $product_query->whereIn('products.brand_id', $brand_ids);
         }
 
         if ($request->order_by) {
@@ -102,18 +91,20 @@ class ProductController extends Controller
                     $product_query->oldest();
                     break;
                 case 'name_asc':
-                    $product_query->orderBy('name', 'asc');
+                    $product_query->orderBy('products.name', 'asc');
                     break;
                 case 'name_desc':
-                    $product_query->orderBy('name', 'desc');
+                    $product_query->orderBy('products.name', 'desc');
                     break;
                 case 'price_high':
-                    $product_query->select('*', DB::raw("(SELECT MAX(price) from product_stocks WHERE product_id = products.id) as sort_price"));
-                    $product_query->orderBy('sort_price', 'desc');
+                    // $product_query->select('*', DB::raw("(SELECT MAX(price) from product_stocks WHERE product_id = products.id) as sort_price"));
+                    // $product_query->orderBy('sort_price', 'desc');
+                    $product_query->orderBy('product_stocks.offer_price','desc');
                     break;
                 case 'price_low':
-                    $product_query->select('*', DB::raw("(SELECT MIN(price) from product_stocks WHERE product_id = products.id) as sort_price"));
-                    $product_query->orderBy('sort_price', 'asc');
+                    // $product_query->select('*', DB::raw("(SELECT MIN(price) from product_stocks WHERE product_id = products.id) as sort_price"));
+                    // $product_query->orderBy('sort_price', 'asc');
+                    $product_query->orderBy('product_stocks.offer_price','asc');
                     break;
                 default:
                     # code...
@@ -123,26 +114,22 @@ class ProductController extends Controller
 
         if ($request->search) {
             $sort_search = $request->search;
-            $products = $product_query
-                ->where('name', 'like', '%' . $sort_search . '%')
-                ->orWhere('tags', 'like', '%' . $sort_search . '%')
-                ->orWhereHas('stocks', function ($q) use ($sort_search) {
-                    $q->where('sku', 'like', '%' . $sort_search . '%');
-                });
-
+            $products = $product_query->where('products.name', 'like', '%' . $sort_search . '%')
+                        ->orWhere('products.tags', 'like', '%' . $sort_search . '%')
+                        ->orWhere('product_stocks.sku', 'like', '%' . $sort_search . '%');
             SearchUtility::store($sort_search, $request);
         }
         if ($min_price != null && $min_price != "" && is_numeric($min_price)) {
-            $product_query->where('unit_price', '>=', $min_price);
+            $product_query->where('product_stocks.offer_price', '>=', $min_price);
         }
 
         if ($max_price != null && $max_price != "" && is_numeric($max_price)) {
-            $product_query->where('unit_price', '<=', $max_price);
+            $product_query->where('product_stocks.offer_price', '<=', $max_price);
         }
 
         $total_count = $product_query->count();
         $products = $product_query->skip($offset)->take($limit)->get();
-        
+        // dd(DB::getQueryLog());
         $next_offset = $offset + $limit;
       
         $response = new ProductFilterCollection($products);
