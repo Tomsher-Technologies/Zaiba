@@ -343,7 +343,7 @@ class ProductController extends Controller
                 $product_stock->making_charge = $prod['making_charge'];
                 $product_stock->qty = $prod['current_stock'];
 
-                $price          = 0;
+                $price = $goldRate = 0;
                 $offertag       = '';
                 $purity         = $product->purity;
                 $metal_weight   = $prod['metal_weight'];
@@ -700,7 +700,7 @@ class ProductController extends Controller
                 $product_stock->qty                 = $prodOld['current_stock'];
                 $product_stock->status              = $prodOld['status'];
                 
-                $price          = 0;
+                $price = $goldRate = 0;
                 $offertag       = '';
                 $purity         = $product->purity;
                 $metal_weight   = $prodOld['metal_weight'];
@@ -805,7 +805,7 @@ class ProductController extends Controller
                 $product_stock->making_charge       = $prod['making_charge'];
                 $product_stock->qty                 = $prod['current_stock'];
 
-                $price          = 0;
+                $price = $goldRate = 0;
                 $offertag       = '';
                 $purity         = $product->purity;
                 $metal_weight   = $prod['metal_weight'];
@@ -1484,7 +1484,7 @@ class ProductController extends Controller
         
         if(!empty($productStocks)){
             foreach($productStocks as $proSk){
-                $price = 0;
+                $price = $goldRate = 0;
                 $offertag = '';
             
                 $product_id = $proSk->product_id;
