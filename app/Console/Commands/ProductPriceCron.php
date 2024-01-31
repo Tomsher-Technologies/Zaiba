@@ -44,13 +44,6 @@ class ProductPriceCron extends Command
                     $goldRate = isset($today_gold_rate[$gold_purity[$purity]]) ? $today_gold_rate[$gold_purity[$purity]] : 0;
                 }
         
-                $productPrice = [
-                    'id' => $proSk->id,
-                    'price' => 0,
-                    'offer_price' => 0,
-                    'offer_tag' => null,
-                ];
-
                 if($goldRate != 0){
                     $metalPrice         = $metal_weight * $goldRate;
                     $stonePrice         = $proSk->stone_price ?? 0;

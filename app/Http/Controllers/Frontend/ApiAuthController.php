@@ -393,9 +393,7 @@ class ApiAuthController extends Controller
     }
 
     public function homePage(){
-        // echo '<pre>';
-        $page         = Page::where('type','home_page')->first();
-        
+        $page         = Page::where('type','home_page')->first(); 
         $data['slider'] = Cache::rememberForever('homeSlider', function () {
             $slider = [];
             $sliders = HomeSlider::whereStatus(1)->with(['mainImage', 'mobileImage'])->orderBy('sort_order')->get();
@@ -434,18 +432,18 @@ class ApiAuthController extends Controller
                 $categoryProducts = [];
                 if($coll_cat->products){
                     foreach($coll_cat->products as $col_prod){
-                        $stock = $col_prod->stocks()->orderBy('metal_weight','asc')->first();
-                        $priceData = getProductPrice($stock);
+                        $stock = $col_prod->stocks()->where('status',1)->orderBy('offer_price','asc')->first();
+                        
                         $categoryProducts[] = [
                             'id' => $col_prod->id,
                             'name' => $col_prod->name,
                             'sku' => $col_prod->sku,
                             'thumbnail_image' => app('url')->asset($col_prod->thumbnail_img),
-                            'stroked_price' => $priceData['original_price'],
-                            'main_price' => $priceData['discounted_price'],
+                            'stroked_price' => $stock->price ?? 0,
+                            'main_price' => $stock->offer_price ?? 0,
                             'min_qty' => $col_prod->min_qty,
                             'slug' => $col_prod->slug,
-                            'offer_tag' => $priceData['offer_tag']
+                            'offer_tag' => $stock->offer_tag ?? ''
                         ];
                     }
                 }
@@ -504,18 +502,17 @@ class ApiAuthController extends Controller
                                     ->get();
             if($homeProducts){
                 foreach($homeProducts as $hmProd){
-                    $stock = $hmProd->stocks()->orderBy('metal_weight','asc')->first();
-                    $priceData = getProductPrice($stock);
+                    $stock = $hmProd->stocks()->where('status',1)->orderBy('offer_price','asc')->first();
                     $home_products['products'][] = [
                         'id' => $hmProd->id,
                         'name' => $hmProd->name,
                         'sku' => $hmProd->sku,
                         'thumbnail_image' => app('url')->asset($hmProd->thumbnail_img),
-                        'stroked_price' => $priceData['original_price'],
-                        'main_price' => $priceData['discounted_price'],
+                        'stroked_price' => $stock->price ?? 0,
+                        'main_price' => $stock->offer_price ?? 0,
                         'min_qty' => $hmProd->min_qty,
                         'slug' => $hmProd->slug,
-                        'offer_tag' => $priceData['offer_tag']
+                        'offer_tag' => $stock->offer_tag ?? ''
                     ];
                 }
             }
