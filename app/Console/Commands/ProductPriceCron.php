@@ -33,7 +33,7 @@ class ProductPriceCron extends Command
         $productStocks      = ProductStock::orderBy('status','desc')->get();
         if(!empty($productStocks)){
             foreach($productStocks as $proSk){
-                $price          = 0;
+                $price = $goldRate = 0;
                 $offertag       = '';
                 $product_id     = $proSk->product_id;
                 $purity         = $proSk->product->purity;
