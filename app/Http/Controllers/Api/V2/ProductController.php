@@ -263,6 +263,7 @@ class ProductController extends Controller
                     'published' =>  $product_stock->product->published ,
                     'photos' => $photos,
                     'thumbnail_image' => get_product_image($product_stock->product->thumbnail_img),
+                    'variant_image' => ($product_stock->image != NULL) ?  get_product_image($product_stock->image) : '' ,
                     'tags' => explode(',', $product_stock->product->tags),
                     'status' => $product_stock->status,
                     'sku' =>  $product_stock->sku,
