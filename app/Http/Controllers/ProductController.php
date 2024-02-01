@@ -381,6 +381,8 @@ class ProductController extends Controller
                             $offertag = 'AED '.$product->discount.' OFF';
                         }
                     }
+                    $product_stock->metal_price_break   = $metalPrice;
+                    $product_stock->making_price_break  = $total_making_charge;
                     $product_stock->price       = $productOrgPrice;
                     $product_stock->offer_price = $discountPrice;
                     $product_stock->offer_tag   = $offertag;
@@ -843,6 +845,8 @@ class ProductController extends Controller
                             $offertag       = 'AED '.$product->discount.' OFF';
                         }
                     }
+                    $product_stock->metal_price_break   = $metalPrice;
+                    $product_stock->making_price_break  = $total_making_charge;
                     $product_stock->price       = $productOrgPrice;
                     $product_stock->offer_price = $discountPrice;
                     $product_stock->offer_tag   = $offertag;
@@ -1533,6 +1537,8 @@ class ProductController extends Controller
                         }
                     }
 
+                    $proSk->metal_price_break   = $metalPrice;
+                    $proSk->making_price_break  = $total_making_charge;
                     $proSk->price = $productOrgPrice;
                     $proSk->offer_price = $discountPrice;
                     $proSk->offer_tag = $offertag;

@@ -60,6 +60,7 @@ class ProductPriceCron extends Command
                         $total_making_charge = $making_charge;
                     }
 
+
                     $productOrgPrice = $metalPrice + $stonePrice + $total_making_charge;
                     $discountPrice = $productOrgPrice;
 
@@ -72,9 +73,11 @@ class ProductPriceCron extends Command
                             $offertag = 'AED '.$proSk->product->discount.' OFF';
                         }
                     }
-                    $proSk->price       = $productOrgPrice;
-                    $proSk->offer_price = $discountPrice;
-                    $proSk->offer_tag   = $offertag;
+                    $proSk->metal_price_break   = $metalPrice;
+                    $proSk->making_price_break  = $total_making_charge;
+                    $proSk->price               = $productOrgPrice;
+                    $proSk->offer_price         = $discountPrice;
+                    $proSk->offer_tag           = $offertag;
                     $proSk->save();
                 }
             }

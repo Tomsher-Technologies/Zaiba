@@ -132,6 +132,11 @@ class Product extends Model
         return URL::to($path);
     }
 
+    public function product_attributes()
+    {
+        return $this->hasMany(ProductAttributes::class,'product_id','id');
+    }
+
     // public function thumbnail()
     // {
     //     return $this->hasOne(Upload::class, 'id', 'thumbnail_img');
