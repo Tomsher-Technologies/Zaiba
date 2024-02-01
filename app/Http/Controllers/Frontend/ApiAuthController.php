@@ -503,6 +503,9 @@ class ApiAuthController extends Controller
             if($homeProducts){
                 foreach($homeProducts as $hmProd){
                     $stock = $hmProd->stocks()->where('status',1)->orderBy('offer_price','asc')->first();
+                 
+                    $total_quantity =  $hmProd->stocks()->where('status',1)->select(\DB::raw('SUM(qty) as quantity'))->first();
+
                     $home_products['products'][] = [
                         'id' => $hmProd->id,
                         'name' => $hmProd->name,
@@ -511,6 +514,7 @@ class ApiAuthController extends Controller
                         'stroked_price' => $stock->price ?? 0,
                         'main_price' => $stock->offer_price ?? 0,
                         'min_qty' => $hmProd->min_qty,
+                        'quantity' => (int)$total_quantity->quantity ?? 0,
                         'slug' => $hmProd->slug,
                         'offer_tag' => $stock->offer_tag ?? ''
                     ];

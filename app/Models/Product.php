@@ -63,6 +63,11 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
+    public function design()
+    {
+        return $this->belongsTo(Designs::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -125,6 +130,11 @@ class Product extends Model
     public function image($path)
     {
         return URL::to($path);
+    }
+
+    public function product_attributes()
+    {
+        return $this->hasMany(ProductAttributes::class,'product_id','id');
     }
 
     // public function thumbnail()

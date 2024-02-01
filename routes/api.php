@@ -75,6 +75,7 @@ Route::group(['middleware' => 'api'], function ($router) {
     });
 
     Route::get('products', [ProductController::class, 'index']);
+    Route::get('product-details', [ProductController::class, 'productDetails']);
     // Route::get('categories', [CategoryController::class, 'index']);
 
     Route::group(['prefix' => 'website'], function () {

@@ -172,19 +172,19 @@
                                 </td>
                                 <td>
                                     <strong>{{ translate('Num of Sale') }}:</strong> {{ $product->num_of_sale }}
-                                    {{ translate('times') }} </br>
-                                    <strong>{{ translate('Base Price') }}:</strong>
-                                    {{ single_price($product->unit_price) }} </br>
-                                    <strong>{{ translate('Rating') }}:</strong> {{ $product->rating }} </br>
-                                    <strong>{{ translate('SKU') }}:</strong> {{ $product->sku }} </br>
+                                    {{ translate('times') }} <br>
+                                    {{-- <strong>{{ translate('Base Price') }}:</strong> --}}
+                                    {{-- {{ single_price($product->unit_price) }} </br> --}}
+                                    <strong>{{ translate('Rating') }}:</strong> {{ $product->rating }} <br>
+                                    <strong>{{ translate('SKU') }}:</strong> {{ $product->sku }} <br>
                                 </td>
                                 <td class="text-center">
                                     @php
                                         $qty = 0;
-                                        if ($product->variant_product) {
+                                        if ($product->product_type == 1) {
                                             foreach ($product->stocks as $key => $stock) {
                                                 $qty += $stock->qty;
-                                                echo $stock->variant . ' - ' . $stock->qty . '<br>';
+                                                echo $stock->sku . ' - <b>' . $stock->qty . '</b><br>';
                                             }
                                         } else {
                                             //$qty = $product->current_stock;
