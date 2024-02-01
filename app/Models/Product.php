@@ -63,6 +63,11 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
+    public function design()
+    {
+        return $this->belongsTo(Designs::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

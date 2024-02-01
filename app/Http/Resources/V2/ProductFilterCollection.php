@@ -23,6 +23,7 @@ class ProductFilterCollection extends ResourceCollection
                 'stroked_price' => $data->price ?? 0,
                 'main_price' => $data->offer_price ?? 0,
                 'min_qty' => $data->product->min_qty ?? 0,
+                'quantity' => $data->qty ?? 0,
                 'slug' => $data->product->slug ?? '',
                 'offer_tag' => $data->offer_tag ?? ''
             ];

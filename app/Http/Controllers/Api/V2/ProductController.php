@@ -15,6 +15,7 @@ use App\Models\Brand;
 use App\Models\Shop;
 use App\Models\Color;
 use App\Models\Page;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use App\Utility\CategoryUtility;
 use App\Utility\SearchUtility;
@@ -150,9 +151,95 @@ class ProductController extends Controller
         return response()->json(['success' => true,"message"=>"Success","data" => $response, "total_count" => $total_count, "next_offset" => $next_offset, 'meta' => $metaData ],200);
     }
 
+    public function productDetails(Request $request){
+        $slug = $request->has('slug') ? $request->slug :  ''; 
+        $sku  = $request->has('sku') ? $request->sku :  ''; 
+
+        if($slug !=  '' && $sku !=''){
+            $product_stock = ProductStock::leftJoin('products','products.id','=','product_stocks.product_id')
+                                    ->where('products.published',1)
+                                    ->where('product_stocks.status',1)
+                                    ->select('product_stocks.*')
+                                    ->where('products.slug', $slug)
+                                    ->where('product_stocks.sku', $sku)
+                                    ->first();
+        
+            $category = [
+                'id'=> 0,
+                'name'=> "",
+                'slug' => "",
+                'logo'=> "",
+            ];
+            $response = [];
+            if($product_stock){
+                if($product_stock->product->category != null) {
+                    $category = [
+                        'id'=> $product_stock->product->category->id ?? '',
+                        'name'=> $product_stock->product->category->name ?? '',
+                        'slug' => $product_stock->product->category->slug ?? '',
+                        'logo'=> uploaded_asset($product_stock->product->category->icon ?? ''),
+                    ];
+                }
+    
+                $photo_paths = explode(',',$product_stock->product->photos);
+         
+                $photos = [];
+                if (!empty($photo_paths)) {
+                    foreach($photo_paths as $php){
+                        $photos[] = get_product_image($php);
+                    }
+                }
+        
+                $response = [
+                    'id' => (integer)$product_stock->id,
+                    'name' => $product_stock->product->name,
+                    'slug' => $product_stock->product->slug,
+                    'product_type' => $product_stock->product->product_type,
+                    'design' => $product_stock->product->design->name ?? '',
+                    'design_category' => ucfirst($product_stock->product->design_category_id ?? ''),
+                    'category' => $category,
+                    'metal_type' => $product_stock->product->metal_type ?? '',
+                    'purity' => $product_stock->product->purity ?? '',
+                    'video_link' => $product_stock->product->video_link != null ?  $product_stock->product->video_link : "",
+                    'return_refund' =>  $product_stock->product->return_refund ,
+                    'published' =>  $product_stock->product->published ,
+                    'photos' => $photos,
+                    'thumbnail_image' => get_product_image($product_stock->product->thumbnail_img),
+                    'tags' => explode(',', $product_stock->product->tags),
+                    'status' => $product_stock->status,
+                    'sku' =>  $product_stock->sku,
+                    'description' => $product_stock->description,
+                    'metal_weight' => $product_stock->metal_weight,
+                    'stone_available' => $product_stock->stone_available,
+                    'stone_type' =>  $product_stock->stone_type ?? null,
+                    'stone_count' => $product_stock->stone_count,
+                    'stone_weight' =>  $product_stock->stone_weight,
+                    'stone_price' => $product_stock->stone_price,
+                    'stroked_price' => $product_stock->price ?? 0,
+                    'main_price' => $product_stock->offer_price ?? 0,
+                    'offer_tag' =>  $product_stock->offer_tag,
+                    'current_stock' => (integer)$product_stock->qty,
+                    'rating' => (double)$product_stock->product->rating,
+                    'rating_count' => (integer)Review::where(['product_id' => $product_stock->product_id])->count(),
+                    'meta_title' => $product_stock->product->seo->meta_title ?? '',
+                    'meta_description' => $product_stock->product->seo->meta_description ?? '',
+                    'meta_keywords' => $product_stock->product->seo->meta_keywords ?? '',
+                    'og_title' => $product_stock->product->seo->og_title ?? '',
+                    'og_description' => $product_stock->product->seo->og_description ?? '',
+                    'twitter_title' => $product_stock->product->seo->twitter_title ?? '',
+                    'twitter_description' => $product_stock->product->seo->twitter_description ?? '',
+            
+                ];
+            }
+            return response()->json(['success' => true,"message"=>"Success","data" => $response],200);
+        }else{
+           echo 'Not found';
+        } 
+    }
+
     public function show($id)
     {
-        return new ProductDetailCollection(Product::where('id', $id)->get());
+        // return new ProductDetailCollection(Product::where('id', $id)->get());
     }
 
     public function admin()
