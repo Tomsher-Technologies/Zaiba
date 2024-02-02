@@ -280,9 +280,9 @@ class ProductController extends Controller
                         $photos[] = get_product_image($php);
                     }
                 }
-                $price_breakup = array( "gold" => $product_stock->metal_price_break,
-                                        "making_charge" =>  $product_stock->making_price_break,
-                                        "stone_price" => $product_stock->stone_price
+                $price_breakup = array( "gold" => $product_stock->metal_price_break ?? 0,
+                                        "making_charge" =>  $product_stock->making_price_break ?? 0,
+                                        "stone_price" => $product_stock->stone_price ?? 0
                                 );
                
                 $response = [
@@ -304,6 +304,7 @@ class ProductController extends Controller
                     'tags' => explode(',', $product_stock->product->tags),
                     'status' => $product_stock->status,
                     'sku' =>  $product_stock->sku,
+                    'quantity' => $product_stock->qty ?? 0,
                     'description' => $product_stock->description,
                     'metal_weight' => $product_stock->metal_weight,
                     'stone_available' => $product_stock->stone_available,
