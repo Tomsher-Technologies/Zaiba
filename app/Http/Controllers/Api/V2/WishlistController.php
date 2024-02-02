@@ -5,55 +5,120 @@ namespace App\Http\Controllers\Api\V2;
 use App\Http\Resources\V2\WishlistCollection;
 use App\Models\Wishlist;
 use App\Models\Product;
+use App\Models\ProductStock;
 use Illuminate\Http\Request;
 
 class WishlistController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-<<<<<<< HEAD
         $user_id = (!empty(auth('sanctum')->user())) ? auth('sanctum')->user()->id : '';
-        if ($user_id != '') {
-            $wishlist = Wishlist::with('product')->where('user_id', $user_id)->get();
-
+        if($user_id != ''){
+            $wishlist = Wishlist::with('product','product_stock')->where('user_id', $user_id)->get();
+           
             $result = [];
-            if ($wishlist) {
-                foreach ($wishlist as $data) {
-                    if (isset($data->product) && !empty($data->product)) {
+            if($wishlist){
+                foreach($wishlist as $data){
+                    if($data->product && $data->product_stock){
                         $result[] = [
                             'id' => (int) $data->id,
                             'product' => [
-                                'id' => $data->product->id,
-                                'name' => $data->product->name,
-                                'slug' => $data->product->slug,
-                                'thumbnail_image' => app('url')->asset($data->product->thumbnail_img),
-                                'has_discount' => home_base_price($data->product, false) != home_discounted_base_price($data->product, false),
-                                'stroked_price' => home_base_price($data->product, false),
-                                'main_price' => home_discounted_base_price($data->product, false),
-                                'price_high_low' => (float)explode('-', home_discounted_base_price($data->product, false))[0] == (float)explode('-', home_discounted_price($data->product, false))[1] ? format_price((float)explode('-', home_discounted_price($data->product, false))[0]) : "From " . format_price((float)explode('-', home_discounted_price($data->product, false))[0]) . " to " . format_price((float)explode('-', home_discounted_price($data->product, false))[1]),
+                                'variant_id' => $data->product_stock->id ?? '',
+                                'product_id' => $data->product_id ?? '',
+                                'name' => $data->product->name ?? '',
+                                'sku' => $data->product_stock->sku ?? '',
+                                'slug' => $data->product->slug ?? '',
+                                'thumbnail_image' => ($data->product_stock->image != NULL && $data->product_stock->image != '0') ? get_product_image($data->product_stock->image,'300') : get_product_image($data->product->thumbnail_img,'300'),
+                                'stroked_price' => $data->product_stock->price ?? 0,
+                                'main_price' => $data->product_stock->offer_price ?? 0,
+                                'min_qty' => $data->product->min_qty ?? 0,
+                                'quantity' => $data->product_stock->qty ?? 0,
+                                'offer_tag' => $data->product_stock->offer_tag ?? '',
+                                'attributes' => getProductAttributes($data->product_stock->attributes)
                             ]
                         ];
                     }
-                }
+                }    
             }
-=======
-        $product_ids = Wishlist::where('user_id', auth()->user()->id)->pluck("product_id")->toArray();
-        $existing_product_ids = Product::whereIn('id', $product_ids)->pluck("id")->toArray();
->>>>>>> f02c273fcda02281970e443290a75a6fb1ad2d78
-
-        $query = Wishlist::query();
-        $query->where('user_id', auth()->user()->id)->whereIn("product_id", $existing_product_ids);
-
-        return new WishlistCollection($query->latest()->get());
+        
+            return response()->json([
+                'status' => true,
+                'message' => 'Success',
+                'data' => $result,
+                'wishlist_count' => count($result)
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found'
+            ], 200);
+        }
     }
 
     public function store(Request $request)
     {
-        Wishlist::updateOrCreate(
-            ['user_id' => $request->user_id, 'product_id' => $request->product_id]
-        );
-        return response()->json(['message' => translate('Product is successfully added to your wishlist')], 201);
+        $product_slug   = $request->has('product_slug') ? $request->product_slug : '';
+        $sku            = $request->has('sku') ? $request->sku : '';
+        $user_id = (!empty(auth('sanctum')->user())) ? auth('sanctum')->user()->id : '';
+        
+        $variantProduct = ProductStock::leftJoin('products as p','p.id','=','product_stocks.product_id')
+                                    ->where('product_stocks.sku', $sku)
+                                    ->where('p.slug', $product_slug)
+                                    ->select('product_stocks.*')->first()?->toArray();
+                                    
+        if(!empty($variantProduct)){
+            $product_id         = $variantProduct['product_id'] ?? null;
+            $product_stock_id   = $variantProduct['id'] ?? null;
+            if($product_id != null &&  $product_stock_id != null){
+                // Check if product already exist in wishlist
+                $checkWhishlist =   Wishlist::where('user_id',$user_id)
+                                            ->where('product_id',$product_id)
+                                            ->where('product_stock_id',$product_stock_id)->count();
+
+                if($checkWhishlist != 0){
+                    Wishlist::where('user_id',$user_id)->where('product_id',$product_id)
+                            ->where('product_stock_id',$product_stock_id)->delete();
+                }else{
+                    Wishlist::create([
+                            'user_id' => $user_id,
+                            'product_id' => $product_id,
+                            'product_stock_id' => $product_stock_id
+                    ]);
+                }
+                return response()->json([
+                    'status' => true,
+                    'wishlist_count' => $this->getWishlistCount($user_id),
+                    'message' => 'Wishlist updated'
+                ], 200);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Details not found'
+                ], 200);
+            }
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Details not found'
+            ], 200);
+        }
+    }
+
+    public function getWishlistCount($user)
+    {
+        return Wishlist::where([
+            'user_id' => $user
+        ])->count();
+    }
+
+    public function getCount(Request $request)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => 'Success',
+            'wishlist_count' => $this->getWishlistCount($request->user()->id),
+        ], 200);
     }
 
     public function destroy($id)
@@ -67,69 +132,24 @@ class WishlistController extends Controller
 
     }
 
-    public function add(Request $request)
-    {
-        $product = Wishlist::where(['product_id' => $request->product_id, 'user_id' => auth()->user()->id])->count();
-        if ($product > 0) {
+    public function removeWishlistItem(Request $request){
+        $list_ids = $request->list_ids ? explode(',', $request->list_ids) : [];
+        $user = getUser();
+
+        if(!empty($list_ids) && $user['users_id'] != ''){
+            Wishlist::where('user_id', $user['users_id'])->whereIn('id',$list_ids)->delete();
+
             return response()->json([
-                'message' => translate('Product present in wishlist'),
-                'is_in_wishlist' => true,
-                'product_id' => (integer)$request->product_id,
-                'wishlist_id' => (integer)Wishlist::where(['product_id' => $request->product_id, 'user_id' => auth()->user()->id])->first()->id
+                'status' => true,
+                'message' => "Wishlist items removed successfully",
+                'wishlist_count' => $this->getWishlistCount($user['users_id']),
             ], 200);
-        } else {
-            Wishlist::create(
-                ['user_id' =>auth()->user()->id, 'product_id' => $request->product_id]
-            );
-
+        }else {
             return response()->json([
-                'message' => translate('Product added to wishlist'),
-                'is_in_wishlist' => true,
-                'product_id' => (integer)$request->product_id,
-                'wishlist_id' => (integer)Wishlist::where(['product_id' => $request->product_id, 'user_id' => auth()->user()->id])->first()->id
-            ], 200);
-        }
-
-    }
-
-    public function remove(Request $request)
-    {
-        $product = Wishlist::where(['product_id' => $request->product_id, 'user_id' =>  auth()->user()->id])->count();
-        if ($product == 0) {
-            return response()->json([
-                'message' => translate('Product in not in wishlist'),
-                'is_in_wishlist' => false,
-                'product_id' => (integer)$request->product_id,
-                'wishlist_id' => 0
-            ], 200);
-        } else {
-            Wishlist::where(['product_id' => $request->product_id, 'user_id' => auth()->user()->id])->delete();
-
-            return response()->json([
-                'message' => translate('Product is removed from wishlist'),
-                'is_in_wishlist' => false,
-                'product_id' => (integer)$request->product_id,
-                'wishlist_id' => 0
+                'status' => false,
+                'message' => "Wishlist item not found"
             ], 200);
         }
     }
 
-    public function isProductInWishlist(Request $request)
-    {
-        $product = Wishlist::where(['product_id' => $request->product_id, 'user_id' => auth()->user()->id])->count();
-        if ($product > 0)
-            return response()->json([
-                'message' => translate('Product present in wishlist'),
-                'is_in_wishlist' => true,
-                'product_id' => (integer)$request->product_id,
-                'wishlist_id' => (integer)Wishlist::where(['product_id' => $request->product_id, 'user_id' => auth()->user()->id])->first()->id
-            ], 200);
-
-        return response()->json([
-            'message' => translate('Product is not present in wishlist'),
-            'is_in_wishlist' => false,
-            'product_id' => (integer)$request->product_id,
-            'wishlist_id' => 0
-        ], 200);
-    }
 }
