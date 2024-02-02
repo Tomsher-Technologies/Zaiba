@@ -295,6 +295,7 @@ class ProductController extends Controller
                     'category' => $category,
                     'metal_type' => $product_stock->product->metal_type ?? '',
                     'purity' => $product_stock->product->purity ?? '',
+                    'video_provider' => $product_stock->product->video_provider ?? '',
                     'video_link' => $product_stock->product->video_link != null ?  $product_stock->product->video_link : "",
                     'return_refund' =>  $product_stock->product->return_refund ,
                     'published' =>  $product_stock->product->published ,
