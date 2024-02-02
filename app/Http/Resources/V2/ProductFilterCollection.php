@@ -10,10 +10,7 @@ class ProductFilterCollection extends ResourceCollection
     public function toArray($request)
     {
        return $this->collection->map(function ($data) {
-            // echo '<pre>';
-            // print_r($data);
             
-            // die;
             return [
                 'id' => $data->id ?? '',
                 'product_id' => $data->product_id ?? '',
@@ -25,7 +22,8 @@ class ProductFilterCollection extends ResourceCollection
                 'min_qty' => $data->product->min_qty ?? 0,
                 'quantity' => $data->qty ?? 0,
                 'slug' => $data->product->slug ?? '',
-                'offer_tag' => $data->offer_tag ?? ''
+                'offer_tag' => $data->offer_tag ?? '',
+                'attributes' => getProductAttributes($data->attributes)
             ];
         });
     }

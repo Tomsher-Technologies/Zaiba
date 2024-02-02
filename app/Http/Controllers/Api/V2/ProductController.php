@@ -154,6 +154,43 @@ class ProductController extends Controller
         return response()->json(['success' => true,"message"=>"Success","data" => $response, "total_count" => $total_count, "next_offset" => $next_offset, 'meta' => $metaData ],200);
     }
 
+    public function relatedProducts(Request $request){
+        $limit = $request->limit ? $request->limit : 10;
+        $offset = $request->offset ? $request->offset : 0;
+        $category_slug = $request->category_slug ?? '';
+        $product_slug = $request->product_slug ?? '';
+
+       
+        $product_query = ProductStock::leftJoin('products','products.id','=','product_stocks.product_id')
+                                    ->where('products.published',1)
+                                    ->where('product_stocks.status',1)
+                                    ->select('product_stocks.*');
+
+        if ($category_slug) {
+            $category_ids = Category::where('slug',$category_slug)->pluck('id')->toArray();
+            $childIds[] = $category_ids;
+            if(!empty($category_ids)){
+                foreach($category_ids as $cId){
+                    $childIds[] = getChildCategoryIds($cId);
+                }
+            }
+
+            if(!empty($childIds)){
+                $childIds = array_merge(...$childIds);
+                $childIds = array_unique($childIds);
+            }
+
+            $product_query->whereIn('products.category_id', $category_ids);
+        }
+        $product_query->where('products.slug','!=', $product_slug)->latest();
+
+        $products = $product_query->skip($offset)->take($limit)->get();
+        
+        $response = new ProductFilterCollection($products);
+      
+        return response()->json(['success' => true,"message"=>"Success","data" => $response],200);
+    }
+
     public function productDetails(Request $request){
         $slug = $request->has('slug') ? $request->slug :  ''; 
         $sku  = $request->has('sku') ? $request->sku :  ''; 

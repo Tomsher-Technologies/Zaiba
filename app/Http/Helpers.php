@@ -1622,3 +1622,16 @@ if (!function_exists('load_seo_tags')) {
         
         return $productPrice;
     }
+
+    function getProductAttributes($attributes){
+        $attributeArr = [];
+        if($attributes){
+            foreach($attributes as $attr){
+                $attributeArr[] = [
+                                    "name" => $attr->attributes?->name,
+                                    "value" => $attr->attribute_value?->value,
+                                ];
+            }
+        }
+        return  $attributeArr;
+    }

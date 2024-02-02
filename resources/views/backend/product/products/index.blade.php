@@ -189,7 +189,7 @@
                                         } else {
                                             //$qty = $product->current_stock;
                                             $qty = optional($product->stocks->first())->qty;
-                                            echo $qty;
+                                            echo '<b>'.$qty.'</b>';
                                         }
                                     @endphp
                                     @if ($qty <= $product->low_stock_quantity)
