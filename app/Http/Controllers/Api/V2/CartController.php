@@ -395,4 +395,63 @@ class CartController extends Controller
             ], 200);
         }
     }
+
+    public function changeQuantity(Request $request)
+    {
+        $cart_id = $request->cart_id ?? '';
+        $quantity = $request->quantity ?? '';
+        $action = $request->action ?? '';
+        $user = getUser();
+
+        if($cart_id != '' && $quantity != '' && $action != '' && $user['users_id'] != ''){
+            $cart = Cart::where([
+                $user['users_id_type'] => $user['users_id']
+            ])->with([
+                'product',
+                'product_stock',
+            ])->findOrFail($request->cart_id);
+    
+            $max_qty = $cart->product_stock->qty;
+
+            if ($action == 'plus') {
+                // Increase quantity of a product in the cart.
+                if ( $quantity <= $max_qty) {
+                    $cart->quantity = $quantity;
+                    $cart->save();
+                    return response()->json([
+                        'status' => true,
+                        'message' => "Cart updated",
+                    ], 200);
+                }else{
+                    return response()->json([
+                        'status' => false,
+                        'message' => "Maximum quantity reached",
+                    ], 200);
+                }
+            }elseif($action == 'minus'){
+                // Decrease quantity of a product in the cart. If it reaches zero then delete that row from the table.
+                if($quantity < 1){
+                    Cart::where('id',$cart->id)->delete();
+                }else{
+                    // Decrease quantity of a product in the cart.
+                    $cart->quantity = $quantity;
+                    $cart->save();
+                }
+                return response()->json([
+                    'status' => true,
+                    'message' => "Cart updated",
+                ], 200);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => "Undefined action value",
+                ], 200);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => "Missing data"
+            ], 200);
+        }
+    }
 }
