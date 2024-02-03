@@ -413,10 +413,9 @@ class CartController extends Controller
     
             $max_qty = $cart->product_stock->qty;
 
-            if ($action == 'plus') {
-                // Increase quantity of a product in the cart.
+            if ($action == 'plus') {           // Increase quantity of a product in the cart.
                 if ( $quantity <= $max_qty) {
-                    $cart->quantity = $quantity;
+                    $cart->quantity = $quantity;   // Update quantity of a product in the cart.
                     $cart->save();
                     return response()->json([
                         'status' => true,
@@ -428,13 +427,11 @@ class CartController extends Controller
                         'message' => "Maximum quantity reached",
                     ], 200);
                 }
-            }elseif($action == 'minus'){
-                // Decrease quantity of a product in the cart. If it reaches zero then delete that row from the table.
+            }elseif($action == 'minus'){   // Decrease quantity of a product in the cart. If it reaches zero then delete that row from the table.
                 if($quantity < 1){
                     Cart::where('id',$cart->id)->delete();
                 }else{
-                    // Decrease quantity of a product in the cart.
-                    $cart->quantity = $quantity;
+                    $cart->quantity = $quantity;        // Update quantity of a product in the cart.
                     $cart->save();
                 }
                 return response()->json([
