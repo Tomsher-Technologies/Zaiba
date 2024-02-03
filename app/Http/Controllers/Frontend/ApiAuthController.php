@@ -39,16 +39,16 @@ class ApiAuthController extends Controller
         ]);
         if($validator->fails()){
             if($request->name == '' || $request->email == '' || $request->password == '' || $request->phone_number == ''){
-                return response()->json(['status' => false, 'message' => 'Please make sure that you fill out all the required fields..', 'data' => []  ], 400);
+                return response()->json(['status' => false, 'message' => 'Please make sure that you fill out all the required fields..', 'data' => []  ], 200);
             }else{
                 $errors = $validator->errors();
                 if ($errors->has('email')) {
-                    return response()->json(['status' => false, 'message' => $errors->first('email'), 'data' => []  ], 400);
+                    return response()->json(['status' => false, 'message' => $errors->first('email'), 'data' => []  ], 200);
                 }
                 if ($errors->has('phone_number')) {
-                    return response()->json(['status' => false, 'message' => $errors->first('phone_number'), 'data' => []  ], 400);
+                    return response()->json(['status' => false, 'message' => $errors->first('phone_number'), 'data' => []  ], 200);
                 }
-                return response()->json(['status' => false, 'message' => 'Something went wrong', 'data' => []  ], 400);
+                return response()->json(['status' => false, 'message' => 'Something went wrong', 'data' => []  ], 200);
             }
         }
 
@@ -259,10 +259,10 @@ class ApiAuthController extends Controller
         if($validator->fails()){
             $errors = $validator->errors();
             if ($errors->has('email')) {
-                return response()->json(['status' => false, 'message' => $errors->first('email'), 'data' => []  ], 400);
+                return response()->json(['status' => false, 'message' => $errors->first('email'), 'data' => []  ], 200);
             }
             if ($errors->has('phone_number')) {
-                return response()->json(['status' => false, 'message' => $errors->first('phone_number'), 'data' => []  ], 400);
+                return response()->json(['status' => false, 'message' => $errors->first('phone_number'), 'data' => []  ], 200);
             }
         }
         
@@ -313,7 +313,7 @@ class ApiAuthController extends Controller
             'phone' => 'required'
         ]);
         if($validator->fails()){
-            return response()->json(['status' => false, 'message' => 'Please make sure that you fill out all the required fields..', 'data' => []  ], 400);
+            return response()->json(['status' => false, 'message' => 'Please make sure that you fill out all the required fields..', 'data' => []  ], 200);
         }
 
         $userId = $request->user()->id;
