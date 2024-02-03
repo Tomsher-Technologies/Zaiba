@@ -23,10 +23,12 @@
             <thead>
                 <tr>
                     <th data-breakpoints="lg">#</th>
-                    <th>{{translate('Code')}}</th>
-                    <th data-breakpoints="lg">{{translate('Type')}}</th>
-                    <th data-breakpoints="lg">{{translate('Start Date')}}</th>
-                    <th data-breakpoints="lg">{{translate('End Date')}}</th>
+                    <th class="text-center">{{translate('Code')}}</th>
+                    <th class="text-center">{{translate('Type')}}</th>
+                    <th class="text-center">{{translate('Discount')}}</th>
+                    <th class="text-center">{{translate('One Time Use')}}</th>
+                    <th class="text-center">{{translate('Start Date')}}</th>
+                    <th class="text-center">{{translate('End Date')}}</th>
                     <th width="10%">{{translate('Options')}}</th>
                 </tr>
             </thead>
@@ -34,14 +36,19 @@
                 @foreach($coupons as $key => $coupon)
                     <tr>
                         <td>{{$key+1}}</td>
-                        <td>{{$coupon->code}}</td>
-                        <td>@if ($coupon->type == 'cart_base')
+                        <td class="text-center">{{$coupon->code}}</td>
+                        <td class="text-center">@if ($coupon->type == 'cart_base')
                                 Cart Base
                             @elseif ($coupon->type == 'product_base')
                                 Product Base
                         @endif</td>
-                        <td>{{ date('d-m-Y', $coupon->start_date) }}</td>
-                        <td>{{ date('d-m-Y', $coupon->end_date) }}</td>
+                        
+                        <td class="text-center">
+                            {{ $coupon->discount }} ({{ ($coupon->discount_type == "percent") ? '%':'AED'}})
+                        </td>
+                        <td class="text-center">{{ ($coupon->one_time_use == 1) ? 'Yes' :'No' }}</td>
+                        <td class="text-center">{{ date('d-m-Y', $coupon->start_date) }}</td>
+                        <td class="text-center">{{ date('d-m-Y', $coupon->end_date) }}</td>
 						<td class="text-right">
                             <a class="btn btn-soft-primary btn-icon btn-circle btn-sm" href="{{route('coupon.edit', encrypt($coupon->id) )}}" title="Edit">
                                 <i class="las la-edit"></i>

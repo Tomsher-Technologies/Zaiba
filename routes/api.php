@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V2\CartController;
 use App\Http\Controllers\Api\V2\ProductController;
 use App\Http\Controllers\Api\V2\CategoryController;
 use App\Http\Controllers\Api\V2\WebsiteController;
+use App\Http\Controllers\Api\V2\CheckoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,7 +69,8 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('wishlists/count', [WishlistController::class, 'getCount']);
         Route::post('wishlist/remove', [WishlistController::class, 'removeWishlistItem']);
 
-        
+        Route::post('coupon-apply', [CheckoutController::class, 'apply_coupon_code']);
+        Route::post('coupon-remove', [CheckoutController::class, 'remove_coupon_code']);
     });
 
     Route::get('products', [ProductController::class, 'index']);
@@ -81,7 +83,8 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::post('cart/remove', [CartController::class, 'removeCartItem']);
     Route::apiResource('cart', CartController::class)->only('index', 'store', 'destroy');
 
-
+    
+    
     Route::group(['prefix' => 'website'], function () {
         Route::get('categories', [WebsiteController::class, 'websiteCategories']);
         Route::get('brands', [WebsiteController::class, 'websiteBrands']);

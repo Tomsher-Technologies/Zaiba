@@ -6,6 +6,8 @@ use App\Http\Resources\V2\CartCollection;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\ProductStock;
+use App\Models\Coupon;
+use App\Models\CouponUsage;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -68,8 +70,12 @@ class CartController extends Controller
                 if ($coupon) {               
                     if (strtotime(date('d-m-Y')) >= $coupon->start_date && strtotime(date('d-m-Y')) <= $coupon->end_date) {
                         if($user_id != ''){
-                            $coupon_used = CouponUsage::where('user_id', $user_id)->where('coupon_id', $coupon->id)->first();
-                            if ($coupon->one_time_use && $coupon_used == null) {
+                            if($coupon->one_time_use == 1){
+                                $coupon_used = CouponUsage::where('user_id', $user_id)->where('coupon_id', $coupon->id)->first();
+                                if ($coupon_used == null) {
+                                    $can_use_coupon = true;
+                                }
+                            }else{
                                 $can_use_coupon = true;
                             }
                         }
@@ -88,6 +94,7 @@ class CartController extends Controller
                             $tax += $cartItem['tax'];
                             $shipping += $cartItem['shipping'] ;
                         }
+
                         $sum = $subtotal + $tax + $shipping;
 
                         if ($sum >= $coupon_details->min_buy) {
@@ -99,6 +106,7 @@ class CartController extends Controller
                             } elseif ($coupon->discount_type == 'amount') {
                                 $coupon_discount = $coupon->discount;
                             }
+
                             if($user_id != ''){
                                 Cart::where('user_id', $user_id)->update([
                                     'discount' => $coupon_discount / count($carts),
@@ -120,6 +128,7 @@ class CartController extends Controller
                                 }
                             }
                         }
+
                         if($user_id != ''){
                             Cart::where('user_id', $user_id)->update([
                                 'discount' => $coupon_discount / count($carts),
@@ -128,12 +137,18 @@ class CartController extends Controller
                             ]);
                         }
                     }
+                }else{
+                    Cart::where('user_id', $user_id)->update([
+                        'discount' => 0.00,
+                        'coupon_code' => NULL,
+                        'coupon_applied' => 0
+                    ]);
                 }
             }else{
                 if($user_id != ''){
                     Cart::where('user_id', $user_id)->update([
                         'discount' => 0.00,
-                        'coupon_code' => "",
+                        'coupon_code' => NULL,
                         'coupon_applied' => 0
                     ]);
                 }
@@ -377,6 +392,62 @@ class CartController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => "Cart item not found"
+            ], 200);
+        }
+    }
+
+    public function changeQuantity(Request $request)
+    {
+        $cart_id = $request->cart_id ?? '';
+        $quantity = $request->quantity ?? '';
+        $action = $request->action ?? '';
+        $user = getUser();
+
+        if($cart_id != '' && $quantity != '' && $action != '' && $user['users_id'] != ''){
+            $cart = Cart::where([
+                $user['users_id_type'] => $user['users_id']
+            ])->with([
+                'product',
+                'product_stock',
+            ])->findOrFail($request->cart_id);
+    
+            $max_qty = $cart->product_stock->qty;
+
+            if ($action == 'plus') {           // Increase quantity of a product in the cart.
+                if ( $quantity <= $max_qty) {
+                    $cart->quantity = $quantity;   // Update quantity of a product in the cart.
+                    $cart->save();
+                    return response()->json([
+                        'status' => true,
+                        'message' => "Cart updated",
+                    ], 200);
+                }else{
+                    return response()->json([
+                        'status' => false,
+                        'message' => "Maximum quantity reached",
+                    ], 200);
+                }
+            }elseif($action == 'minus'){   // Decrease quantity of a product in the cart. If it reaches zero then delete that row from the table.
+                if($quantity < 1){
+                    Cart::where('id',$cart->id)->delete();
+                }else{
+                    $cart->quantity = $quantity;        // Update quantity of a product in the cart.
+                    $cart->save();
+                }
+                return response()->json([
+                    'status' => true,
+                    'message' => "Cart updated",
+                ], 200);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => "Undefined action value",
+                ], 200);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => "Missing data"
             ], 200);
         }
     }

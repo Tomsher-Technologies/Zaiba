@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-6 d-none">
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0 h6">{{ translate('Select Shipping Method') }}</h5>
@@ -47,7 +47,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-6 d-none">
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0 h6">{{ translate('Note') }}</h5>
@@ -76,7 +76,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row d-none">
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-header">
@@ -115,7 +115,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row d-none">
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-header">
@@ -173,10 +173,21 @@
                         <input type="hidden" name="type" value="free_shipping">
 
                         <div class="form-group row">
-                            <label class="col-md-8 col-from-label">
+                            <label class="col-md-4 col-from-label">
+                                Default shipping amount
+                            </label>
+                            <div class="col-md-8">
+                                <input step="0.01" class="form-control" type="number"
+                                    name="default_shipping_amount"
+                                    value="{{ get_setting('default_shipping_amount') ?? 0 }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-4 col-from-label">
                                 Free shipping status
                             </label>
-                            <div class="col-md-4">
+                            <div class="col-md-8">
                                 <label class="aiz-switch aiz-switch-success mb-0">
                                     <input name="free_shipping_status"
                                         {{ get_setting('free_shipping_status') == '1' ? 'checked' : '' }} type="checkbox">
@@ -192,18 +203,7 @@
                             <div class="col-md-8">
                                 <input step="0.01" class="form-control" type="number"
                                     name="free_shipping_min_amount"
-                                    value="{{ get_setting('free_shipping_min_amount') }}">
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="col-md-4 col-from-label">
-                                Free shipping max amount
-                            </label>
-                            <div class="col-md-8">
-                                <input step="0.01" class="form-control" type="number"
-                                    name="free_shipping_max_amount"
-                                    value="{{ get_setting('free_shipping_max_amount') }}">
+                                    value="{{ get_setting('free_shipping_min_amount') ?? 0 }}">
                             </div>
                         </div>
 
@@ -217,15 +217,30 @@
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0 h6">{{ translate('Note') }}</h5>
+                    <h5 class="mb-0 h6">Order Return Time Limit</h5>
                 </div>
-                <div class="card-body">
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            1. Shipping cost for admin is applicable if Seller wise shipping cost is enabled.
-                        </li>
-                    </ul>
-                </div>
+                <form action="{{ route('configuration.return_settings') }}" method="POST"
+                    enctype="multipart/form-data">
+                    <div class="card-body">
+                        @csrf
+                        <input type="hidden" name="type" value="return_product_limit">
+
+                        <div class="form-group row">
+                            <label class="col-md-4 col-from-label">
+                                Return Time Limit (Days)
+                            </label>
+                            <div class="col-md-8">
+                                <input step="1" class="form-control" type="number"
+                                    name="default_return_time"
+                                    value="{{ get_setting('default_return_time') ?? 0 }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-0 text-right">
+                            <button type="submit" class="btn btn-sm btn-primary">{{ translate('Save') }}</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
