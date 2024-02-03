@@ -68,16 +68,19 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('wishlists/count', [WishlistController::class, 'getCount']);
         Route::post('wishlist/remove', [WishlistController::class, 'removeWishlistItem']);
 
-        Route::get('cart/count', [CartController::class, 'getCount']);
-        Route::post('cart/change_quantity', [CartController::class, 'changeQuantity']);
-        Route::post('cart/remove', [CartController::class, 'removeCartItem']);
-        Route::apiResource('cart', CartController::class)->only('index', 'store', 'destroy');
+        
     });
 
     Route::get('products', [ProductController::class, 'index']);
     Route::get('product-details', [ProductController::class, 'productDetails']);
     Route::get('related-products', [ProductController::class, 'relatedProducts']);
     // Route::get('categories', [CategoryController::class, 'index']);
+
+    Route::get('cart/count', [CartController::class, 'getCount']);
+    Route::post('cart/change_quantity', [CartController::class, 'changeQuantity']);
+    Route::post('cart/remove', [CartController::class, 'removeCartItem']);
+    Route::apiResource('cart', CartController::class)->only('index', 'store', 'destroy');
+
 
     Route::group(['prefix' => 'website'], function () {
         Route::get('categories', [WebsiteController::class, 'websiteCategories']);
