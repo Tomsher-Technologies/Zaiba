@@ -398,10 +398,10 @@ class CartController extends Controller
 
     public function changeQuantity(Request $request)
     {
-        $cart_id = $request->cart_id ?? '';
-        $quantity = $request->quantity ?? '';
-        $action = $request->action ?? '';
-        $user = getUser();
+        $cart_id    = $request->cart_id ?? '';
+        $quantity   = $request->quantity ?? '';
+        $action     = $request->action ?? '';
+        $user       = getUser();
 
         if($cart_id != '' && $quantity != '' && $action != '' && $user['users_id'] != ''){
             $cart = Cart::where([
@@ -418,13 +418,13 @@ class CartController extends Controller
                     $cart->quantity = $quantity;   // Update quantity of a product in the cart.
                     $cart->save();
                     return response()->json([
-                        'status' => true,
-                        'message' => "Cart updated",
+                        'status'    => true,
+                        'message'   => "Cart updated",
                     ], 200);
                 }else{
                     return response()->json([
-                        'status' => false,
-                        'message' => "Maximum quantity reached",
+                        'status'    => false,
+                        'message'   => "Maximum quantity reached",
                     ], 200);
                 }
             }elseif($action == 'minus'){   // Decrease quantity of a product in the cart. If it reaches zero then delete that row from the table.
@@ -435,19 +435,19 @@ class CartController extends Controller
                     $cart->save();
                 }
                 return response()->json([
-                    'status' => true,
-                    'message' => "Cart updated",
+                    'status'    => true,
+                    'message'   => "Cart updated",
                 ], 200);
             }else{
                 return response()->json([
-                    'status' => false,
-                    'message' => "Undefined action value",
+                    'status'    => false,
+                    'message'   => "Undefined action value",
                 ], 200);
             }
         } else {
             return response()->json([
-                'status' => false,
-                'message' => "Missing data"
+                'status'    => false,
+                'message'   => "Missing data"
             ], 200);
         }
     }
