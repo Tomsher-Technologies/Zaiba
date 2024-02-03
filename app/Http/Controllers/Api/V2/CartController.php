@@ -203,13 +203,15 @@ class CartController extends Controller
             if($cart_total >= $freeShippingLimit){
                 $total_shipping = 0;
                 Cart::where('user_id', $user_id)->update([
-                    'shipping_cost' => 0
+                    'shipping_cost' => 0,
+                    'shipping_type' => 'free'
                 ]);
             }else{
                 $total_shipping = $defaultShippingCharge;
                 if($user_id != '' && $defaultShippingCharge > 0 && $cartCount != 0){
                     Cart::where('user_id', $user_id)->update([
-                        'shipping_cost' => $defaultShippingCharge / $cartCount
+                        'shipping_cost' => $defaultShippingCharge / $cartCount,
+                        'shipping_type' => 'paid'
                     ]);
                 }
             }
@@ -217,7 +219,8 @@ class CartController extends Controller
             $total_shipping = $defaultShippingCharge;
             if($user_id != '' && $defaultShippingCharge > 0 && $cartCount != 0){
                 Cart::where('user_id', $user_id)->update([
-                    'shipping_cost' => $defaultShippingCharge / $cartCount
+                    'shipping_cost' => $defaultShippingCharge / $cartCount,
+                    'shipping_type' => 'paid'
                 ]);
             }
         }
@@ -226,7 +229,7 @@ class CartController extends Controller
 
         $result['summary'] = [
             'sub_total' => $overall_subtotal,
-            'discount' => $total_discount, // Discount is in percentage
+            'discount' => $total_discount, // Discount is in amount
             'shipping' => $total_shipping,
             'vat_amount' => $total_tax,
             'total' => $cart_total,
