@@ -313,6 +313,14 @@
                         </a>
                         <ul class="aiz-side-nav-list level-2">
                             <li class="aiz-side-nav-item">
+                                <a href="{{ route('shipping_configuration.index') }}" class="aiz-side-nav-link">
+                                    <span class="aiz-side-nav-text">Shipping 
+                                        {{-- and Return --}}
+                                    </span>
+                                </a>
+                            </li>
+
+                            {{-- <li class="aiz-side-nav-item">
                                 <a href="{{ route('general_setting.index') }}" class="aiz-side-nav-link">
                                     <span class="aiz-side-nav-text">General Settings</span>
                                 </a>
@@ -328,7 +336,7 @@
                                 <a href="{{ route('smtp_settings.index') }}" class="aiz-side-nav-link">
                                     <span class="aiz-side-nav-text">SMTP Settings</span>
                                 </a>
-                            </li>
+                            </li> --}}
 
                             <!--<li class="aiz-side-nav-item">-->
                             <!--    <a href="javascript:void(0);" class="aiz-side-nav-link">-->
@@ -381,7 +389,7 @@
 
 
 
-                            <li class="aiz-side-nav-item">
+                            {{-- <li class="aiz-side-nav-item">
                                 <a href="javascript:void(0);" class="aiz-side-nav-link">
                                     <span class="aiz-side-nav-text">Shipping</span>
                                     <span class="aiz-side-nav-arrow"></span>
@@ -412,7 +420,7 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </li>
+                            </li> --}}
 
                         </ul>
                     </li>
