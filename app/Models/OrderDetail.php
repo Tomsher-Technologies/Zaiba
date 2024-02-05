@@ -20,6 +20,11 @@ class OrderDetail extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function product_stock()
+    {
+        return $this->belongsTo(ProductStock::class);
+    }
+
     public function affiliate_log()
     {
         return $this->hasMany(AffiliateLog::class);
