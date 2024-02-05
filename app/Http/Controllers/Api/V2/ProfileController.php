@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\Upload;
 use App\Models\User;
 use App\Models\Wishlist;
+use App\Models\OrderTracking;
 use Illuminate\Http\Request;
 use App\Models\Cart;
 use Hash;
@@ -325,5 +326,150 @@ class ProfileController extends Controller
                 'email_available_message' => $email_available_message,
             ]
         );
+    }
+
+    public function orderList(Request $request){
+        $user_id = (!empty(auth('sanctum')->user())) ? auth('sanctum')->user()->id : '';
+        $user = User::find($user_id);
+        if($user){
+            $sort_search = null;
+            $delivery_status = null;
+            $limit = $request->limit ? $request->limit : 10;
+            $offset = $request->offset ? $request->offset : 0;
+            // $date = $request->date;
+
+            $orders = Order::with(['orderDetails'])->select('id','code','delivery_status','payment_type','coupon_code','grand_total','created_at')->orderBy('id', 'desc')->where('user_id',$user_id);
+            if ($request->has('search')) {
+                $sort_search = $request->search;
+                $orders = $orders->where('code', 'like', '%' . $sort_search . '%');
+            }
+            if ($request->delivery_status != null) {
+                $orders = $orders->where('delivery_status', $request->delivery_status);
+                $delivery_status = $request->delivery_status;
+            }
+            // if ($date != null) {
+            //     $orders = $orders->where('created_at', '>=', date('Y-m-d', strtotime(explode(" to ", $date)[0])))->where('created_at', '<=', date('Y-m-d', strtotime(explode(" to ", $date)[1])));
+            // }
+            
+            $total_count = $orders->count();
+            $orderList = $orders->skip($offset)->take($limit)->get();
+            if($orderList){
+                foreach($orderList as $ol){
+                    $order_data = [];
+                    $ol->order_date = date('M d,Y', strtotime($ol->created_at));
+                    foreach($ol->orderDetails as $key => $oDetails){
+                        $order_data[] = [
+                            "product_id" => $oDetails->product->id,
+                            "name" => $oDetails->product->name,
+                            "slug" => $oDetails->product->slug,
+                            "sku" => $oDetails->product_stock->sku,
+                            "image" =>  ($oDetails->product_stock->image != NULL && $oDetails->product_stock->image != '0') ? get_product_image($oDetails->product_stock->image,'300') : get_product_image($oDetails->product->thumbnail_img,'300'),
+                            "attributes" => json_decode($oDetails->variation),
+                            "price" => $oDetails->price
+                        ];
+                    }
+        
+                    unset($ol->orderDetails);
+                    $ol->products = $order_data;
+                }
+            }
+
+            $data['orders'] = $orderList;
+            
+            $data['next_offset'] = $offset + $limit;
+
+            return response()->json(['status' => true,'message' => 'Data fetched successfully','data' => $data]);   
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found'
+            ]);
+        }
+    }
+
+    public function orderDetails(Request $request){
+        $order_code = $request->order_code ?? '';
+        $user_id = (!empty(auth('sanctum')->user())) ? auth('sanctum')->user()->id : '';
+        $default_return_time = get_setting('default_return_time') ?? 0;
+        if($order_code != ''){
+            $order = Order::where('code',$order_code)->where('user_id',$user_id)->first();
+            if($order){
+                $details['id']                      = $order->id ?? '';
+                $details['code']                    = $order->code ?? '';
+                $details['user_id']                 = $order->user_id ?? '';
+                $details['shipping_address']        = json_decode($order->shipping_address ?? '');
+                $details['billing_address']         = json_decode($order->billing_address ?? '');
+                $details['order_notes']             = $order->order_notes ?? '';
+                $details['shipping_type']           = ($order->shipping_type == 'free_shipping') ? 'Free Shipping' : 'Paid Shipping';
+                $details['shipping_cost']           = $order->shipping_cost ?? '';
+                $details['delivery_status']         = $order->delivery_status ?? '';
+                $details['payment_type']            = $order->payment_type ?? '';
+                $details['payment_status']          = $order->payment_status ?? '';
+                $details['tax']                     = $order->tax ?? '';
+                $details['coupon_code']             = $order->coupon_code ?? '';
+                $details['sub_total']               = $order->sub_total ?? '';
+                $details['coupon_discount']         = $order->coupon_discount ?? '';
+                $details['offer_discount']          = $order->offer_discount ?? '';
+                $details['grand_total']             = $order->grand_total ?? '';
+                $details['delivery_completed_date'] = $order->delivery_completed_date ?? '';
+                $details['order_date']                    = date('d-m-Y h:i A', $order->date);
+                $details['cancel_request']          = $order->cancel_request;
+                $details['estimated_delivery_date'] = ($order->delivery_status != 'delivered' && $order->delivery_status != 'cancelled' && $order->estimated_delivery != NULL && $order->estimated_delivery != '0000-00-00') ? date('d-m-Y', strtotime($order->estimated_delivery)) : '';
+                $details['products'] = [];
+                if($order->orderDetails){
+                    foreach($order->orderDetails as $product){
+                        $requestCount = ($product->refund_request) ? 1 : 0 ;
+                        $return_expiry = null;
+                        if($product->delivery_date != null && $default_return_time != 0 ){
+                            $return_expiry = getDatePlusXDays($product->delivery_date, $default_return_time);
+                        }
+
+                        $details['products'][] = array(
+                            'id' => $product->id ?? '',
+                            'product_id' => $product->product_id ?? '',
+                            'name' => $product->product->name ?? '',
+                            'sku' => $product->product_stock->sku ?? '',
+                            'slug' => $product->product->slug ?? '',
+                            'original_price' => $product->og_price ?? '',
+                            'offer_price' => $product->offer_price ?? '',
+                            'quantity' => $product->quantity ?? '',
+                            'total_price' => $product->price ?? '',
+                            'thumbnail_img' => ($product->product_stock->image != NULL && $product->product_stock->image != '0') ? get_product_image($product->product_stock->image,'300') : get_product_image($product->product->thumbnail_img,'300'),
+                            "attributes" => json_decode($product->variation),
+                            // 'return_refund' => $product->product->return_refund ?? ''
+                        );
+                    }
+                }
+
+                $tracks = OrderTracking::where('order_id', $order->id)->orderBy('id','ASC')->get();
+                $track_list = [];
+                if ($tracks) {
+                    foreach ($tracks as $key=>$value) {
+                        $temp = array();
+                        $temp['id'] = $value->id;
+                        $temp['status'] = $value->status;
+                        $temp['date'] = date("d-m-Y H:i a", strtotime($value->status_date));
+                        $track_list[] = $temp;
+                    }
+                }    
+                $details['timeline'] = $track_list;
+                
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Order found',
+                    'data'=> $details
+                ],200);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No Order Found!',
+                ], 200);
+            }
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Order not found'
+            ]);
+        }
     }
 }

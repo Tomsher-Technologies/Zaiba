@@ -73,6 +73,11 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('coupon-remove', [CheckoutController::class, 'remove_coupon_code']);
 
         Route::post('place-order', [CheckoutController::class, 'placeOrder']);
+
+        Route::group(['prefix' => 'account'], function () {
+            Route::get('orders', [ProfileController::class, 'orderList']);
+            Route::get('order-details', [ProfileController::class, 'orderDetails']);
+        });    
     });
 
     Route::post('payment-success', [CheckoutController::class, 'successPayment'])->name('payment-success');
