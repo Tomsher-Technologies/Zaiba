@@ -16,8 +16,9 @@ class NotificationUtility
     public static function sendOrderPlacedNotification($order, $request = null)
     {
         //sends email to customer with the invoice pdf attached
+
         $array['view'] = 'emails.invoice';
-        $array['subject'] = translate('A new order has been placed') . ' - ' . $order->code;
+        $array['subject'] = translate('Thank you for your order ') . ' - ' . $order->code;
         $array['from'] = env('MAIL_FROM_ADDRESS');
         $array['order'] = $order;
 
@@ -31,29 +32,15 @@ class NotificationUtility
                 }
             }
 
-            $admin_emails = get_setting('admin_emails') ? explode(',', get_setting('admin_emails')) : '';
-            if ($admin_emails) {
-                foreach ($admin_emails as $recipient) {
-                    Mail::to($recipient)->queue(new InvoiceEmailManager($array));
-                }
+            if (env('MAIL_ADMIN')) {
+                $array['view'] = 'emails.invoice';
+                $array['subject'] = translate('A new order has been placed') . ' - ' . $order->code;
+                $array['from'] = env('MAIL_FROM_ADDRESS');
+                $array['order'] = $order;
+                Mail::to(env('MAIL_ADMIN'))->queue(new InvoiceEmailManager($array));
             }
         } catch (\Exception $e) {
         }
-
-
-        //sends Notifications to user
-        // self::sendNotification($order, 'placed');
-        // if ($request != null && get_setting('google_firebase') == 1 && $order->user->device_token != null) {
-        //     $request->device_token = $order->user->device_token;
-        //     $request->title = "Order placed !";
-        //     $request->text = "An order {$order->code} has been placed";
-
-        //     $request->type = "order";
-        //     $request->id = $order->id;
-        //     $request->user_id = $order->user->id;
-
-        //     self::sendFirebaseNotification($request);
-        // }
     }
 
     public static function sendNotification($order, $order_status)
@@ -61,7 +48,8 @@ class NotificationUtility
         if ($order->seller_id == \App\Models\User::where('user_type', 'admin')->first()->id) {
             $users = User::findMany([$order->user->id, $order->seller_id]);
         } else {
-            $users = User::findMany([$order->user->id, $order->seller_id, \App\Models\User::where('user_type', 'admin')->first()->id]);
+            // $order->user->id, $order->seller_id,
+            $users = User::findMany([\App\Models\User::where('user_type', 'admin')->first()->id]);
         }
 
         $order_notification = array();

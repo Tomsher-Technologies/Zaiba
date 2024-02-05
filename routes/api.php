@@ -71,7 +71,12 @@ Route::group(['middleware' => 'api'], function ($router) {
 
         Route::post('coupon-apply', [CheckoutController::class, 'apply_coupon_code']);
         Route::post('coupon-remove', [CheckoutController::class, 'remove_coupon_code']);
+
+        Route::post('place-order', [CheckoutController::class, 'placeOrder']);
     });
+
+    Route::post('payment-success', [CheckoutController::class, 'successPayment'])->name('payment-success');
+    Route::post('payment-cancel', [CheckoutController::class, 'cancelPayment'])->name('payment-cancel');
 
     Route::get('products', [ProductController::class, 'index']);
     Route::get('product-details', [ProductController::class, 'productDetails']);

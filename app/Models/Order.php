@@ -7,28 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $fillable = [
-        'viewed',
-        'user_id',
-        'tracking_code',
-        'shipping_type',
-        'shipping_cost',
-        'shipping_address',
-        'seller_id',
-        'pickup_point_id',
-        'payment_type',
-        'payment_status_viewed',
-        'payment_status',
-        'payment_details',
-        'guest_id',
-        'grand_total',
-        'delivery_viewed',
-        'delivery_status',
-        'date',
-        'coupon_discount',
-        'commission_calculated',
-        'combined_order_id',
-        'code',
-        'billing_address',
+        'combined_order_id', 'code', 'user_id', 'estimated_delivery', 'shipping_address', 'billing_address', 'order_notes', 'delivery_status', 'payment_type', 'payment_status', 'payment_details', 'payment_tracking_id', 'shipping_type', 'shipping_cost', 'tax', 'grand_total', 'sub_total', 'coupon_discount', 'coupon_code', 'offer_discount', 'tracking_code', 'delivery_completed_date', 'date', 'cancel_request', 'cancel_request_date', 'cancel_approval', 'cancel_approval_date', 'cancel_reason'
     ];
 
     public function orderDetails()
@@ -36,24 +15,9 @@ class Order extends Model
         return $this->hasMany(OrderDetail::class);
     }
 
-    public function refund_requests()
-    {
-        return $this->hasMany(RefundRequest::class);
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function seller()
-    {
-        return $this->hasOne(Shop::class, 'user_id', 'seller_id');
-    }
-
-    public function pickup_point()
-    {
-        return $this->belongsTo(PickupPoint::class);
     }
 
     public function affiliate_log()
@@ -61,18 +25,4 @@ class Order extends Model
         return $this->hasMany(AffiliateLog::class);
     }
 
-    public function club_point()
-    {
-        return $this->hasMany(ClubPoint::class);
-    }
-
-    public function delivery_boy()
-    {
-        return $this->belongsTo(User::class, 'assign_delivery_boy', 'id');
-    }
-
-    public function proxy_cart_reference_id()
-    {
-        return $this->hasMany(ProxyPayment::class)->select('reference_id');
-    }
 }
