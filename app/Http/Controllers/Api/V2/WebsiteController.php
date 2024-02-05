@@ -19,8 +19,12 @@ use App\Http\Resources\V2\WebHomeCategoryCollection;
 use App\Http\Resources\V2\WebHomeBrandCollection;
 use App\Http\Resources\V2\WebHomeOffersCollection;
 use App\Http\Resources\V2\WebHomeProductsCollection;
+use App\Models\Contacts;
+use App\Mail\ContactEnquiry;
 use Illuminate\Http\Request;
 use Cache;
+use Mail;
+use Validator;
 
 class WebsiteController extends Controller
 {
@@ -347,5 +351,42 @@ class WebsiteController extends Controller
             }
         }
         return response()->json(['success' => true, "message" => "Success", "data" => $result], 200);
+    }
+
+    public function contactUs(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|email',
+            'phone' => 'required|numeric',
+            'message' => 'required'
+        ]);
+        if($validator->fails()){
+            if($request->name == '' || $request->email == '' || $request->phone == '' || $request->message == ''){
+                return response()->json(['status' => false, 'message' => 'Please make sure that you fill out all the required fields..', 'data' => []  ], 200);
+            }else{
+                $errors = $validator->errors();
+                
+                if ($errors->has('email')) {
+                    return response()->json(['status' => false, 'message' => $errors->first('email'), 'data' => []  ], 200);
+                }
+            
+                if ($errors->has('phone')) {
+                    return response()->json(['status' => false, 'message' => $errors->first('phone'), 'data' => []  ], 200);
+                }
+                return response()->json(['status' => false, 'message' => 'Something went wrong', 'data' => []  ], 200);
+            }
+        }
+
+        $con                = new Contacts;
+        $con->name          = $request->name;
+        $con->email         = $request->email;
+        $con->phone         = $request->phone;
+        $con->message       = $request->message;
+        $con->save();
+
+        Mail::to(env('MAIL_ADMIN'))->queue(new ContactEnquiry($con));
+
+        return response()->json(['status' => true,"message"=>"Thank you for getting in touch. Our team will contact you shortly.","data" => []],200);
     }
 }
