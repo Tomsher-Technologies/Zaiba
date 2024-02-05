@@ -74,6 +74,8 @@ Route::group(['middleware' => 'api'], function ($router) {
 
         Route::post('place-order', [CheckoutController::class, 'placeOrder']);
 
+        Route::post('cancel-order', [CheckoutController::class, 'cancelOrderRequest']);
+
         Route::group(['prefix' => 'account'], function () {
             Route::get('orders', [ProfileController::class, 'orderList']);
             Route::get('order-details', [ProfileController::class, 'orderDetails']);
