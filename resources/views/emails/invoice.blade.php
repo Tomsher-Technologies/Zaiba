@@ -101,12 +101,12 @@
                 <tr>
                     <td class="white-color small"></td>
                     <td class="text-right small"><span class="white-color small">{{ translate('Order ID') }} : </span> <span
-                            class="strong white-color strong"><b>{{ $order->code }}</b></span></td>
+                            class="strong white-color strong"><b class="white-color">{{ $order->code }}</b></span></td>
                 </tr>
                 <tr>
                     <td class="white-color small"></td>
                     <td class="text-right small"><span class="white-color small">{{ translate('Order Date') }} : </span>
-                        <span class="white-color strong"><b>{{ date('d-m-Y', $order->date) }}</b></span>
+                        <span class="white-color strong"><b class="white-color">{{ date('d-m-Y', $order->date) }}</b></span>
                     </td>
                 </tr>
             </table>
