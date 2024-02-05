@@ -92,23 +92,23 @@
             <table>
                 <tr>
                     <td style="font-size: 1.2rem;" class="strong white-color">{{ get_setting('site_name') }}</td>
-                    <td class="text-right"></td>
+                    <td class="text-right"><span class="white-color small">{{ translate('Order ID') }} : </span> <span
+                        class="strong white-color strong"><b class="white-color">{{ $order->code }}</b></span></td>
                 </tr>
                 <tr>
                     <td class="white-color small">{{ get_setting('contact_address') }}</td>
-                    <td class="text-right"></td>
+                    <td class="text-right"><span class="white-color small">{{ translate('Order Date') }} : </span>
+                        <span class="white-color strong"><b class="white-color">{{ date('d-m-Y', $order->date) }}</b></span></td>
+                </tr>
+                {{-- <tr>
+                    <td class="white-color small"></td>
+                    <td class="text-right small"></td>
                 </tr>
                 <tr>
                     <td class="white-color small"></td>
-                    <td class="text-right small"><span class="white-color small">{{ translate('Order ID') }} : </span> <span
-                            class="strong white-color strong"><b class="white-color">{{ $order->code }}</b></span></td>
-                </tr>
-                <tr>
-                    <td class="white-color small"></td>
-                    <td class="text-right small"><span class="white-color small">{{ translate('Order Date') }} : </span>
-                        <span class="white-color strong"><b class="white-color">{{ date('d-m-Y', $order->date) }}</b></span>
+                    <td class="text-right small">
                     </td>
-                </tr>
+                </tr> --}}
             </table>
 
         </div>
