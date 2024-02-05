@@ -30,6 +30,10 @@
             color: #878f9c;
         }
 
+        .white-color{
+            color:#fff !important;
+        }
+
         table {
             width: 100%;
         }
@@ -87,22 +91,22 @@
             </table>
             <table>
                 <tr>
-                    <td style="font-size: 1.2rem;" class="strong">{{ get_setting('site_name') }}</td>
+                    <td style="font-size: 1.2rem;" class="strong white-color">{{ get_setting('site_name') }}</td>
                     <td class="text-right"></td>
                 </tr>
                 <tr>
-                    <td class="gry-color small">{{ get_setting('contact_address') }}</td>
+                    <td class="white-color small">{{ get_setting('contact_address') }}</td>
                     <td class="text-right"></td>
                 </tr>
                 <tr>
-                    <td class="gry-color small"></td>
-                    <td class="text-right small"><span class="gry-color small">{{ translate('Order ID') }}:</span> <span
-                            class="strong">{{ $order->code }}</span></td>
+                    <td class="white-color small"></td>
+                    <td class="text-right small"><span class="white-color small">{{ translate('Order ID') }}:</span> <span
+                            class="strong white-color">{{ $order->code }}</span></td>
                 </tr>
                 <tr>
-                    <td class="gry-color small"></td>
-                    <td class="text-right small"><span class="gry-color small">{{ translate('Order Date') }}:</span>
-                        <span class=" strong">{{ date('d-m-Y', $order->date) }}</span>
+                    <td class="white-color small"></td>
+                    <td class="text-right small"><span class="white-color small">{{ translate('Order Date') }}:</span>
+                        <span class="white-color strong">{{ date('d-m-Y', $order->date) }}</span>
                     </td>
                 </tr>
             </table>
