@@ -18,6 +18,8 @@ use Illuminate\Http\Request;
 use App\Utility\NotificationUtility;
 use App\Utility\SendSMSUtility;
 use App\Models\Cart;
+use App\Mail\EmailManager;
+use Mail;
 
 class CheckoutController
 {
@@ -467,5 +469,56 @@ class CheckoutController
             // $orderPayments->save();
         }
         return redirect(env('CCA_PAYMENT_CANCEL').'?status='.$order_status.'&code='.$order_code);
+    }
+
+    public function cancelOrderRequest(Request $request){
+        $order_id = $request->order_id ?? '';
+        $reason   = $request->reason ?? '';
+        $user = getUser();
+        if($order_id != ''){
+            $order = Order::find($order_id);
+            if($order){
+                if($order->cancel_request == 0 && $order->delivery_status == "pending"){
+                    $order->cancel_request = 1;
+                    $order->cancel_request_date = date('Y-m-d H:i:s');
+                    $order->cancel_reason = $reason;
+                    $order->save();
+
+                    $array['view'] = 'emails.commonmail';
+                    $array['subject'] = "New Order Cancel Request - ".$order->code;
+                    $array['from'] = env('MAIL_FROM_ADDRESS');
+                    $array['content'] = "<p>Hi,</p>
+                                    <p style='line-height: 25px;'>We have received a new order cancel request. Below are the details of the order:</p>
+                                    <p><b>Order Code : </b>".$order->code."</p>
+                                    <p><b>Customer Name : </b>".$order->user->name ."</p>
+                                    <p style='line-height: 25px;'><b>Reason for cancel: </b>".$reason ."</p>
+                                    <p><b>Cancel Request Date: </b>".date('d-M-Y H:i a')."</p><br>
+                                    <p>Thank you for your cooperation.</p>
+                                    <p>Best regards,</p>
+                                    <p>Team ".env('APP_NAME')."</p>";
+                    Mail::to(env('MAIL_ADMIN'))->queue(new EmailManager($array));
+                    
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Order cancel request send successfully'
+                    ], 200);
+                }else{
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Order cancel request already send'
+                    ], 200);
+                }
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Order not found'
+                ], 200);
+            }
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Order not found'
+            ], 200);
+        }
     }
 }

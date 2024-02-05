@@ -30,6 +30,10 @@ class EmailManager extends Mailable
     {
         return $this->view($this->array['view'])
                     ->from($this->array['from'], env('MAIL_FROM_NAME'))
-                    ->subject($this->array['subject']);
+                    ->subject($this->array['subject'])
+                    ->with([
+                        'content' => $this->array['content'],
+                        'subject' => $this->array['subject'],
+                    ]);
     }
 }
