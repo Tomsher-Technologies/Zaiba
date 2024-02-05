@@ -1635,3 +1635,95 @@ if (!function_exists('load_seo_tags')) {
         }
         return  $attributeArr;
     }
+
+    function reduceProductQuantity($productQuantities){
+        if(!empty($productQuantities)){
+            foreach($productQuantities as $key => $value){
+                $product_stock = ProductStock::where('product_id', $key)->first();
+                $product_stock->qty -= $value;
+                $product_stock->save();
+            }
+        }
+    }
+
+    function getOrderStatusMessage($user, $code){
+        return [
+            'order_placed' => "Hi ".$user.", Greetings from ".env('APP_NAME')."! Your order (".$code.") has been placed successfully.",
+            'confirmed' => "Hi ".$user.", Greetings from ".env('APP_NAME')."! Your order (".$code.") has been confirmed.",
+            'picked_up' => "Hi ".$user.", Greetings from ".env('APP_NAME')."! Your order (".$code.") has been picked up by the delivery agent.",
+            'partial_pick_up' => "Hi ".$user.", Greetings from ".env('APP_NAME')."! Your order (".$code.") has been picked up by the delivery agent.",
+            'cancelled' => "Hi ".$user.", Greetings from ".env('APP_NAME')."! Your order (".$code.") has been cancelled.",
+            'cancel_reject' => "Hi ".$user.", Greetings from ".env('APP_NAME')."! Your order (".$code.") cancel request rejected by admin.",
+            'partial_delivery' => "Hi ".$user.", Greetings from ".env('APP_NAME')."! Your order (".$code.") has been delivered.",
+            'delivered' => "Hi ".$user.", Greetings from ".env('APP_NAME')."! Your order (".$code.") has been delivered.",
+            'order_assign' => "Hi ".$user.", Greetings from ".env('APP_NAME')."! New order (".$code.") delivery has been assigned to you.",
+            'return_assign' => "Hi ".$user.", Greetings from ".env('APP_NAME')."! New return order (".$code.") delivery has been assigned to you.",
+            ];
+    }
+
+    function getOrderStatusMessageTest($user, $code){
+        return [
+            'order_placed' => "Hi $user, Greetings from Farook! Your OTP: ".$code." Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.",
+            'confirmed' => "Hi $user, Greetings from Farook! Your OTP: ".$code." Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.",
+            'picked_up' => "Hi $user, Greetings from Farook! Your OTP: ".$code." Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.",
+            'partial_pick_up' => "Hi $user, Greetings from Farook! Your OTP: ".$code." Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.",
+            'cancelled' => "Hi $user, Greetings from Farook! Your OTP: ".$code." Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.",
+            'cancel_reject' => "Hi $user, Greetings from Farook! Your OTP: ".$code." Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.",
+            'partial_delivery' => "Hi $user, Greetings from Farook! Your OTP: ".$code." Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.",
+            'delivered' => "Hi $user, Greetings from Farook! Your OTP: ".$code." Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.",
+            'order_assign' => "Hi $user, Greetings from Farook! Your OTP: ".$code." Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.",
+            'return_assign' => "Hi $user, Greetings from Farook! Your OTP: ".$code." Treat this as confidential. Sharing this with anyone gives them full access to your Farook Account.",
+            ];
+    }
+
+    function encryptCC($plainText,$key)
+	{
+		$key = hextobin(md5($key));
+		$initVector = pack("C*", 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f);
+		$openMode = openssl_encrypt($plainText, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $initVector);
+		$encryptedText = bin2hex($openMode);
+		return $encryptedText;
+	}
+
+	function decryptCC($encryptedText,$key)
+	{
+		$key = hextobin(md5($key));
+		$initVector = pack("C*", 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f);
+		$encryptedText = hextobin($encryptedText);
+		$decryptedText = openssl_decrypt($encryptedText, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $initVector);
+		return $decryptedText;
+	}
+
+    //*********** Padding Function *********************
+
+	 function pkcs5_pad ($plainText, $blockSize)
+     {
+         $pad = $blockSize - (strlen($plainText) % $blockSize);
+         return $plainText . str_repeat(chr($pad), $pad);
+     }
+ 
+     //********** Hexadecimal to Binary function for php 4.0 version ********
+ 
+     function hextobin($hexString) 
+    { 
+        $length = strlen($hexString); 
+        $binString="";   
+        $count=0; 
+        while($count<$length) 
+        {       
+            $subString =substr($hexString,$count,2);           
+            $packedString = pack("H*",$subString); 
+            if ($count==0)
+        {
+            $binString=$packedString;
+        } 
+            
+        else 
+        {
+            $binString.=$packedString;
+        } 
+            
+        $count+=2; 
+        } 
+        return $binString; 
+    } 

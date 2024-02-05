@@ -92,7 +92,7 @@ class CartController extends Controller
                         foreach ($carts as $key => $cartItem) {
                             $subtotal += $cartItem['offer_price'] * $cartItem['quantity'];
                             $tax += $cartItem['tax'];
-                            $shipping += $cartItem['shipping'] ;
+                            $shipping += $cartItem['shipping_cost'] ;
                         }
 
                         $sum = $subtotal + $tax + $shipping;

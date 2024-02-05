@@ -14,6 +14,7 @@ class Address extends Model
         'country_id',
         'state_id',
         'city_id',
+        'city',
         'longitude',
         'latitude',
         'postal_code',
@@ -33,10 +34,5 @@ class Address extends Model
     public function state()
     {
         return $this->belongsTo(State::class);
-    }
-
-    public function city()
-    {
-        return $this->belongsTo(City::class);
     }
 }
