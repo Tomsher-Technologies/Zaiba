@@ -80,7 +80,7 @@
         @php
             $logo = get_setting('header_logo');
         @endphp
-        <div style="background: #b7e3f978;padding: 1.5rem;">
+        <div style="background: #1f4932;padding: 1.5rem;">
             <table>
                 <tr>
                     <td>
@@ -100,13 +100,13 @@
                 </tr>
                 <tr>
                     <td class="white-color small"></td>
-                    <td class="text-right small"><span class="white-color small">{{ translate('Order ID') }}:</span> <span
-                            class="strong white-color">{{ $order->code }}</span></td>
+                    <td class="text-right small"><span class="white-color small">{{ translate('Order ID') }} : </span> <span
+                            class="strong white-color strong"><b>{{ $order->code }}</b></span></td>
                 </tr>
                 <tr>
                     <td class="white-color small"></td>
-                    <td class="text-right small"><span class="white-color small">{{ translate('Order Date') }}:</span>
-                        <span class="white-color strong">{{ date('d-m-Y', $order->date) }}</span>
+                    <td class="text-right small"><span class="white-color small">{{ translate('Order Date') }} : </span>
+                        <span class="white-color strong"><b>{{ date('d-m-Y', $order->date) }}</b></span>
                     </td>
                 </tr>
             </table>
