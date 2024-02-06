@@ -51,11 +51,15 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
         Route::get('user-profile', [ApiAuthController::class, 'user']);
         Route::post('update-profile', [ApiAuthController::class, 'updateProfile'])->name('update-profile');
         Route::post('change-password', [ApiAuthController::class, 'changePassword'])->name('change-password');
+        
+    
+        Route::get('account', [ProfileController::class, 'getUserAccountInfo']);
+
         Route::post('add-address', [ApiAuthController::class, 'addAddress'])->name('add-address');
         Route::post('update-address', [ApiAuthController::class, 'updateAddress'])->name('update-address');
         Route::post('set-default-address', [ApiAuthController::class, 'setDefaultAddress'])->name('set-default-address');
         Route::post('delete-address', [ApiAuthController::class, 'deleteAddress'])->name('delete-address');
-        Route::get('account', [ProfileController::class, 'getUserAccountInfo']);
+        
     });
 });
 
@@ -97,7 +101,7 @@ Route::group(['middleware' => 'api'], function ($router) {
 
     Route::post('contact-us', [WebsiteController::class, 'contactUs']);
     Route::get('store-locator', [WebsiteController::class, 'storeLocations']);
-    
+
     Route::group(['prefix' => 'website'], function () {
         Route::get('categories', [WebsiteController::class, 'websiteCategories']);
         Route::get('brands', [WebsiteController::class, 'websiteBrands']);
