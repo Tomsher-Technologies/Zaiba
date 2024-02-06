@@ -98,6 +98,8 @@ Route::group(['middleware' => 'api'], function ($router) {
 
     Route::post('contact-us', [WebsiteController::class, 'contactUs']);
     Route::get('store-locator', [WebsiteController::class, 'storeLocations']);
+    Route::get('blogs', [WebsiteController::class, 'blogs']);
+    Route::get('blog-details', [WebsiteController::class, 'blogDetails']);
 
     Route::group(['prefix' => 'website'], function () {
         Route::get('categories', [WebsiteController::class, 'websiteCategories']);

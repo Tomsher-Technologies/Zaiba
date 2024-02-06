@@ -17,6 +17,7 @@ use App\Models\Subscriber;
 use App\Models\HeaderMenus;
 use App\Models\Stores;
 use App\Models\Page;
+use App\Models\Blog;
 use App\Http\Resources\V2\WebHomeCategoryCollection;
 use App\Http\Resources\V2\WebHomeBrandCollection;
 use App\Http\Resources\V2\WebHomeOffersCollection;
@@ -27,6 +28,7 @@ use Illuminate\Http\Request;
 use Cache;
 use Mail;
 use Validator;
+use DB;
 
 class WebsiteController extends Controller
 {
@@ -167,8 +169,6 @@ class WebsiteController extends Controller
             'contact_address' => get_setting('contact_address'),
         ]);
     }
-
-
 
     public function offerDetails(Request $request)
     {
@@ -401,5 +401,38 @@ class WebsiteController extends Controller
             $meta->meta_image   = ($meta->meta_image != NULL) ? uploaded_asset($meta->meta_image) : '';
         }
         return response()->json(['status' => true,"message"=>"Success","data" => $shops,"page_data" => $meta],200);
+    }
+    // DB::raw('CONCAT('.url()."', image) as images))
+
+    public function blogs(Request $request){
+        $limit = $request->limit ? $request->limit : 9;
+        $offset = $request->offset ? $request->offset : 0;
+
+        $blogsQuery = Blog::where('status',1)->orderBy('blog_date','desc')->select('id','title', 'slug', 'description', 'blog_date', 'status', 'seo_title', 'og_title', 'twitter_title', 'seo_description', 'og_description', 'twitter_description', 'keywords',DB::raw("CONCAT('".url('/')."', image) AS image"));
+        
+        $total_count = $blogsQuery->count();
+        $blogs = $blogsQuery->skip($offset)->take($limit)->get();
+        $next_offset = $offset + $limit;
+
+        $meta = Page::where('type', 'blog_list')->select('meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image')->first();
+        
+        if($meta){
+            $meta->meta_image   = ($meta->meta_image != NULL) ? uploaded_asset($meta->meta_image) : '';
+        }
+        return response()->json(['status' => true,"message"=>"Success","data" => $blogs, "total_count" => $total_count, "next_offset" => $next_offset,"page_data" => $meta],200);
+    }
+
+    public function blogDetails(Request $request){
+        $slug = $request->has('slug') ? $request->slug : null;
+        if($slug != null){
+            $blogsQuery = Blog::where('slug', $slug)
+                                ->where('status',1)
+                                ->select('id','title', 'slug', 'description', 'blog_date', 'status', 'seo_title', 'og_title', 'twitter_title', 'seo_description', 'og_description', 'twitter_description', 'keywords',DB::raw("CONCAT('".url('/')."', image) AS image"))
+                                ->orderBy('blog_date','desc')
+                                ->first();
+            return response()->json(['success' => true,"message"=>"Success","data" => $blogsQuery],200);
+        }else{
+            return response()->json(['success' => false,"message"=>"No data","data" => []],200);
+        }
     }
 }

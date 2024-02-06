@@ -377,6 +377,7 @@ class ProfileController extends Controller
             $data['orders'] = $orderList;
             
             $data['next_offset'] = $offset + $limit;
+            $data['total_count'] = $total_count;
 
             return response()->json(['status' => true,'message' => 'Data fetched successfully','data' => $data]);   
         }else{

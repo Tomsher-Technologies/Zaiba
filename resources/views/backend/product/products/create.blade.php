@@ -386,7 +386,7 @@
                                     <select class="form-control aiz-selectpicker" name="video_provider"
                                         id="video_provider">
                                         <option value="youtube">Youtube</option>
-                                        <option value="dailymotion">Dailymotion</option>
+                                        {{-- <option value="dailymotion">Dailymotion</option> --}}
                                         <option value="vimeo">Vimeo</option>
                                     </select>
                                 </div>
