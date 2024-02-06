@@ -396,9 +396,9 @@ class WebsiteController extends Controller
         $shops = Stores::where('status',1)->orderBy('name','asc')->get();
 
         $meta = Page::where('type', 'store_locator')->select('heading1 as title', 'meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image')->first();
-        // $shops['page_data'] = $query;
+        
         if($meta){
-            $meta->meta_image       = ($meta->meta_image != NULL) ? uploaded_asset($meta->meta_image) : '';
+            $meta->meta_image   = ($meta->meta_image != NULL) ? uploaded_asset($meta->meta_image) : '';
         }
         return response()->json(['status' => true,"message"=>"Success","data" => $shops,"page_data" => $meta],200);
     }
