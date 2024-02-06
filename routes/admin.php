@@ -311,6 +311,7 @@ Route::group(['prefix' => env('ADMIN_PREFIX'), 'middleware' => ['auth', 'admin']
     //Blog Section
     Route::resource('blog-category', BlogCategoryController::class);
     Route::get('/blog-category/destroy/{id}', [BlogCategoryController::class, 'destroy'])->name('blog-category.destroy');
+
     Route::resource('blog', BlogController::class);
     Route::get('/blog/destroy/{id}', [BlogController::class, 'destroy'])->name('blog.destroy');
     Route::post('/blog/change-status', [BlogController::class, 'change_status'])->name('blog.change-status');

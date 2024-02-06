@@ -5,11 +5,11 @@
 <div class="aiz-titlebar text-left mt-2 mb-3">
     <div class="row align-items-center">
         <div class="col-auto">
-            <h1 class="h3">{{translate('All Posts')}}</h1>
+            <h1 class="h3">{{translate('All Blogs')}}</h1>
         </div>
         <div class="col text-right">
             <a href="{{ route('blog.create') }}" class="btn btn-circle btn-info">
-                <span>{{translate('Add New Post')}}</span>
+                <span>{{translate('Add New Blog')}}</span>
             </a>
         </div>
     </div>
@@ -20,7 +20,7 @@
     <form class="" id="sort_blogs" action="" method="GET">
         <div class="card-header row gutters-5">
             <div class="col text-center text-md-left">
-                <h5 class="mb-md-0 h6">All blog posts</h5>
+                <h5 class="mb-md-0 h6">All Blogs</h5>
             </div>
             
             <div class="col-md-2">
@@ -36,9 +36,8 @@
                     <tr>
                         <th>#</th>
                         <th>{{translate('Title')}}</th>
-                        <th data-breakpoints="lg">{{translate('Category')}}</th>
-                        <th data-breakpoints="lg">{{translate('Short Description')}}</th>
-                        <th data-breakpoints="lg">{{translate('Status')}}</th>
+                        <th >{{translate('Blog Date')}}</th>
+                        <th >{{translate('Status')}}</th>
                         <th class="text-right">{{translate('Options')}}</th>
                     </tr>
                 </thead>
@@ -52,15 +51,13 @@
                             {{ $blog->title }}
                         </td>
                         <td>
-                            @if($blog->category != null)
-                                {{ $blog->category->category_name }}
+                            @if($blog->blog_date != null)
+                                {{ $blog->blog_date }}
                             @else
                                 --
                             @endif
                         </td>
-                        <td>
-                            {{ $blog->short_description }}
-                        </td>
+                       
                         <td>
                             <label class="aiz-switch aiz-switch-success mb-0">
                                 <input type="checkbox" onchange="change_status(this)" value="{{ $blog->id }}" <?php if($blog->status == 1) echo "checked";?>>

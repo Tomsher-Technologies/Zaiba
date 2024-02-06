@@ -664,10 +664,10 @@
                                         <option value="youtube" <?php if ($product->video_provider == 'youtube') {
                                             echo 'selected';
                                         } ?>>Youtube</option>
-                                        <option value="dailymotion" <?php if ($product->video_provider == 'dailymotion') {
-                                            echo 'selected';
-                                        } ?>>Dailymotion
-                                        </option>
+                                        {{-- <option value="dailymotion" <?php //if ($product->video_provider == 'dailymotion') {
+                                           // echo 'selected';
+                                        //} ?>>Dailymotion
+                                        </option> --}}
                                         <option value="vimeo" <?php if ($product->video_provider == 'vimeo') {
                                             echo 'selected';
                                         } ?>>Vimeo</option>
