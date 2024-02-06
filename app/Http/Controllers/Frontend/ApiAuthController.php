@@ -214,30 +214,30 @@ class ApiAuthController extends Controller
         $user = User::with(['addresses'])->find($request->user());
                     
         if(isset($user[0])){
-            $data['id'] = $user[0]['id'] ?? '';
-            $data['name'] = $user[0]['name'] ?? '';
-            $data['email'] = $user[0]['email'] ?? '';
-            $data['phone'] = $user[0]['phone'] ?? '';
+            $data['id']             = $user[0]['id'] ?? '';
+            $data['name']           = $user[0]['name'] ?? '';
+            $data['email']          = $user[0]['email'] ?? '';
+            $data['phone']          = $user[0]['phone'] ?? '';
             $data['phone_verified'] = $user[0]['is_phone_verified'] ?? '';
-            $dataAddress = $user[0]['addresses'] ?? [];
+            $dataAddress            = $user[0]['addresses'] ?? [];
             $address = [];
             if($dataAddress){
                 foreach($dataAddress as $adds){
                     $address[] = [
-                        'id'=>$adds['id'],
-                        'name'=>$adds['name'],
-                        'address'=>$adds['address'],
-                        'country_id'=>$adds['country_id'],
-                        'country_name'=>$adds['country']['name'],
-                        'state_id'=>$adds['state_id'],
-                        'state_name'=>$adds['state']['name'],
-                        'city_id'=>$adds['city_id'],
-                        'city_name'=>$adds['city']['name'],
-                        'postal_code'=>$adds['postal_code'],
-                        'latitude'=>$adds['latitude'],
-                        'longitude'=>$adds['longitude'],
-                        'phone'=>$adds['phone'],
-                        'is_default'=>$adds['set_default']
+                        'id'            => $adds['id'],
+                        'type'          => $adds['type'],
+                        'name'          => $adds['name'],
+                        'address'       => $adds['address'],
+                        'country_id'    => $adds['country_id'],
+                        'country_name'  => ($adds['country_id'] != NULL) ? $adds['country']['name'] : $adds['country_name'],
+                        'state_id'      => $adds['state_id'],
+                        'state_name'    => ($adds['state_id'] != NULL) ? $adds['state']['name'] : $adds['state_name'],
+                        'city_id'       => $adds['city_id'],
+                        'city_name'     => $adds['city'],
+                        'latitude'      => $adds['latitude'],
+                        'longitude'     => $adds['longitude'],
+                        'phone'         => $adds['phone'],
+                        'is_default'    => $adds['set_default']
                     ];
                 }
             }
