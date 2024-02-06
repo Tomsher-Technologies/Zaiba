@@ -15,6 +15,8 @@ use App\Models\Frontend\Banner;
 use App\Models\Frontend\HomeSlider;
 use App\Models\Subscriber;
 use App\Models\HeaderMenus;
+use App\Models\Stores;
+use App\Models\Page;
 use App\Http\Resources\V2\WebHomeCategoryCollection;
 use App\Http\Resources\V2\WebHomeBrandCollection;
 use App\Http\Resources\V2\WebHomeOffersCollection;
@@ -388,5 +390,16 @@ class WebsiteController extends Controller
         Mail::to(env('MAIL_ADMIN'))->queue(new ContactEnquiry($con));
 
         return response()->json(['status' => true,"message"=>"Thank you for getting in touch. Our team will contact you shortly.","data" => []],200);
+    }
+
+    public function storeLocations(){
+        $shops = Stores::where('status',1)->orderBy('name','asc')->get();
+
+        $meta = Page::where('type', 'store_locator')->select('heading1 as title', 'meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image')->first();
+        // $shops['page_data'] = $query;
+        if($meta){
+            $meta->meta_image       = ($meta->meta_image != NULL) ? uploaded_asset($meta->meta_image) : '';
+        }
+        return response()->json(['status' => true,"message"=>"Success","data" => $shops,"page_data" => $meta],200);
     }
 }

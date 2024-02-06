@@ -61,14 +61,14 @@
                                         </div>
                                     @endif
                                 </div>
-
+{{-- 
                                 {!! NoCaptcha::display() !!}
 
                                 @if ($errors->has('g-recaptcha-response'))
                                     <span class="invalid-feedback d-block" style="font-size: 14px" role="alert">
                                         <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
                                     </span>
-                                @endif
+                                @endif --}}
 
                                 <button type="submit" class="btn btn-primary btn-lg btn-block mt-2">
                                     Login
