@@ -11,6 +11,8 @@ use App\Models\CustomerPackage;
 use App\Models\Upload;
 use App\Models\Translation;
 use App\Models\City;
+use App\Models\State;
+use App\Models\Country;
 use App\Models\GoldPrices;
 use App\Utility\CategoryUtility;
 use App\Models\Wallet;
@@ -1727,3 +1729,49 @@ if (!function_exists('load_seo_tags')) {
         } 
         return $binString; 
     } 
+
+    function getCountryId($countryid){
+        $country = Country::where('name','LIKE','%'.$countryid.'%')->pluck('id')->toArray();
+        if(!empty($country)){
+            return $country[0];
+        }else{
+            return NULL;
+        }
+    }
+    
+    function getStateId($stateid){
+        $state = State::where('name','LIKE','%'.$stateid.'%')->pluck('id')->toArray();
+        if(!empty($state)){
+            return $state[0];
+        }else{
+            return NULL;
+        }
+    }
+    
+    function userDefaultAddress($user_id){
+        if($user_id != ''){
+            $data = Address::where('user_id', $user_id)->where('set_default',1)->first();
+            $address = [];
+            if($data){
+                $address = [
+                    'id'      =>(int) $data->id,
+                    'user_id' =>(int) $data->user_id,
+                    'type' => $data->type,
+                    'name' => $data->name,
+                    'address' => $data->address,
+                    'country_id' => (int)  $data->country_id,
+                    'state_id' =>  (int) $data->state_id,                  
+                    'country' => ($data->country_id != NULL) ? $data->country->name : $data->country_name,
+                    'state' => ($data->state_id != NULL) ? $data->state->name : $data->state_name,
+                    'city' => $data->city,
+                    'postal_code' => $data->postal_code,
+                    'phone' => $data->phone,
+                    'set_default' =>(int) $data->set_default,
+                    'lat' => $data->latitude,
+                    'lang' => $data->longitude,
+                ];
+            }
+            return $address;
+        }
+        return array();
+    }
