@@ -426,6 +426,15 @@
                     </li>
                 @endif
 
+                @if (userHasPermision(21))
+                    <li class="aiz-side-nav-item">
+                        <a href="{{ route('admin.stores.index') }}"
+                            class="aiz-side-nav-link {{ areActiveRoutes(['admin.stores.index','admin.stores.create','admin.stores.edit']) }}">
+                            <i class="las la-store aiz-side-nav-icon"></i>
+                            <span class="aiz-side-nav-text">Stores</span>
+                        </a>
+                    </li>
+                @endif
 
                 <!-- Staffs -->
                 @if (userHasPermision(20))

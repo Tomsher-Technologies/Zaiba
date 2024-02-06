@@ -51,6 +51,7 @@ use App\Http\Controllers\TaxController;
 use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\DesignsController;
+use App\Http\Controllers\StoresController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Frontend\HomeSliderController;
 use App\Http\Controllers\Admin\TempImageController;
@@ -433,4 +434,10 @@ Route::group(['prefix' => env('ADMIN_PREFIX'), 'middleware' => ['auth', 'admin']
     Route::post('/products/add-attributes', [ProductController::class, 'get_attribute_values'])->name('products.add-attributes');
 
     Route::get('/product-prices', [ProductController::class, 'updateAllPrices']);
+
+    // Manage Store
+    Route::resource('stores', StoresController::class, ['as' => 'admin']);
+    Route::post('/stores/delete/', [StoresController::class, 'delete'])->name('admin.stores.delete');
+    Route::get('/stores/edit/{id}', [StoresController::class, 'edit'])->name('admin.stores.edit');
+    Route::post('/stores/update/{id}', [StoresController::class, 'update'])->name('admin.stores.update');
 });

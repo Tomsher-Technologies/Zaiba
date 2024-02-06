@@ -96,6 +96,7 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::apiResource('cart', CartController::class)->only('index', 'store', 'destroy');
 
     Route::post('contact-us', [WebsiteController::class, 'contactUs']);
+    Route::get('store-locator', [WebsiteController::class, 'storeLocations']);
     
     Route::group(['prefix' => 'website'], function () {
         Route::get('categories', [WebsiteController::class, 'websiteCategories']);
