@@ -141,7 +141,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function addresses()
     {
-        return $this->hasMany(Address::class)->with(['country','state','city'])->where('is_deleted',0);
+        return $this->hasMany(Address::class)->with(['country','state']);
     }
 
     public function affiliate_log()
