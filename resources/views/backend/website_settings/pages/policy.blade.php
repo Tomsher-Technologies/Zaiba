@@ -119,8 +119,8 @@
                 </div>
 
                 <div class="text-right">
-                    <button type="submit" class="btn btn-primary">Update Page</button>
-                    <button  class="btn btn-warning"><a href="{{ route('website.pages') }}">Cancel</a></button>
+                    <button type="submit" class="btn btn-info">Update Page</button>
+                    <a href="{{ route('website.pages') }}" class="btn btn-warning">Cancel</a>
                 </div>
             </div>
         </form>
