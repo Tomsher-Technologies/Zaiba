@@ -31,21 +31,30 @@
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Sub Title') }} <span
+                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Heading') }} <span
                             class="text-danger">*</span> </label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" placeholder="{{ translate('Sub Title') }}" name="heading1"
+                        <input type="text" class="form-control" placeholder="{{ translate('Heading') }}" name="heading1"
                             value="{{ $page->heading1 }}">
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Add Content') }} <span
+                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Sub Heading') }} <span
+                            class="text-danger">*</span> </label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" placeholder="{{ translate('Sub Heading') }}" name="sub_heading1"
+                            value="{{ $page->sub_heading1 }}">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Content') }} <span
                             class="text-danger">*</span></label>
                     <div class="col-sm-10">
                         <textarea class="aiz-text-editor form-control" placeholder="{{ translate('Content..') }}"
                             data-buttons='[["font", ["bold", "underline", "italic", "clear"]],["para", ["ul", "ol", "paragraph"]],["style", ["style"]],["color", ["color"]],["table", ["table"]],["insert", ["link", "picture", "video"]],["view", ["fullscreen", "codeview", "undo", "redo"]]]'
-                            data-min-height="300" name="content" required>{!! $page->getTranslation('content') !!}</textarea>
+                            data-min-height="300" name="content" required>{!! $page->content !!}</textarea>
                     </div>
                 </div>
 

@@ -20,6 +20,17 @@
             </div>
             <div class="card-body px-0">
                 <input type="hidden" name="type" value="{{ $page->type }}">
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Title') }} <span
+                            class="text-danger">*</span> </label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" placeholder="{{ translate('Title') }}" name="title"
+                            value="{{ $page->title }}">
+                            <input type="hidden" name="type" value="{{ $page->type }}">
+                    </div>
+                </div>
+                
                 <div class="form-group row">
                     <label class="col-sm-2 col-from-label" for="name">{{ translate('Image') }}</label>
                     <div class="col-sm-10">
