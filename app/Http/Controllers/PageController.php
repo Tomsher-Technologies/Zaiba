@@ -99,9 +99,9 @@ class PageController extends Controller
 
                 return view('backend.website_settings.pages.home_page_edit', compact('page', 'banners', 'current_banners', 'categories', 'brands', 'products'));
             }
-            // elseif($page->type == 'terms_conditions' || $page->type == 'privacy_policy' || $page->type == 'return_refund' || $page->type == 'shipping_delivery'){
-            //     return view('backend.website_settings.pages.edit', compact('page'));
-            // } 
+            elseif($page->type == 'terms_conditions' || $page->type == 'privacy_policy' || $page->type == 'return_refund'){
+                return view('backend.website_settings.pages.policy', compact('page'));
+            } 
             elseif ($page->type == 'product_listing') {
                 return view('backend.website_settings.pages.product_listing', compact('page'));
             }
@@ -139,12 +139,7 @@ class PageController extends Controller
     {
         $page = Page::findOrFail($id);
 
-        // preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->slug))
-
         if (Page::where('id', '!=', $id)->where('type', $request->type)->first() == null) {
-            // if ($page->type == 'custom_page') {
-            
-            // }    
             if($request->has('slug')){
                 $page->slug             = Str::slug($request->slug);
             }
@@ -168,11 +163,15 @@ class PageController extends Controller
             }
 
             if($request->has('sub_heading1')){
-                $page->sub_heading1         = $request->sub_heading1;
+                $page->sub_heading1     = $request->sub_heading1;
             }
 
             if($request->has('sub_heading2')){
-                $page->sub_heading2         = $request->sub_heading2;
+                $page->sub_heading2     = $request->sub_heading2;
+            }
+
+            if($request->has('heading3')){
+                $page->heading3         = $request->heading3;
             }
 
             $page->meta_title           = $request->meta_title;
