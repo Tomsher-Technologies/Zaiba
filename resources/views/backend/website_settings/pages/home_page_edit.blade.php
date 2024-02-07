@@ -93,7 +93,7 @@
                         </div>
                         
                         <div class="text-right">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-info">Update</button>
                         </div>
                     </form>
                 </div>
@@ -193,7 +193,7 @@
                             </div>
                         </div>
                         <div class="text-right">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-info">Update</button>
                         </div>
                     </form>
                 </div>
@@ -287,7 +287,7 @@
                             </button>
                         </div>
                         <div class="text-right">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-info">Update</button>
                         </div>
                     </form>
                 </div>
@@ -344,7 +344,7 @@
                             </div>
                         </div> --}}
                         <div class="text-right">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-info">Update</button>
                         </div>
                     </form>
                 </div>
@@ -667,7 +667,7 @@
                        
                         <div class="text-right">
                             <input type="hidden" name="page_type" value="highlights_section">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-info">Update</button>
                         </div>
                     </form>
                 </div>
@@ -750,7 +750,7 @@
                             </div>
                         </div>
                         <div class="text-right">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-info">Update</button>
                         </div>
                     </form>
                 </div>
@@ -834,7 +834,7 @@
                         </div>
                         
                         <div class="text-right">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-info">Update</button>
                         </div>
                     </form>
                 </div>
@@ -895,7 +895,7 @@
                         </div>
 
                         <div class="text-right">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-info">Update</button>
                         </div>
                     </form>
                 </div>
@@ -1012,7 +1012,7 @@
 
 
                         <div class="text-right">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-info">Update</button>
                         </div>
                     </form>
                 </div>
@@ -1054,7 +1054,7 @@
                        @endfor
                        
                         <div class="text-right">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-info">Update</button>
                         </div>
                     </form>
                 </div>
@@ -1147,7 +1147,7 @@
                         </div>
         
                         <div class="text-right">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-info">Update</button>
                         </div>
                     </div>
                 </form>

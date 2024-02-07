@@ -384,6 +384,7 @@ class WebsiteController extends Controller
         $con->name          = $request->name;
         $con->email         = $request->email;
         $con->phone         = $request->phone;
+        $con->subject       = $request->subject ?? NULL;
         $con->message       = $request->message;
         $con->save();
 
@@ -395,7 +396,7 @@ class WebsiteController extends Controller
     public function storeLocations(){
         $shops = Stores::where('status',1)->orderBy('name','asc')->get();
 
-        $meta = Page::where('type', 'store_locator')->select('heading1 as title', 'meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image')->first();
+        $meta = Page::where('type', 'store_locator')->select('heading1 as title','title as page_heading', 'meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image')->first();
         
         if($meta){
             $meta->meta_image   = ($meta->meta_image != NULL) ? uploaded_asset($meta->meta_image) : '';

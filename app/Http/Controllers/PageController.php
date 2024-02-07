@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Page;
 use App\Models\PageTranslation;
 use App\Models\Product;
+use App\Models\Faqs;
 use Cache;
 use Str;
 
@@ -82,9 +83,10 @@ class PageController extends Controller
     public function edit(Request $request, $id)
     {
         $page_name = $request->page;
-        $page = Page::where('slug', $id)->first();
+        $page = Page::where('type', $id)->first();
+       
         if ($page != null) {
-            if ($page_name == 'home') {
+            if ($page->type == 'home_page') {
                 $banners = Banner::where('status', 1)->get();
                 $current_banners = BusinessSetting::whereIn('type', array('home_banner', 'home_mid_banner', 'home_large_banner'))->get()->keyBy('type');
 
@@ -96,7 +98,30 @@ class PageController extends Controller
                 $brands = Brand::all();
 
                 return view('backend.website_settings.pages.home_page_edit', compact('page', 'banners', 'current_banners', 'categories', 'brands', 'products'));
-            } else {
+            }
+            // elseif($page->type == 'terms_conditions' || $page->type == 'privacy_policy' || $page->type == 'return_refund' || $page->type == 'shipping_delivery'){
+            //     return view('backend.website_settings.pages.edit', compact('page'));
+            // } 
+            elseif ($page->type == 'product_listing') {
+                return view('backend.website_settings.pages.product_listing', compact('page'));
+            }
+            elseif ($page->type == 'blog_list') {
+                return view('backend.website_settings.pages.blog_listing', compact('page'));
+            }
+            elseif ($page->type == 'store_locator') {
+                return view('backend.website_settings.pages.store_locator', compact('page'));
+            }
+            elseif ($page->type == 'about_us') {
+                return view('backend.website_settings.pages.about_us', compact('page'));
+            }
+            elseif ($page->type == 'faq') {
+                $questions = Faqs::orderBy('sort_order','asc')->get();
+                return view('backend.website_settings.pages.faq', compact('page','questions'));
+            }
+            elseif ($page->type == 'contact_us') {
+                return view('backend.website_settings.pages.contact_us', compact('page'));
+            } 
+            else {
                 return view('backend.website_settings.pages.edit', compact('page'));
             }
         }
@@ -116,33 +141,70 @@ class PageController extends Controller
 
         // preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->slug))
 
-        if (Page::where('id', '!=', $id)->where('slug', Str::slug($request->slug))->first() == null) {
+        if (Page::where('id', '!=', $id)->where('type', $request->type)->first() == null) {
             // if ($page->type == 'custom_page') {
             
             // }    
             if($request->has('slug')){
-                $page->slug = Str::slug($request->slug);
+                $page->slug             = Str::slug($request->slug);
             }
             if($request->has('title')){
-                $page->title          = $request->title;
+                $page->title            = $request->title;
             }
             if($request->has('content')){
-                $page->content        = $request->content;
+                $page->content          = $request->content;
             }
 
-            $page->meta_title       = $request->meta_title;
-            $page->meta_description = $request->meta_description;
-            $page->keywords         = $request->keywords;
-            $page->meta_image       = $request->meta_image;
+            if($request->has('heading1')){
+                $page->heading1         = $request->heading1;
+            }
 
-            $page->og_title       = $request->og_title;
-            $page->og_description = $request->og_description;
+            if($request->has('page_image')){
+                $page->image1           = $request->page_image;
+            }
 
-            $page->twitter_title       = $request->twitter_title;
-            $page->twitter_description = $request->twitter_description;
+            if($request->has('heading2')){
+                $page->heading2         = $request->heading2;
+            }
+
+            if($request->has('sub_heading1')){
+                $page->sub_heading1         = $request->sub_heading1;
+            }
+
+            if($request->has('sub_heading2')){
+                $page->sub_heading2         = $request->sub_heading2;
+            }
+
+            $page->meta_title           = $request->meta_title;
+            $page->meta_description     = $request->meta_description;
+            $page->keywords             = $request->keywords;
+            $page->meta_image           = $request->meta_image;
+
+            $page->og_title             = $request->og_title;
+            $page->og_description       = $request->og_description;
+
+            $page->twitter_title        = $request->twitter_title;
+            $page->twitter_description  = $request->twitter_description;
 
             $page->save();
 
+            if($request->type == 'faq'){
+                Faqs::truncate();
+                $data = [];
+                foreach ($request->faq as $value) {
+                    if($value['question'] != '' && $value['answer'] != ''){
+                        $data[] = array(
+                            "question" => $value['question'] ?? NULL,
+                            "answer"   => $value['answer'] ?? NULL,
+                            "sort_order" =>  $value['sort_order'] ?? NULL,
+                        );
+                    }
+                }
+            
+                if(!empty($data)){
+                    Faqs::insert($data);
+                }
+            }
 
             flash(translate('Page has been updated successfully'))->success();
             return redirect()->route('website.pages');

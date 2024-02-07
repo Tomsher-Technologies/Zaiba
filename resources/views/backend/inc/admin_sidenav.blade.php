@@ -430,7 +430,7 @@
                     <li class="aiz-side-nav-item">
                         <a href="{{ route('blog.index') }}"
                             class="aiz-side-nav-link {{ areActiveRoutes(['blog.index','blog.create','blog.edit']) }}">
-                            <i class="las la-store aiz-side-nav-icon"></i>
+                            <i class="las la-blog aiz-side-nav-icon"></i>
                             <span class="aiz-side-nav-text">Blogs</span>
                         </a>
                     </li>
