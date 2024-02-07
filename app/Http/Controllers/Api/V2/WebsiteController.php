@@ -18,6 +18,7 @@ use App\Models\HeaderMenus;
 use App\Models\Stores;
 use App\Models\Page;
 use App\Models\Blog;
+use App\Models\Faqs;
 use App\Http\Resources\V2\WebHomeCategoryCollection;
 use App\Http\Resources\V2\WebHomeBrandCollection;
 use App\Http\Resources\V2\WebHomeOffersCollection;
@@ -434,6 +435,64 @@ class WebsiteController extends Controller
             return response()->json(['success' => true,"message"=>"Success","data" => $blogsQuery],200);
         }else{
             return response()->json(['success' => false,"message"=>"No data","data" => []],200);
+        }
+    }
+
+    public function pageContents(Request $request){
+        $page_type = $request->has('page') ? $request->page : null;
+        $faqs = [];
+        if($page_type){
+            $query = Page::where('type', $page_type);
+
+            if($page_type == 'terms_conditions' || $page_type == 'privacy_policy' || $page_type == 'return_refund'){
+                $query->select('title', 'content', 'meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image');
+            }
+
+            if($page_type == 'store_locator'){
+                $query->select('title', 'heading1', 'meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image');
+            }
+
+            if($page_type == 'blog_list'){
+                $query->select('title', 'meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image');
+            }
+            
+            if($page_type == 'about_us'){
+                $query->select('title', 'heading1 as heading', 'sub_heading1 as sub_heading', 'content', 'image1 as image', 'meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image');
+            }
+
+            if($page_type == 'faq'){
+                $query->select('title', 'image1 as image', 'meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image');
+                $faqs = Faqs::select('question','answer','sort_order')->orderBy('sort_order','asc')->get();
+            }
+            if($page_type == 'contact_us'){
+                $query->select('title', 'heading1 as form_heading', 'sub_heading1 as details_heading', 'content as address', 'heading2 as phone', 'sub_heading2 as email', 'heading3 as working_hours', 'meta_title', 'meta_description', 'keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description', 'meta_image');
+            }
+            
+            $pageData = $query->first();
+
+            if($pageData){
+                $pageData->meta_image       = ($pageData->meta_image != NULL) ? uploaded_asset($pageData->meta_image) : '';
+               
+                if($pageData->image){
+                    $pageData->image       = ($pageData->image != NULL) ? uploaded_asset($pageData->image) : '';
+                }
+            }
+
+            if($page_type == 'faq'){
+                $pageData['faqs'] = $faqs;
+            }
+            // if($page_type == 'contact_us'){
+            //     $pageData['facebook']   = get_setting('facebook_link');
+            //     $pageData['instagram']  = get_setting('instagram_link');
+            //     $pageData['twitter']    = get_setting('twitter_link');
+            //     $pageData['youtube']    = get_setting('youtube_link');
+            //     $pageData['linkedin']   = get_setting('linkedin_link');
+            //     $pageData['whatsapp']   = get_setting('whatsapp_link');
+            //     $pageData['dribbble']   = get_setting('dribbble_link');
+            // }
+            return response()->json(['status' => true,"message"=>"Success","data" => $pageData],200);
+        }else{
+            return response()->json(['status' => false,"message"=>"No data found","data" => []],200);
         }
     }
 }

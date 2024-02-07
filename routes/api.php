@@ -100,6 +100,7 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::get('store-locator', [WebsiteController::class, 'storeLocations']);
     Route::get('blogs', [WebsiteController::class, 'blogs']);
     Route::get('blog-details', [WebsiteController::class, 'blogDetails']);
+    Route::get('page-contents', [WebsiteController::class, 'pageContents']);
 
     Route::group(['prefix' => 'website'], function () {
         Route::get('categories', [WebsiteController::class, 'websiteCategories']);
