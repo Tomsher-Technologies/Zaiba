@@ -390,6 +390,8 @@ Route::group(['prefix' => env('ADMIN_PREFIX'), 'middleware' => ['auth', 'admin']
     Route::post('/shipping_configuration/free_shipping', [BusinessSettingsController::class, 'freeshipping_settings'])->name('shipping_configuration.free_shipping');
     Route::post('/configuration/return', [BusinessSettingsController::class, 'return_settings'])->name('configuration.return_settings');
 
+    Route::post('/configuration/vat', [BusinessSettingsController::class, 'vat_settings'])->name('configuration.vat_settings');
+
     // Route::resource('pages', 'PageController');
     // Route::get('/pages/destroy/{id}', [PageController::class,'destroy'])->name('pages.destroy');
 

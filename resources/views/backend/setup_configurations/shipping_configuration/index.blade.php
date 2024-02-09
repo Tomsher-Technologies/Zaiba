@@ -214,7 +214,37 @@
                 </form>
             </div>
         </div>
+
         <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0 h6">VAT (%)</h5>
+                </div>
+                <form action="{{ route('configuration.vat_settings') }}" method="POST"
+                    enctype="multipart/form-data">
+                    <div class="card-body">
+                        @csrf
+                        <input type="hidden" name="type" value="vat_percentage">
+
+                        <div class="form-group row">
+                            <label class="col-md-4 col-from-label">
+                                Percentage
+                            </label>
+                            <div class="col-md-8">
+                                <input step="0.01" class="form-control" type="number" name="vat_percentage"
+                                    value="{{ get_setting('vat_percentage') ?? 0 }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-0 text-right">
+                            <button type="submit" class="btn btn-sm btn-primary">{{ translate('Save') }}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-6 d-none">
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0 h6">Order Return Time Limit</h5>

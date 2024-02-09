@@ -694,4 +694,18 @@ class BusinessSettingsController extends Controller
         Artisan::call('cache:clear');
         return back();
     }
+
+    public function vat_settings(Request $request)
+    {
+        BusinessSetting::updateOrCreate([
+            'type' => 'vat_percentage'
+        ], [
+            'value' => $request->vat_percentage ?? 0
+        ]);
+
+        flash(translate('Settings updated successfully'))->success();
+
+        Artisan::call('cache:clear');
+        return back();
+    }
 }

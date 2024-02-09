@@ -58,7 +58,7 @@
                         <th>Name</th>
                         <th >Parent Category</th>
                         {{-- <th >Link</th> --}}
-                        <th class="text-center">Order Level</th>
+                        <th class="text-center">Slug</th>
                         {{-- <th data-breakpoints="lg">Level</th> --}}
                         <th >Banner</th>
                         <th >Icon</th>
@@ -82,7 +82,7 @@
                                 @endif
                             </td>
                            
-                            <td class="text-center">{{ $category->order_level }}</td>
+                            <td class="text-center">{{ $category->slug }}</td>
                             {{-- <td>{{ $category->level }}</td> --}}
                             <td>
                                 @if ($category->banner != null)
