@@ -91,8 +91,8 @@
                         </div>
 
                         <div class="form-group mb-3 text-right">
-                            <button type="submit" class="btn btn-primary">Save</button>
-                            <a href="{{ route('designs.index') }}" class="btn btn-danger radius-50">Cancel</a>
+                            <button type="submit" class="btn btn-info">Save</button>
+                            <a href="{{ route('designs.index') }}" class="btn btn-warning radius-50">Cancel</a>
                         </div>
                     </form>
                 </div>

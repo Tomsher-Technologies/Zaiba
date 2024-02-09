@@ -5,7 +5,7 @@
     <div class="card">
         <div class="card-header">
             <h1 class="h2 fs-16 mb-0">Order Details</h1>
-            <a class="btn btn-primary" href="{{ Session::has('last_url') ? Session::get('last_url') : route('cancel_requests.index') }}" >Go Back</a>
+            <a class="btn btn-info" href="{{ Session::has('last_url') ? Session::get('last_url') : route('cancel_requests.index') }}" >Go Back</a>
         </div>
         <div class="card-body">
             <div class="row gutters-5">

@@ -204,7 +204,8 @@
                         </div>
                     </div> --}}
                         <div class="form-group mb-0 text-right">
-                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="submit" class="btn btn-info">Save</button>
+                            <a href="{{ route('categories.index') }}" class="btn btn-warning radius-50">Cancel</a>
                         </div>
                     </form>
                 </div>
