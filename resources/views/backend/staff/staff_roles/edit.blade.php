@@ -116,6 +116,20 @@
                                     </label>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <label class="col-from-label">Order Cancel Requests</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="aiz-switch aiz-switch-success mb-0">
+                                        <input type="checkbox" name="permissions[]" class="form-control demo-sw"
+                                            value="4" {{ in_array(4, $permissions) ? 'checked' : '' }}>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-10">
                                     <label class="col-from-label">Product Enquiry</label>

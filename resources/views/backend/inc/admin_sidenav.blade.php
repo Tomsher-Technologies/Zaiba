@@ -118,14 +118,22 @@
                                     </a>
                                 </li>
                             @endif
-                            @if (userHasPermision(28))
+                            @if (userHasPermision(4))
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{ route('cancel_requests.index') }}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['cancel_requests.index', 'cancel_orders.show']) }}">
+                                        <span class="aiz-side-nav-text">Cancel Requests</span>
+                                    </a>
+                                </li>
+                            @endif
+                            {{-- @if (userHasPermision(28))
                                 <li class="aiz-side-nav-item">
                                     <a href="{{ route('enquiries.index') }}"
                                         class="aiz-side-nav-link {{ areActiveRoutes(['enquiries.index', 'enquiries.show']) }}">
                                         <span class="aiz-side-nav-text">Product Enquiry</span>
                                     </a>
                                 </li>
-                            @endif
+                            @endif --}}
                         </ul>
                     </li>
                 @endif
@@ -234,11 +242,11 @@
                                     </li>
                                 @endif
                             @endif --}}
-                            <li class="aiz-side-nav-item">
+                            {{-- <li class="aiz-side-nav-item">
                                 <a href="{{ route('subscribers.index') }}" class="aiz-side-nav-link">
                                     <span class="aiz-side-nav-text">Subscribers</span>
                                 </a>
-                            </li>
+                            </li> --}}
                             <li class="aiz-side-nav-item">
                                 <a href="{{ route('coupon.index') }}"
                                     class="aiz-side-nav-link {{ areActiveRoutes(['coupon.index', 'coupon.create', 'coupon.edit']) }}">
@@ -282,11 +290,11 @@
                                     <span class="aiz-side-nav-text">Pages</span>
                                 </a>
                             </li>
-                            <li class="aiz-side-nav-item">
+                            {{-- <li class="aiz-side-nav-item">
                                 <a href="{{ route('website.appearance') }}" class="aiz-side-nav-link">
                                     <span class="aiz-side-nav-text">Appearance</span>
                                 </a>
-                            </li>
+                            </li> --}}
                             <li class="aiz-side-nav-item">
                                 <a href="{{ route('home-slider.index') }}"
                                     class="aiz-side-nav-link {{ areActiveRoutes(['home-slider.index', 'home-slider.create', 'home-slider.edit']) }}">

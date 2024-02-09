@@ -29,6 +29,7 @@ use App\Mail\InvoiceEmailManager;
 use App\Utility\NotificationUtility;
 // use CoreComponentRepository;
 use App\Utility\SmsUtility;
+use App\Utility\SendSMSUtility;
 
 class OrderController extends Controller
 {
@@ -107,6 +108,73 @@ class OrderController extends Controller
             ->get();
 
         return view('backend.sales.all_orders.show', compact('order', 'delivery_boys'));
+    }
+
+    public function allCancelRequests(Request $request){
+        $request->session()->put('last_url', url()->full());
+        $search         = ($request->has('search')) ? $request->search : '';
+        $ca_search      = ($request->has('ca_search')) ? $request->ca_search : '';
+        $date           = ($request->has('date')) ? $request->date : ''; //
+        $refund_search  = ($request->has('refund_search')) ? $request->refund_search : '';
+
+        $orders = Order::where('cancel_request',1)->orderBy('cancel_request_date','DESC');
+        if($search){
+            $orders = $orders->where('code', 'like', '%' . $search . '%');
+        }
+        if($ca_search){
+            $ca_search = ($ca_search == 10) ? 0 : $ca_search;
+            $orders = $orders->where('cancel_approval', $ca_search);
+        }
+
+        if ($date != null) {
+            $orders = $orders->whereDate('cancel_request_date', '>=', date('Y-m-d', strtotime(explode(" to ", $date)[0])))->whereDate('cancel_request_date', '<=', date('Y-m-d', strtotime(explode(" to ", $date)[1])));
+        }
+        if ($refund_search) {
+            $orders = $orders->where('cancel_refund_type', $refund_search);
+        }
+
+        $orders = $orders->paginate(15);
+        // echo '<pre>';
+        // print_r($orders);
+        // die;
+        return view("backend.sales.cancel_requests",compact('orders', 'search', 'ca_search', 'date', 'refund_search'));
+    }
+
+    public function cancelRequestStatus(Request $request){
+        $id = $request->id;
+        $status = $request->status;
+        
+        $cancel_request = Order::findOrFail($id);
+        if($cancel_request->cancel_request == 1 ){
+
+            $message = getOrderStatusMessageTest($cancel_request->user->name, $cancel_request->code);
+            $userPhone = $cancel_request->user->phone ?? '';
+
+            $cancel_request->cancel_approval = $status;
+            if($status == 1){
+                $cancel_request->delivery_status = 'cancelled';
+                
+                if($userPhone != '' && isset($message['cancelled']) && $message['cancelled'] != ''){
+                    SendSMSUtility::sendSMS($userPhone, $message['cancelled']);
+                }
+            }else{
+                if($userPhone != '' && isset($message['cancel_reject']) && $message['cancel_reject'] != ''){
+                    SendSMSUtility::sendSMS($userPhone, $message['cancel_reject']);
+                }
+            }
+            $cancel_request->cancel_approval_date = date('Y-m-d H:i:s');
+            $cancel_request->save(); 
+            
+            echo 1;
+        }else{
+            echo 0;
+        }
+     }
+
+     public function cancel_orders_show($id)
+    {
+        $order = Order::findOrFail(decrypt($id));
+        return view('backend.sales.cancel_orders_show', compact('order'));
     }
 
     // Inhouse Orders

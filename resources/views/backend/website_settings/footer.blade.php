@@ -10,7 +10,7 @@
         </div>
     </div>
     <ul class="nav nav-tabs nav-fill border-light">
-        @foreach (\App\Models\Language::all() as $key => $language)
+        {{-- @foreach (\App\Models\Language::all() as $key => $language)
             <li class="nav-item">
                 <a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
                     href="{{ route('website.footer', ['lang' => $language->code]) }}">
@@ -18,7 +18,7 @@
                     <span>{{ $language->name }}</span>
                 </a>
             </li>
-        @endforeach
+        @endforeach --}}
     </ul>
     <div class="card">
         <div class="card-header">
@@ -26,7 +26,7 @@
         </div>
         <div class="card-body">
             <div class="row gutters-10">
-                <div class="col-lg-6">
+                <div class="col-lg-6 d-none">
                     <div class="card shadow-none bg-light">
                         <div class="card-header">
                             <h6 class="mb-0">About Widget</h6>
@@ -76,7 +76,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-6 mx-auto">
                     <div class="card shadow-none bg-light">
                         <div class="card-header">
                             <h6 class="mb-0">Contact Info Widget</h6>
