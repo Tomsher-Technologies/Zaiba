@@ -9,7 +9,7 @@ return
         'creator'               => 'Laravel Pdf',
         'display_mode'          => 'fullpage',
         'tempDir'               => base_path('temp/'),
-        'font_path' => base_path('public/assets/fonts/'),
+        'font_path' => base_path('public/admin_assets/assets/fonts/'),
         'font_data' => [
             'roboto' => [
                 'R'  => 'Roboto-Regular.ttf',    // regular font

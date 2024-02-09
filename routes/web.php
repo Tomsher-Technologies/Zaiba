@@ -296,7 +296,7 @@ Route::group(['middleware' => ['auth']], function () {
     // Route::post('/products/published', [ProductController::class,'updatePublished'])->name('products.published');
     // Route::post('/products/add-more-choice-option', [ProductController::class,'add_more_choice_option'])->name('products.add-more-choice-option');
 
-    Route::get('invoice/{order_id}', [InvoiceController::class, 'invoice_download'])->name('invoice.download');
+    // Route::get('invoice/{order_id}', [InvoiceController::class, 'invoice_download'])->name('invoice.download');
 
     Route::resource('orders', OrderController::class);
     Route::get('/orders/destroy/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');

@@ -1,192 +1,234 @@
+<!DOCTYPE html>
 <html>
+
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{  translate('INVOICE') }}</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <meta charset="UTF-8">
-	<style media="all">
-        @page {
-			margin: 0;
-			padding:0;
-		}
-		body{
-			font-size: 0.875rem;
-            font-family: '<?php echo  $font_family ?>';
-            font-weight: normal;
-            direction: <?php echo  $direction ?>;
-            text-align: <?php echo  $text_align ?>;
-			padding:0;
-			margin:0; 
-		}
-		.gry-color *,
-		.gry-color{
-			color:#000;
-		}
-		table{
-			width: 100%;
-		}
-		table th{
-			font-weight: normal;
-		}
-		table.padding th{
-			padding: .25rem .7rem;
-		}
-		table.padding td{
-			padding: .25rem .7rem;
-		}
-		table.sm-padding td{
-			padding: .1rem .7rem;
-		}
-		.border-bottom td,
-		.border-bottom th{
-			border-bottom:1px solid #eceff4;
-		}
-		.text-left{
-			text-align:<?php echo  $text_align ?>;
-		}
-		.text-right{
-			text-align:<?php echo  $not_text_align ?>;
-		}
-	</style>
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            margin: 0;
+            /* padding: 20px; */
+        }
+
+        .invoice {
+            width: 100%;
+            /* margin: 0 auto; */
+            /* border: 1px solid #ccc; */
+            /* padding: 20px; */
+            /* border-radius: 6px; */
+
+        }
+
+        .invoice-header {
+            width: 100%;
+            height: 50px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .invoice-header h1 {
+            margin: 0;
+            width: 50%;
+            float: right;
+            text-align: right;
+        }
+
+        .invoice-info {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 35px;
+            height: 70px;
+        }
+
+        .invoice-info-left {
+            text-align: left;
+            width: 50%;
+            float: left;
+        }
+
+        .invoice-info-right {
+            width: 50%;
+            text-align: right;
+            float: right;
+
+        }
+
+        .invoice-address {
+            width: 100%;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            height: 250px;
+        }
+
+        .invoice-address p {
+            margin: 5px 0;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+
+        }
+
+        .invoice-table th,
+        .invoice-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .invoice-total {
+            text-align: right;
+        }
+
+        .invoice-logo {
+            /* width: 50%; */
+            /* max-width: 150px; */
+            margin-right: 20px;
+            float: left;
+            text-align: left;
+        }
+
+        .invoice-table .theader {
+            background: #f5f6fa;
+
+        }
+
+        th {
+            padding: 10px 15px;
+            line-height: 1.55em;
+        }
+
+        td {
+            padding: 10px 15px;
+            line-height: 1.55em;
+        }
+    </style>
 </head>
+
 <body>
-	<div>
+    <div class="invoice">
+        <div class="invoice-header">
+            <img width="140" src="{{ $imagePath }}" alt="Logo" class="invoice-logo">
+            <h1>Invoice</h1>
+        </div>
 
-		@php
-			$logo = get_setting('header_logo');
-		@endphp
+        <div class="invoice-info">
+            <div class="invoice-info-left">
+                <strong>Invoice Number:</strong> {{ $order->code }} <br>
+                <hr style="border: 0.5px solid #eee">
+                <strong>Payment Method:</strong> {{ ucfirst(str_replace('_', ' ', $order->payment_type)) }}
+                <br>
+                <hr style="border: 0.5px solid #eee">
+                <strong>Shipping Method:</strong> {{ ucfirst(str_replace('_', ' ', $order->shipping_type)) }}
+            </div>
 
-		<div style="background: #eceff4;padding: 1rem;">
-			<table>
-				<tr>
-					<td>
-						@if($logo != null)
-							<img src="{{ uploaded_asset($logo) }}" height="30" style="display:inline-block;">
-						@else
-							<img src="{{ static_asset('assets/img/logo.png') }}" height="30" style="display:inline-block;">
-						@endif
-					</td>
-					<td style="font-size: 1.5rem;" class="text-right strong">{{  translate('INVOICE') }}</td>
-				</tr>
-			</table>
-			<table>
-				<tr>
-					<td style="font-size: 1rem;" class="strong">{{ get_setting('site_name') }}</td>
-					<td class="text-right"></td>
-				</tr>
-				<tr>
-					<td class="gry-color small">{{ get_setting('contact_address') }}</td>
-					<td class="text-right"></td>
-				</tr>
-				<tr>
-					<td class="gry-color small">{{  translate('Email') }}: {{ get_setting('contact_email') }}</td>
-					<td class="text-right small"><span class="gry-color small">{{  translate('Order ID') }}:</span> <span class="strong">{{ $order->code }}</span></td>
-				</tr>
-				<tr>
-					<td class="gry-color small">{{  translate('Phone') }}: {{ get_setting('contact_phone') }}</td>
-					<td class="text-right small"><span class="gry-color small">{{  translate('Order Date') }}:</span> <span class=" strong">{{ date('d-m-Y', $order->date) }}</span></td>
-				</tr>
-			</table>
+            <div class="invoice-info-right">
+                <strong>Date:</strong> {{ date('d M Y, h:i:a', $order->date) }} <br>
+                <hr style="border: 0.5px solid #eee">
+                <strong>Delivery Status:</strong>
+                {{ ucfirst(str_replace('_', ' ', $order->delivery_status)) }} <br>
+                <hr style="border: 0.5px solid #eee">
+                <strong>&nbsp;</strong>
+            </div>
+        </div>
 
-		</div>
+        <hr style="border: 0.5px solid #eee">
 
-		<div style="padding: 1rem;padding-bottom: 0">
-            <table>
-				@php
-					$shipping_address = json_decode($order->shipping_address);
-				@endphp
-				<tr><td class="strong small gry-color">Bill to:</td></tr>
-				<tr><td class="strong">{{ $shipping_address->name }}</td></tr>
-				<tr><td class="gry-color small">{{ $shipping_address->address }}, {{ $shipping_address->city }}, {{ $shipping_address->postal_code }}, {{ $shipping_address->country }}</td></tr>
-				<tr><td class="gry-color small">Email: {{ $shipping_address->email }}</td></tr>
-				<tr><td class="gry-color small">Phone: {{ $shipping_address->phone }}</td></tr>
-			</table>
-		</div>
+        <div class="invoice-address">
+            <div class="invoice-info-left">
+                <strong>Billing Address:</strong>
+                <p>
+                    @php 
+                        $billingAddress = json_decode($order->billing_address);
+                    @endphp
+                    {{ $billingAddress?->name }} <br>
+                    {{ $billingAddress?->address }}<br>
+                    {{ $billingAddress?->city }}<br>
+                    {{ $billingAddress?->state }}<br>
+                    {{ $billingAddress?->country }}<br>
+                    {{ $billingAddress?->phone }}<br>
+                    {{ $billingAddress?->email }}<br>
+                </p>
+            </div>
+            <div class="invoice-info-left" style="float: right; text-align:right">
+                <strong>Shipping Address:</strong>
+                <p>
+                    @php 
+                        $shippingAddress = json_decode($order->shipping_address);
+                    @endphp
+                    {{ $shippingAddress?->name }}<br>
+                    {{ $shippingAddress?->address }} <br>
+                    {{ $shippingAddress?->city }} <br>
+                    {{ $shippingAddress?->state }} <br>
+                    {{ $shippingAddress?->country }} <br>
+                    {{ $shippingAddress?->phone }} <br>
+                    {{ $shippingAddress?->email }} <br>
+                </p>
+            </div>
+        </div>
 
-	    <div style="padding: 1rem;">
-			<table class="padding text-left small border-bottom">
-				<thead>
-	                <tr class="gry-color" style="background: #eceff4;">
-	                    <th width="35%" class="text-left">Product Name</th>
-						<th width="15%" class="text-left">Delivery Type</th>
-	                    <th width="10%" class="text-left">Qty</th>
-	                    <th width="15%" class="text-left">Unit Price</th>
-	                    <th width="10%" class="text-left">Tax</th>
-	                    <th width="15%" class="text-right">Total</th>
-	                </tr>
-				</thead>
-				<tbody class="strong">
-	                @foreach ($order->orderDetails as $key => $orderDetail)
-		                @if ($orderDetail->product != null)
-							<tr class="">
-								<td>{{ $orderDetail->product->name }} @if($orderDetail->variation != null) ({{ $orderDetail->variation }}) @endif</td>
-								<td>
-									@if ($order->shipping_type != null && $order->shipping_type == 'home_delivery')
-										Home Delivery
-									@elseif ($order->shipping_type == 'pickup_point')
-										@if ($order->pickup_point != null)
-											{{ $order->pickup_point->name }} (Pickip Point)
-										@endif
-									@endif
-								</td>
-								<td class="">{{ $orderDetail->quantity }}</td>
-								<td class="currency">{{ single_price($orderDetail->price/$orderDetail->quantity) }}</td>
-								<td class="currency">{{ single_price($orderDetail->tax/$orderDetail->quantity) }}</td>
-			                    <td class="text-right currency">{{ single_price($orderDetail->price+$orderDetail->tax) }}</td>
-							</tr>
-		                @endif
-					@endforeach
-	            </tbody>
-			</table>
-		</div>
+        <table class="invoice-table">
+            <thead class="theader">
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($order->orderDetails as $key => $orderDetail)
+                    <tr>
+                        <td class="text-start">
+                            <span class="fw-medium">
+                                {{ $orderDetail->product->name }}
+                            </span>
+                            @if ($orderDetail->variation != null)
+                                @php
+                                    $variations = json_decode($orderDetail->variation);
+                                    
+                                @endphp
+                                <ul>
+                                    @foreach($variations as $var)
+                                        <li> {{ $var->name ?? '' }} : {{ $var->value ?? '' }}</li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </td>
+                        <td class="gry-color currency">
+                            @if ($orderDetail->og_price != $orderDetail->offer_price)
+                                <del>{{ single_price($orderDetail->og_price) }}</del> <br>
+                            @endif
+                            {{ single_price($orderDetail->price / $orderDetail->quantity) }}</td>
+                        <td class="gry-color">{{ $orderDetail->quantity }}</td>
+                        <td class="text-right currency">
+                            {{ single_price($orderDetail->price) }}
+                        </td>
+                       
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
 
-	    <div style="padding:0 1.5rem;">
-	        <table class="text-right sm-padding small strong">
-	        	<thead>
-	        		<tr>
-	        			<th width="60%"></th>
-	        			<th width="40%"></th>
-	        		</tr>
-	        	</thead>
-		        <tbody>
-			        <tr>
-			            <td class="text-left">
-                            @php
-                                $removedXML = '<?xml version="1.0" encoding="UTF-8"?>';
-                            @endphp
-                            {!! str_replace($removedXML,"", QrCode::size(100)->generate($order->code)) !!}
-			            </td>
-			            <td>
-					        <table class="text-right sm-padding small strong">
-						        <tbody>
-							        <tr>
-							            <th class="gry-color text-left">Sub Total</th>
-							            <td class="currency">{{ single_price($order->orderDetails->sum('price')) }}</td>
-							        </tr>
-							        <tr>
-							            <th class="gry-color text-left">Shipping Cost</th>
-							            <td class="currency">{{ single_price($order->orderDetails->sum('shipping_cost')) }}</td>
-							        </tr>
-							        <tr class="border-bottom">
-							            <th class="gry-color text-left">Total Tax</th>
-							            <td class="currency">{{ single_price($order->orderDetails->sum('tax')) }}</td>
-							        </tr>
-				                    <tr class="border-bottom">
-							            <th class="gry-color text-left">Coupon Discount</th>
-							            <td class="currency">{{ single_price($order->coupon_discount) }}</td>
-							        </tr>
-							        <tr>
-							            <th class="text-left strong">Grand Total</th>
-							            <td class="currency">{{ single_price($order->grand_total) }}</td>
-							        </tr>
-						        </tbody>
-						    </table>
-			            </td>
-			        </tr>
-		        </tbody>
-		    </table>
-	    </div>
-
-	</div>
+        <div class="invoice-total">
+            <p><strong>Subtotal:</strong> {{ single_price($order->orderDetails->sum('price')) }}</p>
+            <p><strong>Tax:</strong> {{ single_price($order->orderDetails->sum('tax')) }}</p>
+            <p><strong>Discount:</strong> {{ single_price($order->coupon_discount) }}</p>
+            <p><strong>Shipping Charge:</strong> {{ single_price($order->shipping_cost) }}</p>
+            <p><strong>Grand Total:</strong> {{ single_price($order->grand_total) }}</p>
+        </div>
+    </div>
 </body>
+
 </html>

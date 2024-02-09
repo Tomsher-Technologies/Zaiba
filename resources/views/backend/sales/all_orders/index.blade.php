@@ -9,18 +9,7 @@
                 <h5 class="mb-md-0 h6">All Orders</h5>
             </div>
 
-            <div class="dropdown mb-2 mb-md-0">
-                <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
-                    {{translate('Bulk Action')}}
-                </button>
-                <div class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item" href="#" onclick="bulk_delete()"> {{translate('Delete selection')}}</a>
-<!--                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#exampleModal">
-                        <i class="las la-sync-alt"></i>
-                        {{translate('Change Order Status')}}
-                    </a>-->
-                </div>
-            </div>
+            
 
             <!-- Change Status Modal -->
             <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -84,8 +73,8 @@
             <table class="table aiz-table mb-0">
                 <thead>
                     <tr>
-                        <!--<th>#</th>-->
-                        <th>
+                        <th>#</th>
+                        {{-- <th>
                             <div class="form-group">
                                 <div class="aiz-checkbox-inline">
                                     <label class="aiz-checkbox">
@@ -94,13 +83,13 @@
                                     </label>
                                 </div>
                             </div>
-                        </th>
+                        </th> --}}
                         <th>Order Code</th>
-                        <th data-breakpoints="md">Num. of Products</th>
-                        <th data-breakpoints="md">Customer</th>
-                        <th data-breakpoints="md">Amount</th>
-                        <th data-breakpoints="md">Delivery Status</th>
-                        <th data-breakpoints="md">Payment Status</th>
+                        <th >Num. of Products</th>
+                        <th >Customer</th>
+                        <th >Amount</th>
+                        <th >Delivery Status</th>
+                        <th >Payment Status</th>
                         @if (addon_is_activated('refund_request'))
                         <th>Refund</th>
                         @endif
@@ -110,19 +99,10 @@
                 <tbody>
                     @foreach ($orders as $key => $order)
                     <tr>
-    <!--                    <td>
-                            {{ ($key+1) + ($orders->currentPage() - 1)*$orders->perPage() }}
-                        </td>-->
                         <td>
-                            <div class="form-group">
-                                <div class="aiz-checkbox-inline">
-                                    <label class="aiz-checkbox">
-                                        <input type="checkbox" class="check-one" name="id[]" value="{{$order->id}}">
-                                        <span class="aiz-square-check"></span>
-                                    </label>
-                                </div>
-                            </div>
+                            {{ ($key+1) + ($orders->currentPage() - 1)*$orders->perPage() }}
                         </td>
+                       
                         <td>
                             {{ $order->code }}
                         </td>
@@ -172,9 +152,7 @@
                             <a class="btn btn-soft-info btn-icon btn-circle btn-sm" href="{{ route('invoice.download', $order->id) }}" title="Download Invoice">
                                 <i class="las la-download"></i>
                             </a>
-                            <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete" data-href="{{route('orders.destroy', $order->id)}}" title="Delete">
-                                <i class="las la-trash"></i>
-                            </a>
+                           
                         </td>
                     </tr>
                     @endforeach
