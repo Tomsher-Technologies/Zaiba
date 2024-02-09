@@ -76,11 +76,11 @@
                                         <span class="aiz-side-nav-text">Attribute</span>
                                     </a>
                                 </li>
-                                <li class="aiz-side-nav-item">
+                                {{-- <li class="aiz-side-nav-item">
                                     <a href="{{ route('reviews.index') }}" class="aiz-side-nav-link">
                                         <span class="aiz-side-nav-text">Product Reviews</span>
                                     </a>
-                                </li>
+                                </li> --}}
                             @endif
                             @if (userHasPermision(30))
                                 <li class="aiz-side-nav-item">
