@@ -322,7 +322,7 @@
                         <ul class="aiz-side-nav-list level-2">
                             <li class="aiz-side-nav-item">
                                 <a href="{{ route('shipping_configuration.index') }}" class="aiz-side-nav-link">
-                                    <span class="aiz-side-nav-text">Shipping 
+                                    <span class="aiz-side-nav-text">Shipping & VAT
                                         {{-- and Return --}}
                                     </span>
                                 </a>
