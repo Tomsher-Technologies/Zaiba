@@ -86,22 +86,26 @@
                                 enctype="multipart/form-data">
                                 @csrf
                                 <div class="form-group">
-                                    <label>Contact address</label>
-                                    <input type="hidden" name="types[][{{ $lang }}]" value="contact_address">
-                                    <input type="text" class="form-control" placeholder="Address" name="contact_address"
-                                        value="{{ get_setting('contact_address', null, $lang) }}">
+                                    <label>Address</label>
+                                    <input type="hidden" name="types[][{{ $lang }}]" value="footer_address">
+                                    <textarea class="form-control" placeholder="Address" name="footer_address">{{ get_setting('footer_address') }}</textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label>Contact phone</label>
-                                    <input type="hidden" name="types[]" value="contact_phone">
-                                    <input type="text" class="form-control" placeholder="Phone" name="contact_phone"
-                                        value="{{ get_setting('contact_phone') }}">
+                                    <label>Phone</label>
+                                    <input type="hidden" name="types[]" value="footer_phone">
+                                    <input type="text" class="form-control" placeholder="Phone" name="footer_phone"
+                                        value="{{ get_setting('footer_phone') }}">
                                 </div>
                                 <div class="form-group">
-                                    <label>Contact email</label>
-                                    <input type="hidden" name="types[]" value="contact_email">
-                                    <input type="text" class="form-control" placeholder="Email" name="contact_email"
-                                        value="{{ get_setting('contact_email') }}">
+                                    <label>Email</label>
+                                    <input type="hidden" name="types[]" value="footer_email">
+                                    <input type="text" class="form-control" placeholder="Email" name="footer_email"
+                                        value="{{ get_setting('footer_email') }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Working Hours</label>
+                                    <input type="hidden" name="types[][{{ $lang }}]" value="footer_working_hours">
+                                    <textarea class="form-control" placeholder="Working Hours" name="footer_working_hours">{{ get_setting('footer_working_hours') }}</textarea>
                                 </div>
                                 <div class="text-right">
                                     <button type="submit" class="btn btn-primary">Update</button>
@@ -110,7 +114,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-12">
+                <div class="col-lg-12 d-none">
                     <div class="card shadow-none bg-light">
                         <div class="card-header">
                             <h6 class="mb-0">Link Widget One</h6>
@@ -205,7 +209,7 @@
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label>Copyright Text (Translatable)</label>
+                            <label>Copyright Text</label>
                             <input type="hidden" name="types[][{{ $lang }}]" value="frontend_copyright_text">
                             <textarea class="aiz-text-editor form-control" name="frontend_copyright_text"
                                 data-buttons='[["font", ["bold", "underline", "italic"]],["insert", ["link"]],["view", ["undo","redo"]]]'
@@ -220,7 +224,7 @@
                         <h6 class="mb-0">Social Link Widget </h6>
                     </div>
                     <div class="card-body">
-                        <div class="form-group row">
+                        <div class="form-group row d-none">
                             <label class="col-md-2 col-from-label">{{ translate('Show Social Links?') }}</label>
                             <div class="col-md-9">
                                 <label class="aiz-switch aiz-switch-success mb-0">
@@ -231,6 +235,27 @@
                                 </label>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label>Social Links Title</label>
+                            <div class="input-group form-group">
+                                <input type="hidden" name="types[]" value="social_title">
+                                <input type="text" class="form-control" placeholder="" name="social_title"
+                                    value="{{ get_setting('social_title') }}">
+                                
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Social Links Sub Title</label>
+                            <div class="input-group form-group">
+                                <input type="hidden" name="types[]" value="social_sub_title">
+                                <input type="text" class="form-control" placeholder="" name="social_sub_title"
+                                    value="{{ get_setting('social_sub_title') }}">
+                                
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label>Social Links</label>
                             <div class="input-group form-group">

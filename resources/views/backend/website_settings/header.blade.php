@@ -18,7 +18,7 @@
 			<div class="card-body">
 				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
 					@csrf
-					<div class="form-group row">
+					<div class="form-group row d-none">
 	                    <label class="col-md-3 col-from-label">Header Logo</label>
 						<div class="col-md-8">
 		                    <div class=" input-group " data-toggle="aizuploader" data-type="image">
@@ -32,7 +32,7 @@
 		                    <div class="file-preview"></div>
 						</div>
 	                </div>
-                    <div class="form-group row">
+                    <div class="form-group row d-none">
 						<label class="col-md-3 col-from-label">{{translate('Show Language Switcher?')}}</label>
 						<div class="col-md-8">
 							<label class="aiz-switch aiz-switch-success mb-0">
@@ -42,7 +42,7 @@
 							</label>
 						</div>
 					</div>
-                    <div class="form-group row">
+                    <div class="form-group row d-none">
                         <label class="col-md-3 col-from-label">{{translate('Show Currency Switcher?')}}</label>
 						<div class="col-md-8">
 							<label class="aiz-switch aiz-switch-success mb-0">
@@ -52,7 +52,7 @@
 							</label>
 						</div>
 					</div>
-	                <div class="form-group row">
+	                <div class="form-group row d-none">
 						<label class="col-md-3 col-from-label">{{translate('Enable stikcy header?')}}</label>
 						<div class="col-md-8">
 							<label class="aiz-switch aiz-switch-success mb-0">
@@ -62,7 +62,7 @@
 							</label>
 						</div>
 					</div>
-					<div class="border-top pt-3">
+					<div class="border-top pt-3 d-none">
 						<div class="form-group row">
 		                    <label class="col-md-3 col-from-label">Topbar Banner</label>
 							<div class="col-md-8">
@@ -77,7 +77,7 @@
 			                    <div class="file-preview"></div>
 							</div>
 		                </div>
-		                <div class="form-group row">
+		                <div class="form-group row d-none">
 							<label class="col-md-3 col-from-label">{{translate('Topbar Banner Link')}}</label>
 							<div class="col-md-8">
 								<div class="form-group">
@@ -87,7 +87,20 @@
 							</div>
 						</div>
 					</div>
-                    <div class="border-top pt-3">
+
+					<div class=" pt-3">
+                        <div class="form-group row">
+							<label class="col-md-3 col-from-label">{{translate('Help Line Title')}}</label>
+							<div class="col-md-8">
+								<div class="form-group">
+									<input type="hidden" name="types[]" value="helpline_title">
+									<input type="text" class="form-control" placeholder="Help line title" name="helpline_title" value="{{ get_setting('helpline_title') }}">
+								</div>
+							</div>
+						</div>
+                    </div>
+
+                    <div class="">
                         <div class="form-group row">
 							<label class="col-md-3 col-from-label">{{translate('Help line number')}}</label>
 							<div class="col-md-8">
@@ -98,7 +111,8 @@
 							</div>
 						</div>
                     </div>
-					<div class="border-top pt-3">
+
+					<div class="border-top pt-3 d-none">
 						<label class="">{{translate('Header Nav Menu')}}</label>
 						<div class="header-nav-menu">
 							<input type="hidden" name="types[]" value="header_menu_labels">
