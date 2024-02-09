@@ -13,6 +13,7 @@ use App\Models\Translation;
 use App\Models\City;
 use App\Models\State;
 use App\Models\Country;
+use App\Models\Attribute;
 use App\Models\GoldPrices;
 use App\Utility\CategoryUtility;
 use App\Models\Wallet;
@@ -1747,7 +1748,13 @@ if (!function_exists('load_seo_tags')) {
             return NULL;
         }
     }
-    
+    function allAttributes()
+    {
+        return Cache::rememberForever('attributes', function () {
+            return Attribute::all();
+        });
+    }
+
     function userDefaultAddress($user_id){
         if($user_id != ''){
             $data = Address::where('user_id', $user_id)->where('set_default',1)->first();

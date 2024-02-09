@@ -180,6 +180,7 @@ return [
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
+        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         /*
          * Package Service Providers...
          */
@@ -243,7 +244,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
-        'PDF' => niklasravnsborg\LaravelPdf\Facades\Pdf::class,
+        // 'PDF' => niklasravnsborg\LaravelPdf\Facades\Pdf::class,
         'Paystack' => Unicodeveloper\Paystack\Facades\Paystack::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Str' => Illuminate\Support\Str::class,

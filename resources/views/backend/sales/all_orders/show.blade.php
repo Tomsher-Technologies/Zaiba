@@ -69,7 +69,7 @@
                         <input type="text" class="form-control" value="{{ $delivery_status }}" disabled>
                     @endif
                 </div>
-                <div class="col-md-3 ml-auto">
+                <div class="col-md-3 ml-auto d-none">
                     <label for="update_tracking_code">Tracking Code (optional)</label>
                     <input type="text" class="form-control" id="update_tracking_code"
                         value="{{ $order->tracking_code }}">
@@ -79,14 +79,14 @@
                 {!! QrCode::size(100)->generate($order->code) !!}
             </div>
             <div class="row gutters-5">
-                <div class="col text-center text-md-left">
+                <div class="col-sm-12 col-md-6 text-md-left">
                     <address>
                         <strong class="text-main">{{ json_decode($order->shipping_address)->name }}</strong><br>
                         {{ json_decode($order->shipping_address)->email }}<br>
                         {{ json_decode($order->shipping_address)->phone }}<br>
                         {{ json_decode($order->shipping_address)->address }},
                         {{ json_decode($order->shipping_address)->city }},
-                        {{ json_decode($order->shipping_address)->postal_code }}<br>
+                        <br>
                         {{ json_decode($order->shipping_address)->country }}
                     </address>
                     @if ($order->manual_payment && is_array(json_decode($order->manual_payment_data, true)))
@@ -102,8 +102,8 @@
                                 height="100"></a>
                     @endif
                 </div>
-                <div class="col-md-4 ml-auto">
-                    <table>
+                <div class="col-sm-12 col-md-6 float-right">
+                    <table class="float-right">
                         <tbody>
                             <tr>
                                 <td class="text-main text-bold">Order #</td>
@@ -148,15 +148,14 @@
                     <table class="table table-bordered aiz-table invoice-summary">
                         <thead>
                             <tr class="bg-trans-dark">
-                                <th data-breakpoints="lg" class="min-col">#</th>
+                                <th class="min-col">#</th>
                                 <th width="10%">Photo</th>
                                 <th class="text-uppercase">Description</th>
-                                <th data-breakpoints="lg" class="text-uppercase">Delivery Type</th>
-                                <th data-breakpoints="lg" class="min-col text-center text-uppercase">Qty
+                                <th class="min-col text-center text-uppercase">Qty
                                 </th>
-                                <th data-breakpoints="lg" class="min-col text-center text-uppercase">
+                                <th class="min-col text-center text-uppercase">
                                     Price</th>
-                                <th data-breakpoints="lg" class="min-col text-right text-uppercase">
+                                <th class="min-col text-center text-uppercase">
                                     Total</th>
                             </tr>
                         </thead>
@@ -165,44 +164,33 @@
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td>
-                                        @if ($orderDetail->product != null && $orderDetail->product->auction_product == 0)
-                                            <a href="{{ route('product', $orderDetail->product->slug) }}"
-                                                target="_blank"><img height="50"
-                                                    src="{{ uploaded_asset($orderDetail->product->thumbnail_img) }}"></a>
-                                        @elseif ($orderDetail->product != null && $orderDetail->product->auction_product == 1)
-                                            <a href="{{ route('auction-product', $orderDetail->product->slug) }}"
-                                                target="_blank"><img height="50"
-                                                    src="{{ uploaded_asset($orderDetail->product->thumbnail_img) }}"></a>
+                                        @if ($orderDetail->product != null)
+                                            <img height="50" src="{{ uploaded_asset($orderDetail->product->thumbnail_img) }}">
                                         @else
                                             <strong>N/A</strong>
                                         @endif
                                     </td>
                                     <td>
-                                        @if ($orderDetail->product != null && $orderDetail->product->auction_product == 0)
-                                            <strong><a href="{{ route('product', $orderDetail->product->slug) }}"
-                                                    target="_blank"
-                                                    class="text-muted">{{ $orderDetail->product->name }}</a></strong>
-                                            <small>{{ $orderDetail->variation }}</small>
-                                        @elseif ($orderDetail->product != null && $orderDetail->product->auction_product == 1)
-                                            <strong><a href="{{ route('auction-product', $orderDetail->product->slug) }}"
-                                                    target="_blank"
-                                                    class="text-muted">{{ $orderDetail->product->name }}</a></strong>
+                                        @if ($orderDetail->product != null)
+                                            <strong class="text-muted fs-13">{{ $orderDetail->product->name }}</strong>
+                                            {{-- <small> --}}
+                                                @if ($orderDetail->variation != null)
+                                                    @php
+                                                        $variations = json_decode($orderDetail->variation);
+                                                    
+                                                    @endphp
+                                                    <ul>
+                                                        @foreach($variations as $var)
+                                                        <li> {{ $var->name ?? '' }} : <b>{{ $var->value ?? '' }}</b></li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+                                            {{-- </small> --}}
                                         @else
                                             <strong>Product Unavailable</strong>
                                         @endif
                                     </td>
-                                    <td>
-                                        @if ($order->shipping_type != null && $order->shipping_type == 'home_delivery')
-                                            Home Delivery
-                                        @elseif ($order->shipping_type == 'pickup_point')
-                                            @if ($order->pickup_point != null)
-                                                {{ $order->pickup_point->name }}
-                                                (Pickup Point)
-                                            @else
-                                                Pickup Point
-                                            @endif
-                                        @endif
-                                    </td>
+                                   
                                     <td class="text-center">{{ $orderDetail->quantity }}</td>
                                     <td class="text-center">
                                         @if ($orderDetail->og_price)

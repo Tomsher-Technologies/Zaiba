@@ -52,6 +52,7 @@ use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\DesignsController;
 use App\Http\Controllers\StoresController;
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Frontend\HomeSliderController;
 use App\Http\Controllers\Admin\TempImageController;
@@ -288,7 +289,7 @@ Route::group(['prefix' => env('ADMIN_PREFIX'), 'middleware' => ['auth', 'admin']
 
     Route::post('/bulk-order-status', [OrderController::class, 'bulk_order_status'])->name('bulk-order-status');
 
-
+    Route::get('invoice/{order_id}', [InvoiceController::class, 'invoice_download'])->name('invoice.download');
     // Pickup point orders
     // Route::get('orders_by_pickup_point', [OrderController::class, 'pickup_point_order_index'])->name('pick_up_point.order_index');
     // Route::get('/orders_by_pickup_point/{id}/show', [OrderController::class, 'pickup_point_order_sales_show'])->name('pick_up_point.order_show');
