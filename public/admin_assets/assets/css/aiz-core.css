@@ -5979,15 +5979,17 @@ div.footable-loader > span.fooicon:after {
 }
 
 .pagination .active .page-link {
-  background-image: linear-gradient(to right, #ed6ea0, #ec8c69, #f7186a , #FBB03B);
-        background-position: 100% 0;
+  /* background-image: linear-gradient(to right, #ed6ea0, #ec8c69, #f7186a , #FBB03B); */
+    background-image: linear-gradient(to right, #0c432f, #d8bb7f, #0c432f , #dcc28b);
+    background-position: 100% 0;
     moz-transition: all .4s ease-in-out;
     -o-transition: all .4s ease-in-out;
     -webkit-transition: all .4s ease-in-out;
     transition: all .4s ease-in-out;
 }
 .pagination .page-link:hover {
-  background-image: linear-gradient(to right, #ed6ea0, #ec8c69, #f7186a , #FBB03B);
+  /* background-image: linear-gradient(to right, #ed6ea0, #ec8c69, #f7186a , #FBB03B); */
+    background-image: linear-gradient(to right, #0c432f, #d8bb7f, #0c432f , #dcc28b);
     color: #fff;
         background-position: 100% 0;
     moz-transition: all .4s ease-in-out;

@@ -78,6 +78,7 @@ class OrderController extends Controller
     public function all_orders(Request $request)
     {
         //CoreComponentRepository::instantiateShopRepository();
+        $request->session()->put('last_url', url()->full());
 
         $date = $request->date;
         $sort_search = null;

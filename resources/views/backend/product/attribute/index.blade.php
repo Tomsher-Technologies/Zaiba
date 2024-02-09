@@ -75,7 +75,7 @@
 						<input type="text" placeholder="{{ translate('Name')}}" id="name" name="name" class="form-control" required>
 					</div>
 					<div class="form-group mb-3 text-right">
-						<button type="submit" class="btn btn-primary">{{translate('Save')}}</button>
+						<button type="submit" class="btn btn-info">{{translate('Save')}}</button>
 					</div>
 				</form>
 			</div>

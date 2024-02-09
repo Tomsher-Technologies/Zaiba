@@ -222,10 +222,10 @@
                             </label>
                         </td> --}}
                                 <td class="text-center">
-                                    <a class="btn btn-soft-success btn-icon btn-circle btn-sm"
+                                    {{-- <a class="btn btn-soft-success btn-icon btn-circle btn-sm"
                                         href="{{ route('product', $product->slug) }}" target="_blank" title="View">
                                         <i class="las la-eye"></i>
-                                    </a>
+                                    </a> --}}
                                     <a class="btn btn-soft-primary btn-icon btn-circle btn-sm"
                                         href="{{ route('products.edit', ['id' => $product->id, 'lang' => env('DEFAULT_LANGUAGE')]) }}"
                                         title="Edit">

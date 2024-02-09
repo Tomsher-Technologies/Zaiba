@@ -8,7 +8,7 @@
                 <h1 class="h3">All Designs</h1>
             </div>
             <div class="col-md-6 text-md-right">
-                <a href="{{ route('designs.create') }}" class="btn btn-primary">
+                <a href="{{ route('designs.create') }}" class="btn btn-info">
                     <span>Add new design</span>
                 </a>
             </div>

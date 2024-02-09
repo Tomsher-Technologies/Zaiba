@@ -45,7 +45,7 @@
 
                         <div class="col-auto mt-3">
                             <div class="form-group mb-0" style="margin: inherit;">
-                                <button type="submit" class="btn btn-warning">Filter</button>
+                                <button type="submit" class="btn btn-info">Filter</button>
                             </div>
                         </div>
                     </div>

@@ -64,7 +64,7 @@
             </div>
             <div class="col-auto">
                 <div class="form-group mb-0">
-                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <button type="submit" class="btn btn-info">Filter</button>
                 </div>
             </div>
         </div>

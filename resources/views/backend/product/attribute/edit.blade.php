@@ -30,7 +30,7 @@
                   </div>
               </div>
               <div class="form-group mb-0 text-right">
-                  <button type="submit" class="btn btn-primary">{{translate('Save')}}</button>
+                  <button type="submit" class="btn btn-info">{{translate('Save')}}</button>
               </div>
             </form>
         </div>
