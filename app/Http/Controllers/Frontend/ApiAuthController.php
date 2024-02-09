@@ -18,6 +18,7 @@ use App\Models\BusinessSetting;
 use App\Models\Frontend\Banner;
 use App\Models\Page;
 use App\Models\Product;
+use App\Models\GoldPrices;
 use Validator;
 use Hash;
 use Str;
@@ -725,6 +726,46 @@ class ApiAuthController extends Controller
             }
         }
 
-        return response()->json([ 'status' => true, 'message' => 'Success', 'data' => $menus],200);
+        $data['menus'] = $menus;
+
+        $payments = explode(',',get_setting('payment_method_images'));
+        $images = [];
+        if(!empty($payments)){
+            foreach($payments as $pay){
+                $images[] = uploaded_asset($pay);
+            }
+        }
+
+        $gold_rate = GoldPrices::first()?->toArray();
+
+        $data['header_contents'] = [
+            'helpline_title' => get_setting('helpline_title'),
+            'helpline_number' => get_setting('helpline_number'),
+            'gold_rates' => [
+                '18' => $gold_rate['18_k'] ?? 0,
+                '21' => $gold_rate['21_k'] ?? 0,
+                '22' => $gold_rate['22_k'] ?? 0,
+                '24' => $gold_rate['24_k'] ?? 0,
+                'last_updated' => (isset($gold_rate['updated_at'])) ? date('d/m/Y H:i a', strtotime($gold_rate['updated_at'])) : null
+            ]
+        ];
+
+        $data['footer_contents'] = [
+            'social_title'      => get_setting('social_title'),
+            'social_sub_title'  => get_setting('social_sub_title'),
+            'facebook_link'     => get_setting('facebook_link'),
+            'twitter_link'      => get_setting('twitter_link'),
+            'instagram_link'    => get_setting('instagram_link'),
+            'youtube_link'      => get_setting('youtube_link'),
+            'linkedin_link'     => get_setting('linkedin_link'),
+            'whatsapp_link'     => get_setting('whatsapp_link'),
+            'address'           => get_setting('footer_address'),
+            'phone'             => get_setting('footer_phone'),
+            'email'             => get_setting('footer_email'),
+            'working_hours'     => get_setting('footer_working_hours'),
+            'copright'          => get_setting('frontend_copyright_text'),
+            'payment_methods'   => $images
+        ];
+        return response()->json([ 'status' => true, 'message' => 'Success', 'data' => $data],200);
     }
 }
