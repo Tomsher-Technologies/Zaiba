@@ -138,7 +138,7 @@
                                     <td>{{ $key + 1 }}</td>
                                     <td>
                                         @if ($orderDetail->product != null)
-                                            <img height="50" src="{{ uploaded_asset($orderDetail->product->thumbnail_img) }}">
+                                            <img height="50" src="{{ get_product_image($orderDetail->product->thumbnail_img, '300') }}">
                                         @else
                                             <strong>N/A</strong>
                                         @endif
