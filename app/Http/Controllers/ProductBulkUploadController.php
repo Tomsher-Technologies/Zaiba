@@ -61,8 +61,10 @@ class ProductBulkUploadController extends Controller
     public function bulk_upload(Request $request)
     {
         if ($request->hasFile('bulk_file')) {
+            set_time_limit(1800);
             try {
                 $import = new ProductsImport;
+               
                 Excel::import($import, request()->file('bulk_file'));
             } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
                 $failures = $e->failures();
@@ -75,7 +77,7 @@ class ProductBulkUploadController extends Controller
                 }
             }
         }
-
+        // die;
         return back();
     }
 }

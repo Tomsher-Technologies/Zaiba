@@ -43,6 +43,8 @@ class Product extends Model
         'weight',
         'hide_price',
         'part_number',
+        'product_type',
+        'design_id', 'design_category_id', 'metal_type', 'purity', 'tags', 'short_description', 'variant_product', 'attributes', 'published', 'stock_visibility_state', 'featured', 'current_stock', 'min_qty', 'low_stock_quantity', 'discount', 'discount_type', 'discount_start_date', 'discount_end_date', 'num_of_sale', 'pdf', 'rating', 'external_link', 'external_link_btn', 'created_by', 'updated_by'
     ];
 
     // protected $with = ['taxes'];
